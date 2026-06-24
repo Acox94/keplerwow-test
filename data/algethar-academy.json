@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T16:15:33.645Z",
+    "extracted_at": "2026-06-24T16:28:28.744Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2300,7 +2300,7 @@
         },
         {
           "cast_time_ms": 1000,
-          "coaching_note": "The tank stomp also brands the tank with +100% Physical damage taken — the next physical hit on the tank lands DOUBLED. The tank pops a major defensive (or pre-plan an ally external onto them) for that follow-up; don't let another big physical land while the brand is up. (Trading the hit isn't a casual option — it needs a DPS to taunt AND immunity-soak the doubled swing, a high-risk play for experienced groups only.)",
+          "coaching_note": "The tank stomp applies a +100% Physical damage-taken DEBUFF for ~10s. The tank can't dodge the follow-up swings (the boss keeps hitting them) — they have to MITIGATE the window, so use a large damage-reduction cooldown that lasts about as long as the debuff (~10s) to cover the doubled hits. (Trading it out — a DPS taunts and immunity-soaks the doubled swing — is a high-risk, experienced-only alternative, not the default.)",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",

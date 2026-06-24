@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T16:15:33.645Z",
+    "extracted_at": "2026-06-24T16:28:28.744Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -1460,7 +1460,7 @@
         },
         {
           "cast_time_ms": 2500,
-          "coaching_note": "Knocks the primary target and brands them +40% Physical damage taken — the follow-up physical hits land amplified.",
+          "coaching_note": "Knocks the primary target and applies a +40% Physical damage-taken debuff — the follow-up physical hits land amplified (the tank mitigates the window).",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",

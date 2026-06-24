@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T16:15:33.645Z",
+    "extracted_at": "2026-06-24T16:28:28.744Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2446,7 +2446,7 @@
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": "Shards of ice — move out; being hit brands you +50% Frost damage taken (and snares you), so the next Frost hit lands amplified.",
+          "coaching_note": "Shards of ice — move out; being hit applies a +50% Frost damage-taken debuff (and snares you), so the next Frost hit lands amplified.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "Magic",
@@ -2586,7 +2586,7 @@
       "spells": [
         {
           "cast_time_ms": 2500,
-          "coaching_note": "Tyrannus knocks away and brands his target with +200% Shadow damage taken — a follow-up Shadow hit on the branded player can one-shot. Peel/clear or external the branded target before the next Shadow cast lands.",
+          "coaching_note": "Tyrannus knocks away his target (the tank) and applies a +200% Shadow damage-taken debuff. While it's up the tank can't avoid his Shadow follow-up — it lands ~tripled and can one-shot, so MITIGATE the window with a large damage-reduction cooldown / a pre-planned ally external on the tank.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
