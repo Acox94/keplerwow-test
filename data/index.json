@@ -1,0 +1,34 @@
+[
+  {
+    "slug": "algethar-academy",
+    "name": "Algeth'ar Academy"
+  },
+  {
+    "slug": "magisters-terrace",
+    "name": "Magisters' Terrace"
+  },
+  {
+    "slug": "maisara-caverns",
+    "name": "Maisara Caverns"
+  },
+  {
+    "slug": "nexus-point-xenas",
+    "name": "Nexus-Point Xenas"
+  },
+  {
+    "slug": "pit-of-saron",
+    "name": "Pit of Saron"
+  },
+  {
+    "slug": "seat-of-the-triumvirate",
+    "name": "Seat of the Triumvirate"
+  },
+  {
+    "slug": "skyreach",
+    "name": "Skyreach"
+  },
+  {
+    "slug": "windrunner-spire",
+    "name": "Windrunner Spire"
+  }
+]
