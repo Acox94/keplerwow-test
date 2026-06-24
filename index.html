@@ -68,6 +68,16 @@
     }
     button.run:disabled { opacity: .4; cursor: not-allowed; }
 
+    /* ---- comp: 5 role rows, each a dropdown of the role-eligible specs ----- */
+    .comp-row { display: grid; grid-template-columns: 58px 1fr; gap: 10px; align-items: center; margin-bottom: 8px; }
+    .comp-role { font-size: 11px; font-weight: 650; color: var(--ink-dim); text-transform: uppercase; letter-spacing: .5px; }
+    .comp-select {
+      width: 100%; background: var(--panel-2); color: var(--ink); border: 1px solid var(--line);
+      border-radius: 7px; padding: 8px 10px; font-size: 13.5px; font-family: inherit; cursor: pointer;
+    }
+    .comp-select:hover { border-color: var(--accent); }
+    .comp-select:focus { outline: none; border-color: var(--accent); }
+
     /* ---- report ----------------------------------------------------------- */
     #report:empty { display: none; }
     .report-head { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
@@ -107,7 +117,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T06:38:33.002Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T06:55:00.183Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -135,9 +145,8 @@
 
       <section class="panel">
         <h2>Comp</h2>
-        <p class="hint">Pick up to 5 specs.</p>
-        <div class="chips" id="comp-chips"></div>
-        <div class="scroll" id="spec-list"></div>
+        <p class="hint">Build your 5-player group by role.</p>
+        <div id="comp-rows"></div>
       </section>
     </div>
 

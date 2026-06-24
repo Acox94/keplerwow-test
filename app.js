@@ -6021,8 +6021,8 @@ var state = {
   dungeon: null,
   pull: /* @__PURE__ */ new Map(),
   // npc_id -> count
-  comp: [],
-  // spec_ids (max 5)
+  // 5 fixed role slots [Tank, Healer, DPS 1, DPS 2, DPS 3]; null = empty. Engine group = the non-null ones.
+  compSlots: [null, null, null, null, null],
   skill: "experienced"
 };
 var $ = (id) => document.getElementById(id);
@@ -6040,9 +6040,8 @@ async function loadDungeon(slug) {
   const res = await fetch(`./data/${slug}.json`);
   state.dungeon = DungeonExport.parse(await res.json());
   state.pull.clear();
-  seedDefaults(state.dungeon);
   renderCreatures();
-  renderSpecs();
+  renderComp();
   renderChips();
   runAnalysis();
 }
@@ -6051,27 +6050,13 @@ function hasPriorityCast(c) {
     (s) => s.is_interruptible || s.is_stoppable || s.is_lethal || s.requires_interrupt || s.mechanic != null || s.completion_effect != null || s.coaching_note != null || s.dispel_type !== "None"
   );
 }
-function seedDefaults(d) {
-  const threatening = d.creatures.filter(hasPriorityCast).slice(0, 3);
-  for (const c of threatening) state.pull.set(c.npc_id, 1);
-  if (state.comp.length === 0) {
-    const chosen = [];
-    const roles = [
-      (s) => s.party_role === "tank",
-      (s) => s.party_role === "healer",
-      (s) => s.party_role === "melee_dps",
-      (s) => s.party_role === "ranged_dps",
-      (s) => s.role === "DPS"
-    ];
-    for (const want of roles) {
-      const fresh = d.specs.find((s) => want(s) && !chosen.includes(s) && !chosen.some((c) => c.class === s.class));
-      const any = d.specs.find((s) => want(s) && !chosen.includes(s));
-      const pick = fresh ?? any;
-      if (pick) chosen.push(pick);
-    }
-    state.comp = chosen.slice(0, 5).map((s) => s.spec_id);
-  }
-}
+var COMP_SLOTS = [
+  { label: "Tank", eligible: (s) => s.party_role === "tank" },
+  { label: "Healer", eligible: (s) => s.party_role === "healer" },
+  { label: "DPS 1", eligible: (s) => s.role === "DPS" },
+  { label: "DPS 2", eligible: (s) => s.role === "DPS" },
+  { label: "DPS 3", eligible: (s) => s.role === "DPS" }
+];
 var RERELEASE_GAP = 5e4;
 function isStaleDuplicate(c, all) {
   return all.some((d) => d.name === c.name && d.npc_id !== c.npc_id && Math.abs(d.npc_id - c.npc_id) > RERELEASE_GAP && d.spells.length > c.spells.length);
@@ -6102,32 +6087,22 @@ function renderCreatures() {
     };
   });
 }
-function renderSpecs() {
+function renderComp() {
   const d = state.dungeon;
   if (!d) return;
-  const byClass = /* @__PURE__ */ new Map();
-  for (const s of d.specs) {
-    if (!byClass.has(s.class)) byClass.set(s.class, []);
-    byClass.get(s.class).push(s);
-  }
-  const groups = [...byClass.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-  $("spec-list").innerHTML = groups.map(
-    ([cls, specs]) => `<div class="classgroup"><div class="cls">${esc(cls)}</div>${specs.map((s) => {
-      const picked = state.comp.includes(s.spec_id);
-      return `<div class="row ${picked ? "picked" : ""}" data-spec="${s.spec_id}">
-            <span class="name">${esc(s.spec_name)}</span>
-            <span class="meta">${esc(s.party_role.replace("_", " "))}</span>
-          </div>`;
-    }).join("")}</div>`
-  ).join("");
-  $("spec-list").querySelectorAll(".row").forEach((row) => {
-    row.onclick = () => {
-      const id = Number(row.dataset.spec);
-      const i = state.comp.indexOf(id);
-      if (i >= 0) state.comp.splice(i, 1);
-      else if (state.comp.length < 5) state.comp.push(id);
-      renderSpecs();
-      renderChips();
+  $("comp-rows").innerHTML = COMP_SLOTS.map((slot, i) => {
+    const opts = d.specs.filter(slot.eligible).sort((a, b) => `${a.class} ${a.spec_name}`.localeCompare(`${b.class} ${b.spec_name}`));
+    const chosen = state.compSlots[i];
+    const optionTags = opts.map((s) => `<option value="${s.spec_id}"${s.spec_id === chosen ? " selected" : ""}>${esc(s.class)} ${esc(s.spec_name)}</option>`).join("");
+    return `<div class="comp-row">
+      <label class="comp-role">${slot.label}</label>
+      <select class="comp-select" data-slot="${i}"><option value="">\u2014 select \u2014</option>${optionTags}</select>
+    </div>`;
+  }).join("");
+  $("comp-rows").querySelectorAll(".comp-select").forEach((el) => {
+    el.onchange = () => {
+      const i = Number(el.dataset.slot);
+      state.compSlots[i] = el.value ? Number(el.value) : null;
       runAnalysis();
     };
   });
@@ -6148,20 +6123,6 @@ function renderChips() {
       runAnalysis();
     };
   });
-  const specName = (id) => {
-    const s = d.specs.find((x) => x.spec_id === id);
-    return s ? `${s.class} ${s.spec_name}` : `#${id}`;
-  };
-  $("comp-chips").innerHTML = state.comp.map((id) => `<button class="chip spec" data-spec="${id}">${esc(specName(id))}<span class="x">\u2715</span></button>`).join("") || `<span class="hint" style="margin:0">no specs picked yet</span>`;
-  $("comp-chips").querySelectorAll(".chip").forEach((chip) => {
-    chip.onclick = () => {
-      const id = Number(chip.dataset.spec);
-      state.comp = state.comp.filter((x) => x !== id);
-      renderSpecs();
-      renderChips();
-      runAnalysis();
-    };
-  });
   $("analyze").disabled = state.pull.size === 0;
 }
 function runAnalysis() {
@@ -6172,7 +6133,8 @@ function runAnalysis() {
     return;
   }
   const pull = [...state.pull.entries()].map(([npc_id, count]) => ({ npc_id, count }));
-  const report = analyzePull(d, pull, state.comp, { skill: state.skill });
+  const group = state.compSlots.filter((x) => x != null);
+  const report = analyzePull(d, pull, group, { skill: state.skill });
   renderReport(report);
 }
 var SEV_RANK = { critical: 0, warning: 1, caution: 2, info: 3 };
