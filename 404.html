@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T16:44:06.369Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T17:12:33.071Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -1274,7 +1274,7 @@ function dispelGapAdvice(dt, casts) {
     } else if (amHit === null) {
       out[R] = `No ${dt} removal in the comp \u2014 whoever it lands on rides it out (personal / heal-through).`;
     } else {
-      out[R] = `No ${dt} removal in the comp \u2014 it lands on your ${coarseRolePhrase(hit)}; help them survive it (externals / peels).`;
+      out[R] = `No ${dt} removal in the comp \u2014 it lands on your ${coarseRolePhrase(hit)}; help them survive it (externals / spot-heals).`;
     }
   }
   return out;
@@ -1285,7 +1285,7 @@ function immunityDispelAdvice(dt, removals) {
   for (const R of ROLE_TAGS) {
     const amAnswerer = answerers.some((a) => a.role === R);
     const phrase = answerersPhrase(answerers, R);
-    out[R] = amAnswerer ? `Your only ${dt} removal is ${phrase} \u2014 it clears it but DROPS ALL THREAT on the target; never on the tank without a taunt ready (/cancelaura macro).` : `No standard ${dt} dispel \u2014 ${phrase} is the only removal, but it drops threat, so it won't be used on the tank. Plan to heal/peel through it otherwise.`;
+    out[R] = amAnswerer ? `Your only ${dt} removal is ${phrase} \u2014 it clears it but DROPS ALL THREAT on the target; never on the tank without a taunt ready (/cancelaura macro).` : `No standard ${dt} dispel \u2014 ${phrase} is the only removal, but it drops threat, so it won't be used on the tank. Plan to heal through it otherwise.`;
   }
   return out;
 }
@@ -1378,11 +1378,11 @@ function tankBusterAdvice(tb) {
   for (const R of ["healer", "dps"]) {
     const mine = myAbilities(allies, R);
     if (!lethal) {
-      out[R] = mine ? `Tank-buster \u2014 have ${mine} ready on the tank if it spikes.` : `Tank-buster on the tank \u2014 their actives cover it; ${R === "healer" ? "top them right after" : "keep DPSing, be ready to peel"}.`;
+      out[R] = mine ? `Tank-buster \u2014 have ${mine} ready on the tank if it spikes.` : `Tank-buster on the tank \u2014 their actives cover it; ${R === "healer" ? "top them right after" : "keep DPSing"}.`;
     } else if (mine) {
       out[R] = `LETHAL tank-buster \u2014 pre-plan YOUR external on the tank (${mine}); don't let it land raw.`;
     } else if (allies.length > 0) {
-      out[R] = `LETHAL tank-buster \u2014 ${answerersPhrase(allies, R)} must cover the tank; ${R === "healer" ? "pre-heal and back it up" : "help peel / save an external if you have one"}.`;
+      out[R] = `LETHAL tank-buster \u2014 ${answerersPhrase(allies, R)} must cover the tank; ${R === "healer" ? "pre-heal and back it up" : "keep DPSing \u2014 they have the tank covered"}.`;
     } else if (tb.tank_self_answer) {
       out[R] = `LETHAL tank-buster \u2014 no ally external, so the tank self-covers (${tb.tank_self_answer.ability}); ${R === "healer" ? "pre-heal hard around it" : "help where you can"}.`;
     } else {
@@ -1395,7 +1395,7 @@ function dpsSurvivalAdvice(st) {
   const personals = st.personal_answers.map(extAnswerer);
   const affected = new Set(st.affected.map((s) => coarseRole(s.party_role)));
   const out = {};
-  out.tank = "Not aimed at you \u2014 a one-shot on a squishy; help peel / drop an external on them if you can.";
+  out.tank = "Not aimed at you \u2014 the targeted squishy presses their own personal and the healer covers; if an ADD is fixating them, taunt it off.";
   for (const R of ["healer", "dps"]) {
     const mine = myAbilities(personals, R);
     if (mine) {
@@ -1403,7 +1403,7 @@ function dpsSurvivalAdvice(st) {
     } else if (affected.has(R)) {
       out[R] = "This can one-shot you and you bring no school-matched personal \u2014 pre-position, bait it safely, and call for a heal / external.";
     } else {
-      out[R] = "Lands on another squishy, not you \u2014 keep going; help peel if needed.";
+      out[R] = "Lands on another squishy, not you \u2014 keep going (CC any add that fixates them).";
     }
   }
   return out;
@@ -1706,7 +1706,7 @@ function buildWarnings(r, group) {
       category: "targeting",
       coaching: true,
       subjects: subj([tt.cast]),
-      message: `${labelCast(tt.cast)} bypasses your tank \u2014 it lands on your ${rolePhrase(orderRoles(tt.affected))}, who can't soak it like the tank.${lethal ? " It is lethal: pre-plan personals/externals." : " Pre-plan personals/peels."}`
+      message: `${labelCast(tt.cast)} bypasses your tank \u2014 it lands on your ${rolePhrase(orderRoles(tt.affected))}, who can't soak it like the tank.${lethal ? " It is lethal: pre-plan personals/externals." : " Pre-plan personals/spot-heals."}`
     });
   }
   for (const mt of r.movement.threats) {
