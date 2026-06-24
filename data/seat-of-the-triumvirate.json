@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T10:07:33.940Z",
+    "extracted_at": "2026-06-24T10:22:41.547Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -127,7 +127,9 @@
           "school": "Shadow",
           "spell_id": 244750,
           "tank_buster": true,
-          "target_roles": null,
+          "target_roles": [
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -326,7 +328,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -334,7 +336,11 @@
           "school": "Shadow",
           "spell_id": 244579,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps"
+          ],
           "unavoidable": false
         },
         {
@@ -416,13 +422,45 @@
           "is_lethal": false,
           "is_stoppable": false,
           "mechanic": null,
-          "name": "Null Palm",
+          "name": "Fixate",
           "notes": null,
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
           "priority": "reference",
+          "recast_cooldown_confidence": null,
+          "recast_cooldown_ms": null,
+          "requires_interrupt": false,
+          "scales_to_lethal": false,
+          "school": "Physical",
+          "spell_id": 244657,
+          "tank_buster": false,
+          "target_roles": null,
+          "unavoidable": false
+        },
+        {
+          "cast_time_ms": 0,
+          "coaching_note": null,
+          "completion_effect": null,
+          "dispel_detonates": false,
+          "dispel_type": "None",
+          "displacement": [],
+          "dot": false,
+          "freedom_partial": false,
+          "is_aoe": false,
+          "is_channeled": false,
+          "is_interruptible": false,
+          "is_lethal": false,
+          "is_stoppable": false,
+          "mechanic": null,
+          "name": "Null Palm",
+          "notes": null,
+          "observed_channel_stop": null,
+          "observed_kick_point": null,
+          "party_targets": null,
+          "positioning": [],
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -664,7 +702,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": "measured",
           "recast_cooldown_ms": 16818,
           "requires_interrupt": false,
@@ -672,7 +710,9 @@
           "school": "Shadow",
           "spell_id": 1263440,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -901,6 +941,38 @@
           "is_lethal": false,
           "is_stoppable": false,
           "mechanic": null,
+          "name": "Void Bomb",
+          "notes": null,
+          "observed_channel_stop": null,
+          "observed_kick_point": null,
+          "party_targets": null,
+          "positioning": [],
+          "priority": "reference",
+          "recast_cooldown_confidence": null,
+          "recast_cooldown_ms": null,
+          "requires_interrupt": false,
+          "scales_to_lethal": false,
+          "school": "Physical",
+          "spell_id": 247175,
+          "tank_buster": false,
+          "target_roles": null,
+          "unavoidable": false
+        },
+        {
+          "cast_time_ms": 0,
+          "coaching_note": null,
+          "completion_effect": null,
+          "dispel_detonates": false,
+          "dispel_type": "None",
+          "displacement": [],
+          "dot": false,
+          "freedom_partial": false,
+          "is_aoe": false,
+          "is_channeled": false,
+          "is_interruptible": false,
+          "is_lethal": false,
+          "is_stoppable": false,
+          "mechanic": null,
           "name": "Umbral Flanking",
           "notes": null,
           "observed_channel_stop": null,
@@ -914,6 +986,38 @@
           "scales_to_lethal": false,
           "school": "Physical",
           "spell_id": 247245,
+          "tank_buster": false,
+          "target_roles": null,
+          "unavoidable": false
+        },
+        {
+          "cast_time_ms": 0,
+          "coaching_note": null,
+          "completion_effect": null,
+          "dispel_detonates": false,
+          "dispel_type": "None",
+          "displacement": [],
+          "dot": false,
+          "freedom_partial": false,
+          "is_aoe": false,
+          "is_channeled": false,
+          "is_interruptible": false,
+          "is_lethal": false,
+          "is_stoppable": false,
+          "mechanic": null,
+          "name": "Umbral Flanking",
+          "notes": null,
+          "observed_channel_stop": null,
+          "observed_kick_point": null,
+          "party_targets": null,
+          "positioning": [],
+          "priority": "reference",
+          "recast_cooldown_confidence": null,
+          "recast_cooldown_ms": null,
+          "requires_interrupt": false,
+          "scales_to_lethal": false,
+          "school": "Physical",
+          "spell_id": 247246,
           "tank_buster": false,
           "target_roles": null,
           "unavoidable": false
@@ -962,7 +1066,7 @@
           "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
-          "is_lethal": false,
+          "is_lethal": true,
           "is_stoppable": false,
           "mechanic": null,
           "name": "Overload",
@@ -1008,7 +1112,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1016,7 +1120,9 @@
           "school": "Shadow",
           "spell_id": 1266449,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1311,7 +1417,12 @@
           "school": "Shadow",
           "spell_id": 1262526,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         }
       ],
@@ -1363,7 +1474,12 @@
           "school": "Shadow",
           "spell_id": 245601,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1503,7 +1619,11 @@
           "school": "Physical",
           "spell_id": 1262519,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps"
+          ],
           "unavoidable": false
         },
         {
@@ -2071,6 +2191,38 @@
           "unavoidable": false
         },
         {
+          "cast_time_ms": 0,
+          "coaching_note": null,
+          "completion_effect": null,
+          "dispel_detonates": false,
+          "dispel_type": "None",
+          "displacement": [],
+          "dot": false,
+          "freedom_partial": false,
+          "is_aoe": false,
+          "is_channeled": false,
+          "is_interruptible": false,
+          "is_lethal": false,
+          "is_stoppable": false,
+          "mechanic": null,
+          "name": "Naaru's Lament",
+          "notes": null,
+          "observed_channel_stop": null,
+          "observed_kick_point": null,
+          "party_targets": null,
+          "positioning": [],
+          "priority": "reference",
+          "recast_cooldown_confidence": null,
+          "recast_cooldown_ms": null,
+          "requires_interrupt": false,
+          "scales_to_lethal": false,
+          "school": "Shadow",
+          "spell_id": 245396,
+          "tank_buster": false,
+          "target_roles": null,
+          "unavoidable": false
+        },
+        {
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2123,7 +2275,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -2131,7 +2283,12 @@
           "school": "Physical",
           "spell_id": 247816,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -2349,7 +2506,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -2357,7 +2514,12 @@
           "school": "Shadow",
           "spell_id": 1265420,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -2381,7 +2543,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -2389,7 +2551,12 @@
           "school": "Shadow",
           "spell_id": 1265421,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -2413,7 +2580,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -2445,7 +2612,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -2500,7 +2667,7 @@
           "is_aoe": false,
           "is_channeled": false,
           "is_interruptible": false,
-          "is_lethal": false,
+          "is_lethal": true,
           "is_stoppable": false,
           "mechanic": null,
           "name": "Abyssal Lance",
@@ -2509,7 +2676,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -2517,7 +2684,9 @@
           "school": "Shadow",
           "spell_id": 1267207,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -3564,7 +3733,11 @@
           "school": "Shadow",
           "spell_id": 1269081,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "tank"
+          ],
           "unavoidable": false
         }
       ],

@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T10:07:33.940Z",
+    "extracted_at": "2026-06-24T10:22:41.547Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -398,7 +398,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -406,7 +406,11 @@
           "school": "Arcane",
           "spell_id": 373326,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps"
+          ],
           "unavoidable": false
         },
         {
@@ -634,7 +638,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -642,7 +646,12 @@
           "school": "Arcane",
           "spell_id": 439488,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -674,7 +683,11 @@
           "school": "Arcane",
           "spell_id": 454365,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps"
+          ],
           "unavoidable": false
         },
         {
@@ -730,7 +743,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -738,7 +751,9 @@
           "school": "Arcane",
           "spell_id": 1282251,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -770,7 +785,9 @@
           "school": "Arcane",
           "spell_id": 1282252,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "tank"
+          ],
           "unavoidable": false
         }
       ],
@@ -999,7 +1016,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1007,7 +1024,12 @@
           "school": "Nature",
           "spell_id": 377004,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1039,7 +1061,12 @@
           "school": "Nature",
           "spell_id": 377009,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1054,7 +1081,7 @@
           "is_aoe": false,
           "is_channeled": false,
           "is_interruptible": true,
-          "is_lethal": false,
+          "is_lethal": true,
           "is_stoppable": false,
           "mechanic": null,
           "name": "Overpowering Gust",
@@ -1063,7 +1090,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1071,7 +1098,11 @@
           "school": "Nature",
           "spell_id": 377034,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1255,7 +1286,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1263,7 +1294,12 @@
           "school": "Nature",
           "spell_id": 1276752,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1295,7 +1331,12 @@
           "school": "Nature",
           "spell_id": 1276770,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1319,7 +1360,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1327,7 +1368,12 @@
           "school": "Fire",
           "spell_id": 1285508,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1359,7 +1405,12 @@
           "school": "Fire",
           "spell_id": 1285509,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         }
       ],
@@ -1534,7 +1585,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1542,7 +1593,10 @@
           "school": "Arcane",
           "spell_id": 385958,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1566,7 +1620,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1589,7 +1643,7 @@
           "is_aoe": false,
           "is_channeled": false,
           "is_interruptible": false,
-          "is_lethal": false,
+          "is_lethal": true,
           "is_stoppable": false,
           "mechanic": null,
           "name": "Mana Bomb",
@@ -1598,7 +1652,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1606,7 +1660,11 @@
           "school": "Arcane",
           "spell_id": 386181,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps"
+          ],
           "unavoidable": false
         },
         {
@@ -1621,7 +1679,7 @@
           "is_aoe": false,
           "is_channeled": false,
           "is_interruptible": false,
-          "is_lethal": false,
+          "is_lethal": true,
           "is_stoppable": false,
           "mechanic": null,
           "name": "Corrupted Mana",
@@ -1630,7 +1688,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1638,7 +1696,12 @@
           "school": "Arcane",
           "spell_id": 386201,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1694,7 +1757,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1702,7 +1765,12 @@
           "school": "Arcane",
           "spell_id": 388537,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -1734,7 +1802,12 @@
           "school": "Physical",
           "spell_id": 388651,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         }
       ],
@@ -2116,7 +2189,9 @@
           "school": "Physical",
           "spell_id": 388544,
           "tank_buster": true,
-          "target_roles": null,
+          "target_roles": [
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -2131,7 +2206,7 @@
           "is_aoe": false,
           "is_channeled": false,
           "is_interruptible": true,
-          "is_lethal": false,
+          "is_lethal": true,
           "is_stoppable": false,
           "mechanic": null,
           "name": "Branch Out",
@@ -2140,7 +2215,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -2148,7 +2223,12 @@
           "school": "Physical",
           "spell_id": 388623,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -2163,7 +2243,7 @@
           "is_aoe": false,
           "is_channeled": true,
           "is_interruptible": false,
-          "is_lethal": false,
+          "is_lethal": true,
           "is_stoppable": false,
           "mechanic": null,
           "name": "Germinate",
@@ -2172,7 +2252,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -2180,7 +2260,12 @@
           "school": "Physical",
           "spell_id": 388796,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
@@ -2195,7 +2280,7 @@
           "is_aoe": false,
           "is_channeled": false,
           "is_interruptible": true,
-          "is_lethal": false,
+          "is_lethal": true,
           "is_stoppable": false,
           "mechanic": null,
           "name": "Burst Forth",
@@ -2204,7 +2289,7 @@
           "observed_kick_point": null,
           "party_targets": null,
           "positioning": [],
-          "priority": "reference",
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -2212,7 +2297,12 @@
           "school": "Nature",
           "spell_id": 388923,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false
         },
         {
