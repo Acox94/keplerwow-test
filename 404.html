@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T11:32:09.220Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T11:42:40.827Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -1205,19 +1205,21 @@ function mitigableAfterAdvice(casts, group) {
   }
   const hit = hitRolesOf(casts);
   const noun = debuffTypeNoun(casts);
+  const tick = casts.some((t) => t.dot) ? " to end the ticks" : "";
+  const healSentence = casts.some((t) => t.unavoidable || t.is_aoe) ? " Heal/mitigate through until then." : "";
   const out = {};
   for (const R of ROLE_TAGS) {
     const phrase = answerersPhrase(answerers, R);
     const amAnswerer = answerers.some((a) => a.role === R);
     const amHit = hit.size === 0 ? null : hit.has(R);
     if (amAnswerer) {
-      out[R] = `Can't be stopped \u2014 remove the ${noun} after it lands: ${phrase}.${amHit ? " (It can land on you too.)" : ""}`;
+      out[R] = `Can't be stopped \u2014 remove the ${noun} after it lands${tick}: ${phrase}.${healSentence}${amHit ? " (It can land on you too.)" : ""}`;
     } else if (amHit === true) {
-      out[R] = `You'll take the ${noun} \u2014 it can't be stopped, so ${phrase} removes it after it lands; survive the tick (personal / heal) until it's off.`;
+      out[R] = `You'll take the ${noun} \u2014 it can't be stopped, so ${phrase} removes it after it lands${tick}; survive the ticks (personal / heal) until it's off.`;
     } else if (amHit === null) {
-      out[R] = `Can't be stopped \u2014 ${phrase} removes the ${noun} after it lands.`;
+      out[R] = `Can't be stopped \u2014 ${phrase} removes the ${noun} after it lands${tick}.`;
     } else {
-      out[R] = `Not your removal \u2014 ${phrase} clears the ${noun} after it lands; cover the team while it's up.`;
+      out[R] = `Not your removal \u2014 ${phrase} clears the ${noun} after it lands${tick}; cover the team while it's up.`;
     }
   }
   return out;
@@ -1611,13 +1613,17 @@ function buildWarnings(r, group) {
     });
   }
   if (r.awareness.mitigable_after.length > 0) {
+    const ma = r.awareness.mitigable_after;
+    const hasDot = ma.some((t) => t.dot);
+    const hasUnavoid = ma.some((t) => t.unavoidable || t.is_aoe);
+    const nature = hasUnavoid && hasDot ? "an unavoidable party-wide DoT" : hasDot ? "a damage-over-time debuff" : hasUnavoid ? "an unavoidable party-wide hit" : "a debuff";
     w.push({
       severity: "info",
       category: "survive",
       coaching: true,
-      subjects: subj(r.awareness.mitigable_after),
-      message: `Cannot be stopped, but the debuff is removable \u2014 dispel after it lands${landsOn(r.awareness.mitigable_after)}: ${list(r.awareness.mitigable_after)}.`,
-      role_advice: mitigableAfterAdvice(r.awareness.mitigable_after, group)
+      subjects: subj(ma),
+      message: `Cannot be stopped \u2014 ${nature}, but removable: dispel it after it lands${hasDot ? " to end the ticks" : ""}${hasUnavoid ? "; heal/mitigate through until then" : ""}${landsOn(ma)}: ${list(ma)}.`,
+      role_advice: mitigableAfterAdvice(ma, group)
     });
   }
   for (const sc of r.scaling) {
@@ -1724,14 +1730,16 @@ function buildWarnings(r, group) {
       message: `Group brings fear(s) \u2014 feared mobs may pull extra packs: ${r.misplays.fear_abilities.map((a) => `${a.spell_name} (${a.spec.class} ${a.spec.spec_name})`).join(", ")}.`
     });
   }
-  if (r.awareness.unavoidable_casts.length > 0) {
-    const lethal = r.awareness.unavoidable_casts.some((t) => t.is_lethal);
+  const mitigableKeys = new Set(r.awareness.mitigable_after.map(castKey));
+  const unavoidableShown = r.awareness.unavoidable_casts.filter((t) => !mitigableKeys.has(castKey(t)));
+  if (unavoidableShown.length > 0) {
+    const lethal = unavoidableShown.some((t) => t.is_lethal);
     w.push({
       severity: lethal ? "warning" : "info",
       category: "awareness",
       coaching: lethal ? void 0 : true,
-      subjects: subj(r.awareness.unavoidable_casts),
-      message: `${sumCount(r.awareness.unavoidable_casts)} unavoidable party-wide cast(s) \u2014 heal/mitigate through${lethal ? " (lethal without a cooldown)" : ""}: ${list(r.awareness.unavoidable_casts)}.`
+      subjects: subj(unavoidableShown),
+      message: `${sumCount(unavoidableShown)} unavoidable party-wide cast(s) \u2014 heal/mitigate through${lethal ? " (lethal without a cooldown)" : ""}: ${list(unavoidableShown)}.`
     });
   }
   const avoidable = r.awareness.avoidable_casts.filter((t) => !t.dispel_detonates);
@@ -1745,14 +1753,15 @@ function buildWarnings(r, group) {
       message: `${sumCount(avoidable)} avoidable cast(s) \u2014 reposition${lethal ? " (lethal if you stand in it)" : ""}: ${avoidable.map((t) => `${t.spell_name} [${avoidanceHint(t)}]`).join(", ")}.`
     });
   }
-  if (r.awareness.dot_casts.length > 0) {
-    const removable = r.awareness.dot_casts.some((t) => FRIENDLY_DISPEL_TYPES.includes(t.dispel_type));
+  const dotShown = r.awareness.dot_casts.filter((t) => !mitigableKeys.has(castKey(t)));
+  if (dotShown.length > 0) {
+    const removable = dotShown.some((t) => FRIENDLY_DISPEL_TYPES.includes(t.dispel_type));
     w.push({
       severity: "info",
       category: "awareness",
       coaching: true,
-      subjects: subj(r.awareness.dot_casts),
-      message: `${sumCount(r.awareness.dot_casts)} damage-over-time cast(s) \u2014 sustained pressure${removable ? " (a removable one can be dispelled to end the ticks)" : ""}: ${list(r.awareness.dot_casts)}.`
+      subjects: subj(dotShown),
+      message: `${sumCount(dotShown)} damage-over-time cast(s) \u2014 sustained pressure${removable ? " (a removable one can be dispelled to end the ticks)" : ""}: ${list(dotShown)}.`
     });
   }
   for (const tb of r.tank_buster.threats) {
