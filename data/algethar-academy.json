@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T12:04:26.468Z",
+    "extracted_at": "2026-06-24T12:16:02.718Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2240,14 +2240,14 @@
         },
         {
           "cast_time_ms": 2500,
-          "coaching_note": "Summons an Ancient Branch add, which spawns every pull regardless — its kit (Healing Touch, Abundance) is auto-included below, so plan for it. A kick may delay/reduce, not prevent.",
+          "coaching_note": "Thrown at a ground LOCATION — dodge the impact (lethal only if you stand in it). It also spawns an Ancient Branch add at that spot every pull (unavoidable); the add's kit (Healing Touch, Abundance) is auto-included below.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": true,
@@ -2258,7 +2258,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,

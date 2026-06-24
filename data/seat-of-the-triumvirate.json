@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T12:04:26.468Z",
+    "extracted_at": "2026-06-24T12:16:02.718Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -391,7 +391,7 @@
           "freedom_partial": false,
           "is_aoe": false,
           "is_channeled": true,
-          "is_interruptible": true,
+          "is_interruptible": false,
           "is_lethal": false,
           "is_stoppable": false,
           "mechanic": null,
@@ -2402,7 +2402,7 @@
           "freedom_partial": false,
           "is_aoe": false,
           "is_channeled": false,
-          "is_interruptible": true,
+          "is_interruptible": false,
           "is_lethal": false,
           "is_stoppable": false,
           "mechanic": null,
