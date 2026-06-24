@@ -129,7 +129,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T08:50:48.986Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T09:03:18.414Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -191,6 +191,10 @@ var STOPPING_MECHANICS = /* @__PURE__ */ new Set([
   "horrified",
   "sapped"
 ]);
+function creatureTypeAllowed(condition, creature_type) {
+  const types = condition?.creature_types;
+  return !types || types.length === 0 || types.includes(creature_type);
+}
 var MOVEMENT_IMPAIR_MECHANICS = /* @__PURE__ */ new Set(["rooted", "snared"]);
 var CASTER_ROLES = /* @__PURE__ */ new Set(["healer", "ranged_dps"]);
 var SEVERITY_RANK = { critical: 0, warning: 1, caution: 2, info: 3 };
@@ -253,6 +257,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
         npc_id: c.npc_id,
         npc_name: c.name,
         is_boss: c.is_boss,
+        creature_type: c.creature_type,
         spell_id: s.spell_id,
         spell_name: s.name,
         count: m.count,
@@ -396,10 +401,11 @@ function analyzeStops(threats, group) {
     else unpreventable.push(t);
   }
   const interrupt_supply = group.filter((s) => s.rollups.has_interrupt).length;
+  const stoppableTypes = new Set(cc_or_kick.map((t) => t.creature_type));
   let cc_stop_supply = 0;
   for (const s of group) {
     cc_stop_supply += s.control.filter(
-      (c) => c.kind === "cc" && c.mechanic !== null && STOPPING_MECHANICS.has(c.mechanic)
+      (c) => c.kind === "cc" && c.mechanic !== null && STOPPING_MECHANICS.has(c.mechanic) && [...stoppableTypes].some((ct) => creatureTypeAllowed(c.condition, ct))
     ).length;
   }
   const must_kick_demand = sumCount(must_kick);
@@ -839,15 +845,16 @@ function simulateCcBurst(stops, group) {
     const period = t.recast_cooldown_ms;
     for (let copy = 0; copy < t.count; copy++) {
       const mob = `${t.npc_id}#${copy}`;
-      for (let time = 0; time < SIM_WINDOW_MS; time += period) events.push({ time, mob });
+      for (let time = 0; time < SIM_WINDOW_MS; time += period) events.push({ time, mob, ct: t.creature_type });
     }
   }
   if (events.length === 0) {
     return { available: false, window_s: SIM_WINDOW_MS / 1e3, total_casts: 0, suppressed_by_cc: 0, stopped: 0, leaked: 0, coverage_pct: 100, leaked_per_min: 0, peak_concurrent: 0 };
   }
   const ccs = group.flatMap(
-    (s) => s.control.filter((c) => c.kind === "cc" && c.mechanic !== null && DR_CATEGORY[c.mechanic] !== void 0 && c.cooldown_ms !== null).map((c) => ({ cooldown: c.cooldown_ms, duration: c.duration_ms ?? 0, aoe: c.is_aoe, category: DR_CATEGORY[c.mechanic], free_at: 0 }))
+    (s) => s.control.filter((c) => c.kind === "cc" && c.mechanic !== null && DR_CATEGORY[c.mechanic] !== void 0 && c.cooldown_ms !== null).map((c) => ({ cooldown: c.cooldown_ms, duration: c.duration_ms ?? 0, aoe: c.is_aoe, category: DR_CATEGORY[c.mechanic], allowed: c.condition?.creature_types ?? null, free_at: 0 }))
   );
+  const ccHits = (cc, ct) => !cc.allowed || cc.allowed.length === 0 || cc.allowed.includes(ct);
   events.sort((a, b) => a.time - b.time || (a.mob < b.mob ? -1 : 1));
   const suppressUntil = /* @__PURE__ */ new Map();
   const dr = /* @__PURE__ */ new Map();
@@ -876,6 +883,7 @@ function simulateCcBurst(stops, group) {
       return true;
     });
     const land = (cc, c) => {
+      if (!ccHits(cc, c.ct)) return false;
       const mult = drMult(c.mob, cc.category, t);
       if (mult <= 0) return false;
       applyDr(c.mob, cc.category, t);
@@ -884,7 +892,7 @@ function simulateCcBurst(stops, group) {
       return true;
     };
     if (remaining.length >= 2) {
-      const aoe = ccs.find((k) => k.free_at <= t && k.aoe);
+      const aoe = ccs.find((k) => k.free_at <= t && k.aoe && remaining.some((c) => ccHits(k, c.ct)));
       if (aoe) {
         aoe.free_at = t + aoe.cooldown;
         remaining = remaining.filter((c) => !land(aoe, c));
@@ -893,7 +901,7 @@ function simulateCcBurst(stops, group) {
     for (const k of ccs) {
       if (remaining.length === 0) break;
       if (k.free_at > t) continue;
-      const idx = remaining.findIndex((c) => drMult(c.mob, k.category, t) > 0);
+      const idx = remaining.findIndex((c) => drMult(c.mob, k.category, t) > 0 && ccHits(k, c.ct));
       if (idx < 0) continue;
       k.free_at = t + k.cooldown;
       land(k, remaining.splice(idx, 1)[0]);
@@ -918,12 +926,14 @@ function analyzeCcThroughput(stops, group) {
   const demand = rated.reduce((n, t) => n + 6e4 / t.recast_cooldown_ms * t.count, 0);
   const cc_casters = stops.cc_or_kick.reduce((n, t) => n + t.count, 0);
   const aoe_factor = Math.min(MAX_SIMULTANEOUS_PRIORITY_CASTS, Math.max(1, cc_casters));
+  const stoppableTypes = new Set(stops.cc_or_kick.map((t) => t.creature_type));
   const byCat = /* @__PURE__ */ new Map();
   for (const s of group) {
     for (const c of s.control) {
       if (c.kind !== "cc" || c.mechanic === null || c.cooldown_ms === null) continue;
       const cat = DR_CATEGORY[c.mechanic];
       if (!cat) continue;
+      if (![...stoppableTypes].some((ct) => creatureTypeAllowed(c.condition, ct))) continue;
       const rate = 6e4 / c.cooldown_ms * (c.is_aoe ? aoe_factor : 1);
       const e = byCat.get(cat) ?? { rate: 0, abilities: /* @__PURE__ */ new Set() };
       e.rate += rate;
@@ -1069,10 +1079,11 @@ function interruptersOf(group) {
   }
   return out;
 }
-function ccStoppersOf(group) {
+function ccStoppersOf(group, casts) {
+  const types = new Set(casts.map((t) => t.creature_type));
   const out = [];
   for (const s of group) {
-    const c = s.control.find((x) => x.kind === "cc" && x.mechanic !== null && STOPPING_MECHANICS.has(x.mechanic));
+    const c = s.control.find((x) => x.kind === "cc" && x.mechanic !== null && STOPPING_MECHANICS.has(x.mechanic) && [...types].some((ct) => creatureTypeAllowed(x.condition, ct)));
     if (c) out.push({ role: coarseRole(s.party_role), spec: toResolvedSpec(s), ability: c.name });
   }
   return out;
@@ -1193,8 +1204,8 @@ function kickAdvice(group, short, shortBy) {
   }
   return out;
 }
-function ccStopAdvice(group, spareInterrupts) {
-  const ccers = ccStoppersOf(group);
+function ccStopAdvice(group, casts, spareInterrupts) {
+  const ccers = ccStoppersOf(group, casts);
   const kickers = interruptersOf(group);
   const spareTail = spareInterrupts > 0 ? ` (or spend one of your ${spareInterrupts} spare kick${spareInterrupts > 1 ? "s" : ""})` : "";
   const out = {};
@@ -1320,7 +1331,7 @@ function buildWarnings(r, group) {
       category: "cc",
       subjects: subj(stops.cc_or_kick),
       message: `${stops.cc_or_kick_demand} stoppable cast(s) exceed available CC (${stops.cc_stop_supply}) + spare interrupts (${stops.spare_interrupts}) \u2014 short by ${stops.cc_shortfall}: ${list(stops.cc_or_kick)}.`,
-      role_advice: ccStopAdvice(group, stops.spare_interrupts)
+      role_advice: ccStopAdvice(group, stops.cc_or_kick, stops.spare_interrupts)
     });
   } else if (stops.cc_or_kick.length > 0) {
     w.push({
@@ -1329,7 +1340,7 @@ function buildWarnings(r, group) {
       coaching: true,
       subjects: subj(stops.cc_or_kick),
       message: `${stops.cc_or_kick_demand} stoppable cast(s) \u2014 answer with CC to save interrupts (${stops.cc_stop_supply} CC + ${stops.spare_interrupts} spare interrupt available).`,
-      role_advice: ccStopAdvice(group, stops.spare_interrupts)
+      role_advice: ccStopAdvice(group, stops.cc_or_kick, stops.spare_interrupts)
     });
   }
   if (r.throughput.must_kick.rated_casts > 0) {
