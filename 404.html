@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T17:12:33.071Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T17:51:40.543Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -1377,6 +1377,7 @@ function tankBusterAdvice(tb) {
   }
   for (const R of ["healer", "dps"]) {
     const mine = myAbilities(allies, R);
+    if (R === "dps" && !mine) continue;
     if (!lethal) {
       out[R] = mine ? `Tank-buster \u2014 have ${mine} ready on the tank if it spikes.` : `Tank-buster on the tank \u2014 their actives cover it; ${R === "healer" ? "top them right after" : "keep DPSing"}.`;
     } else if (mine) {
@@ -1395,7 +1396,7 @@ function dpsSurvivalAdvice(st) {
   const personals = st.personal_answers.map(extAnswerer);
   const affected = new Set(st.affected.map((s) => coarseRole(s.party_role)));
   const out = {};
-  out.tank = "Not aimed at you \u2014 the targeted squishy presses their own personal and the healer covers; if an ADD is fixating them, taunt it off.";
+  out.tank = "Not aimed at you \u2014 the targeted squishy presses their own personal and the healer covers them.";
   for (const R of ["healer", "dps"]) {
     const mine = myAbilities(personals, R);
     if (mine) {
@@ -1403,7 +1404,7 @@ function dpsSurvivalAdvice(st) {
     } else if (affected.has(R)) {
       out[R] = "This can one-shot you and you bring no school-matched personal \u2014 pre-position, bait it safely, and call for a heal / external.";
     } else {
-      out[R] = "Lands on another squishy, not you \u2014 keep going (CC any add that fixates them).";
+      out[R] = "Lands on another squishy, not you \u2014 keep going.";
     }
   }
   return out;
@@ -1822,12 +1823,10 @@ function buildWarnings(r, group) {
     });
   }
   for (const tb of r.tank_buster.threats) {
+    if (!tb.cast.is_lethal) continue;
     const name = labelCast(tb.cast);
     const tbAdvice = tankBusterAdvice(tb);
-    if (!tb.cast.is_lethal) {
-      const hint = tb.ally_answers.length ? `, with an external (${externalList(tb.ally_answers)}) if it spikes` : "";
-      w.push({ severity: "info", category: "tank_buster", coaching: true, subjects: subj([tb.cast]), role_advice: tbAdvice, message: `${name} is a tank-buster \u2014 tank actives cover it${hint}.` });
-    } else if (tb.ally_answers.length > 0) {
+    if (tb.ally_answers.length > 0) {
       w.push({
         severity: "warning",
         category: "tank_buster",
@@ -6850,9 +6849,11 @@ function renderReport(rep) {
     ${rep.boss_reference.length ? `<label class="boss-toggle"><input type="checkbox" id="boss-mech-toggle"${state.showBoss ? " checked" : ""}/> Show boss mechanics <span class="boss-toggle-n">${rep.boss_reference.length}</span></label>` : ""}
   </div>`;
   const lens = state.roleFilter;
-  const visible = rep.warnings.filter(
-    (w) => lens === "all" || w.roles.length === 0 || w.roles.includes(lens) || (w.subjects?.length ?? 0) > 0
-  );
+  const visible = rep.warnings.filter((w) => {
+    if (lens === "all" || w.roles.length === 0 || w.roles.includes(lens)) return true;
+    if ((w.subjects?.length ?? 0) > 0) return !w.role_advice || lens in w.role_advice;
+    return false;
+  });
   const sections = SOURCE_SECTIONS.map(({ source, label }) => {
     const ws = visible.filter((w) => w.source === source).sort((a, b) => SEV_RANK[a.severity] - SEV_RANK[b.severity]);
     const refCards = source === "boss" && state.showBoss ? rep.boss_reference.map(referenceCard) : [];
