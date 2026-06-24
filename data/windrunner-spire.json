@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T10:22:41.547Z",
+    "extracted_at": "2026-06-24T10:38:46.773Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -40,6 +40,7 @@
   },
   "creatures": [
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Demon",
@@ -54,6 +55,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Humanoid",
@@ -68,6 +70,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Humanoid",
@@ -82,6 +85,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Humanoid",
@@ -96,6 +100,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Humanoid",
@@ -110,6 +115,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Humanoid",
@@ -124,6 +130,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Undead",
@@ -138,6 +145,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Humanoid",
@@ -152,6 +160,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Beast",
@@ -403,6 +412,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -561,6 +571,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -817,6 +828,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -1245,6 +1257,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Aberration",
@@ -1581,6 +1594,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Beast",
@@ -1595,6 +1609,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Beast",
@@ -1644,6 +1659,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Beast",
@@ -1695,6 +1711,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -1789,6 +1806,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -1803,6 +1821,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -1817,6 +1836,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Not specified",
@@ -1911,6 +1931,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -1964,6 +1985,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2021,6 +2043,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2035,6 +2058,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2087,6 +2111,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2223,6 +2248,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2277,6 +2303,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2291,6 +2318,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2305,6 +2333,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2319,6 +2348,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Beast",
@@ -2333,6 +2363,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Humanoid",
@@ -2347,6 +2378,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Humanoid",
@@ -2361,6 +2393,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Humanoid",
@@ -2375,6 +2408,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2389,6 +2423,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Elemental",
@@ -2446,6 +2481,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2460,6 +2496,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Non-combat Pet",
@@ -2474,6 +2511,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Beast",
@@ -2488,6 +2526,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Demon",
@@ -2502,6 +2541,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
@@ -2516,6 +2556,7 @@
       "summoned_by": null
     },
     {
+      "avoidable": false,
       "base_health": null,
       "classification": "Normal",
       "creature_type": "Dragonkin",
