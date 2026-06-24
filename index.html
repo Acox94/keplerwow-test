@@ -147,7 +147,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T19:20:32.396Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T19:37:23.425Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -250,7 +250,11 @@ function analyzePull(dungeon, pull, group, opts = {}) {
   const creatureById = new Map(dungeon.creatures.map((c) => [c.npc_id, c]));
   const specById = new Map(dungeon.specs.map((s) => [s.spec_id, s]));
   const spellNameById = /* @__PURE__ */ new Map();
-  for (const c of dungeon.creatures) for (const s of c.spells) spellNameById.set(s.spell_id, s.name);
+  const castOrderBySpellId = /* @__PURE__ */ new Map();
+  for (const c of dungeon.creatures) for (const s of c.spells) {
+    spellNameById.set(s.spell_id, s.name);
+    if (s.cast_order != null) castOrderBySpellId.set(s.spell_id, s.cast_order);
+  }
   const unavoidableAddsBySummoner = /* @__PURE__ */ new Map();
   for (const c of dungeon.creatures) {
     if (!c.is_boss_add || c.summoned_by == null || c.avoidable) continue;
@@ -337,7 +341,9 @@ function analyzePull(dungeon, pull, group, opts = {}) {
         coaching_note: s.coaching_note,
         secondary_of: s.secondary_of,
         secondary_of_name: s.secondary_of != null ? spellNameById.get(s.secondary_of) ?? null : null,
-        cast_order: s.cast_order,
+        // A SECONDARY (a pool/add/death-burst) with no explicit cast_order inherits its PRIMARY's, so it slots
+        // right behind the cast that causes it in the timeline (the sort tiebreaker keeps the primary first).
+        cast_order: s.cast_order ?? (s.secondary_of != null ? castOrderBySpellId.get(s.secondary_of) ?? null : null),
         dispel_detonates: s.dispel_detonates,
         freedom_partial: s.freedom_partial,
         cast_time_ms: s.cast_time_ms,
@@ -6946,8 +6952,9 @@ function renderReport(rep) {
     const orders = (w.subjects ?? []).map((s) => s.cast_order).filter((o) => o != null);
     return orders.length ? Math.min(...orders) : Number.MAX_SAFE_INTEGER;
   };
+  const isSecondary = (w) => (w.subjects?.length ?? 0) > 0 && (w.subjects ?? []).every((s) => s.secondary_of_name != null) ? 1 : 0;
   const sections = SOURCE_SECTIONS.map(({ source, label }) => {
-    const ws = visible.filter((w) => w.source === source).sort((a, b) => source === "boss" ? castOrderOf(a) - castOrderOf(b) || SEV_RANK[a.severity] - SEV_RANK[b.severity] : SEV_RANK[a.severity] - SEV_RANK[b.severity]);
+    const ws = visible.filter((w) => w.source === source).sort((a, b) => source === "boss" ? castOrderOf(a) - castOrderOf(b) || isSecondary(a) - isSecondary(b) || SEV_RANK[a.severity] - SEV_RANK[b.severity] : SEV_RANK[a.severity] - SEV_RANK[b.severity]);
     const groups = groupBySubject(ws);
     const cards = groups.map((g) => g.subject ? castGroupCard(g.subject, g.warnings, state.roleFilter) : warningCard(g.warnings[0], state.roleFilter));
     const refCards = source === "boss" && state.showBoss ? rep.boss_reference.map(referenceCard) : [];
