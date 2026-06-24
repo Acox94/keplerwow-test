@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T06:09:59.665Z",
+    "extracted_at": "2026-06-24T09:19:41.889Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -46,10 +46,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Treant",
       "npc_id": 54983,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -58,10 +60,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Diabolic Imp",
       "npc_id": 219161,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -70,10 +74,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Voidwraith",
       "npc_id": 224466,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -82,10 +88,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Infernal Fragment",
       "npc_id": 226790,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -94,10 +102,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Kasreth",
       "npc_id": 241539,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -106,6 +116,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Lothraxion",
       "npc_id": 241546,
@@ -147,7 +158,8 @@
           ],
           "unavoidable": true
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -156,6 +168,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lingering Image",
       "npc_id": 241642,
@@ -197,7 +210,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -206,6 +220,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Corewright Arcanist",
       "npc_id": 241644,
@@ -245,7 +260,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -254,6 +270,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Flux Engineer",
       "npc_id": 241647,
@@ -297,7 +314,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -306,6 +324,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Circuit Seer",
       "npc_id": 248373,
@@ -349,7 +368,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -358,6 +378,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Nexus Adept",
       "npc_id": 248708,
@@ -404,7 +425,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -413,10 +435,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Smudge",
       "npc_id": 248769,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -425,10 +449,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dreadflail",
       "npc_id": 251024,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -437,6 +463,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Nullifier",
       "npc_id": 251031,
@@ -478,7 +505,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -487,10 +515,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dread Shade",
       "npc_id": 251422,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -499,10 +529,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fractured Image",
       "npc_id": 251568,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -511,10 +543,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Nullifier",
       "npc_id": 251853,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -523,10 +557,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Mana Battery",
       "npc_id": 252825,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -535,10 +571,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Corespark Conduit",
       "npc_id": 252852,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -547,10 +585,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Nascent Dreadflail",
       "npc_id": 252903,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -559,10 +599,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Corewarden Nysarra",
       "npc_id": 254227,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -571,10 +613,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Desperate Soul",
       "npc_id": 254505,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -583,6 +627,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lightwrought",
       "npc_id": 254926,
@@ -666,7 +711,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -675,10 +721,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Radiant Swarm",
       "npc_id": 254932,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -687,10 +735,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fractured Image",
       "npc_id": 255133,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -699,10 +749,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Mana Battery",
       "npc_id": 259569,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     }
   ],
   "dungeon": {

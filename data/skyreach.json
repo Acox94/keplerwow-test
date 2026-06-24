@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T06:09:59.665Z",
+    "extracted_at": "2026-06-24T09:19:41.889Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -46,10 +46,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Treant",
       "npc_id": 54983,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -58,10 +60,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Niuzao",
       "npc_id": 73967,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -70,6 +74,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Ranjit",
       "npc_id": 75964,
@@ -189,7 +194,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -198,10 +204,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Skyreach Overlord",
       "npc_id": 75975,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -210,10 +218,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lowborn Servant",
       "npc_id": 75976,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -222,10 +232,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Solar Construct",
       "npc_id": 76087,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -234,10 +246,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Sun Trinket",
       "npc_id": 76094,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -246,10 +260,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Solar Familiar",
       "npc_id": 76097,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -258,10 +274,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Air Familiar",
       "npc_id": 76102,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -270,10 +288,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Diving Chakram Spinner",
       "npc_id": 76116,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -282,10 +302,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Soaring Chakram Master",
       "npc_id": 76132,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -294,10 +316,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Araknath",
       "npc_id": 76141,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -306,10 +330,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Skyreach Sun Construct Prototype",
       "npc_id": 76142,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -318,10 +344,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Rukhran",
       "npc_id": 76143,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -330,10 +358,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Defense Construct",
       "npc_id": 76145,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -342,10 +372,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Defense Construct",
       "npc_id": 76146,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -354,10 +386,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dread Raven",
       "npc_id": 76149,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -366,10 +400,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Suntalon Tamer",
       "npc_id": 76154,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -378,10 +414,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Outcast Warrior",
       "npc_id": 76205,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -390,10 +428,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Sunwing",
       "npc_id": 76227,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -402,10 +442,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dread Raven Hatchling",
       "npc_id": 76253,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -414,6 +456,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "High Sage Viryx",
       "npc_id": 76266,
@@ -457,7 +500,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -466,10 +510,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Solar Zealot",
       "npc_id": 76267,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -478,10 +524,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Arakkoa Magnifying Glass",
       "npc_id": 76285,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -490,10 +538,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Skyreach Shield Construct",
       "npc_id": 76292,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -502,10 +552,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Defense Construct",
       "npc_id": 76306,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -514,10 +566,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Defense Construct",
       "npc_id": 76307,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -526,10 +580,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Defense Construct",
       "npc_id": 76309,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -538,10 +594,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Defense Construct",
       "npc_id": 76310,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -550,10 +608,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Skyreach Arcanologist",
       "npc_id": 76376,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -562,10 +622,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Rukhran",
       "npc_id": 76379,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -574,10 +636,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Life-Pact Familiar",
       "npc_id": 76778,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -586,10 +650,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Solar Magnifier",
       "npc_id": 77559,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -598,10 +664,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Whirling Dervish",
       "npc_id": 77605,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -610,6 +678,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Driving Gale-Caller",
       "npc_id": 78932,
@@ -658,7 +727,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -667,6 +737,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Solar Elemental",
       "npc_id": 78933,
@@ -710,7 +781,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -719,10 +791,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Suntalon",
       "npc_id": 79093,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -731,6 +805,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Adorned Bladetalon",
       "npc_id": 79303,
@@ -811,7 +886,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -820,6 +896,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Blinding Sun Priestess",
       "npc_id": 79462,
@@ -861,7 +938,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -870,10 +948,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Radiant Supernova",
       "npc_id": 79463,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -882,6 +962,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Initiate of the Rising Sun",
       "npc_id": 79466,
@@ -928,7 +1009,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -937,10 +1019,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Adept of the Dawn",
       "npc_id": 79467,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -949,10 +1033,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Whirling Dervish",
       "npc_id": 79469,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -961,10 +1047,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Pile of Ash",
       "npc_id": 79505,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -973,10 +1061,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Reshad",
       "npc_id": 81273,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -985,10 +1075,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadow-Sage Iskar",
       "npc_id": 82376,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -997,10 +1089,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Reshad",
       "npc_id": 84782,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1009,10 +1103,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Uncharged Construct",
       "npc_id": 86918,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1021,10 +1117,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fel Imp",
       "npc_id": 95139,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1033,10 +1131,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dreadstalker",
       "npc_id": 98035,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1045,10 +1145,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Wild Imp",
       "npc_id": 143622,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1057,10 +1159,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lindormi",
       "npc_id": 197915,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1069,10 +1173,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Pit Lord",
       "npc_id": 228574,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1081,10 +1187,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Overlord",
       "npc_id": 228575,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1093,10 +1201,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Mother of Chaos",
       "npc_id": 228576,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1105,10 +1215,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Xal'atath",
       "npc_id": 229227,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1117,10 +1229,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Corrupted Machinist",
       "npc_id": 229695,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1129,10 +1243,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Explosive Bomberbot",
       "npc_id": 229706,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1141,10 +1257,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Spirit Wolf",
       "npc_id": 233037,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1153,10 +1271,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lesser Ghoul",
       "npc_id": 237409,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1165,10 +1285,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Podium Dial",
       "npc_id": 241878,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1177,10 +1299,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Doomguard",
       "npc_id": 250785,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1189,10 +1313,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Raging Squall",
       "npc_id": 250992,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1201,10 +1327,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dread Shade",
       "npc_id": 251422,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1213,10 +1341,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Solar Orb",
       "npc_id": 251880,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1225,10 +1355,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Antoran Jailer",
       "npc_id": 255147,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1237,10 +1369,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fel Ravager",
       "npc_id": 258587,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1249,10 +1383,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lindormi",
       "npc_id": 259053,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1261,10 +1397,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Four Winds",
       "npc_id": 259751,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1273,10 +1411,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lady Sacrolash",
       "npc_id": 260076,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1285,10 +1425,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Warlock Alythess",
       "npc_id": 260077,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     }
   ],
   "dungeon": {

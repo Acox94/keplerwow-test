@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T06:09:59.665Z",
+    "extracted_at": "2026-06-24T09:19:41.889Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -46,10 +46,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Niuzao",
       "npc_id": 73967,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -58,10 +60,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dreadstalker",
       "npc_id": 98035,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -70,10 +74,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Treant",
       "npc_id": 103822,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -82,6 +88,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Viceroy Nezhar",
       "npc_id": 122056,
@@ -123,7 +130,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -132,6 +140,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Zuraal the Ascended",
       "npc_id": 122313,
@@ -318,7 +327,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -327,6 +337,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Saprish",
       "npc_id": 122316,
@@ -402,7 +413,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -411,6 +423,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Darkfang",
       "npc_id": 122319,
@@ -451,7 +464,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -460,6 +474,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Famished Broken",
       "npc_id": 122322,
@@ -501,7 +516,8 @@
           ],
           "unavoidable": true
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -510,10 +526,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Sapped Voidlord",
       "npc_id": 122398,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -522,10 +540,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadowguard Trickster",
       "npc_id": 122401,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -534,10 +554,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadowguard Champion",
       "npc_id": 122403,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -546,6 +568,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dire Voidbender",
       "npc_id": 122404,
@@ -587,7 +610,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -596,6 +620,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dark Conjurer",
       "npc_id": 122405,
@@ -674,7 +699,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -683,10 +709,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Warp Stalker",
       "npc_id": 122407,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -695,10 +723,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadow Stalker",
       "npc_id": 122408,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -707,10 +737,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Skyfin",
       "npc_id": 122410,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -719,10 +751,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Bound Voidcaller",
       "npc_id": 122412,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -731,6 +765,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Ruthless Riftstalker",
       "npc_id": 122413,
@@ -799,7 +834,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -808,6 +844,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Umbral War-Adept",
       "npc_id": 122421,
@@ -848,7 +885,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -857,6 +895,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Shadow-Weaver",
       "npc_id": 122423,
@@ -931,7 +970,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -940,10 +980,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Voidmaw",
       "npc_id": 122456,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -952,10 +994,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Darkcaller",
       "npc_id": 122457,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -964,10 +1008,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Void Discharge",
       "npc_id": 122478,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -976,10 +1022,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dark Aberration",
       "npc_id": 122482,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -988,10 +1036,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadow Stalker",
       "npc_id": 122560,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1000,6 +1050,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Rift Warden",
       "npc_id": 122571,
@@ -1036,7 +1087,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1045,10 +1097,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Coalesced Void",
       "npc_id": 122716,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1057,10 +1111,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Umbral Tentacle",
       "npc_id": 122827,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1069,10 +1125,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Waning Void",
       "npc_id": 123050,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1081,10 +1139,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alleria Windrunner",
       "npc_id": 123187,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1093,10 +1153,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alleria Windrunner",
       "npc_id": 123743,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1105,10 +1167,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Locus-Walker",
       "npc_id": 123744,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1117,10 +1181,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Void Image",
       "npc_id": 123889,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1129,6 +1195,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Merciless Subjugator",
       "npc_id": 124171,
@@ -1206,7 +1273,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1215,10 +1283,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Viceroy Nezhar",
       "npc_id": 124309,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1227,6 +1297,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "L'ura",
       "npc_id": 124729,
@@ -1265,7 +1336,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1274,10 +1346,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Greater Rift Warden",
       "npc_id": 124745,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1286,10 +1360,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "War-Adept Essence",
       "npc_id": 124880,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1298,10 +1374,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Void Flayer",
       "npc_id": 124947,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1310,10 +1388,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Unstable Dark Matter",
       "npc_id": 124964,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1322,10 +1402,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadow-Weaver Essence",
       "npc_id": 124967,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1334,10 +1416,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Skyfin",
       "npc_id": 125079,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1346,10 +1430,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadow Stalker",
       "npc_id": 125080,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1358,10 +1444,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Warp Stalker",
       "npc_id": 125081,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1370,10 +1458,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Locus-Walker",
       "npc_id": 125099,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1382,10 +1472,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Saprish's Staff",
       "npc_id": 125131,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1394,6 +1486,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadewing",
       "npc_id": 125340,
@@ -1435,7 +1528,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1444,10 +1538,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Skyfin Juvenile",
       "npc_id": 125493,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1456,10 +1552,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Voidstalker Runt",
       "npc_id": 125495,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1468,10 +1566,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Void Shardling",
       "npc_id": 125504,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1480,10 +1580,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Chaotic Runoff",
       "npc_id": 125505,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1492,10 +1594,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadowguard Voidtender",
       "npc_id": 125615,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1504,10 +1608,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Commander Atalaa",
       "npc_id": 125620,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1516,10 +1622,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alleria Windrunner",
       "npc_id": 125836,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1528,10 +1636,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Locus-Walker",
       "npc_id": 125840,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1540,10 +1650,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lashing Voidling",
       "npc_id": 125857,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1552,10 +1664,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Rift Warden",
       "npc_id": 125860,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1564,10 +1678,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alleria Windrunner",
       "npc_id": 125871,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1576,10 +1692,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Locus-Walker",
       "npc_id": 125872,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1588,10 +1706,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fragmented Voidling",
       "npc_id": 125981,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1600,10 +1720,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Urjad",
       "npc_id": 126283,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1612,10 +1734,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Sealed Void Cache",
       "npc_id": 126312,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1624,10 +1748,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dark Fissure",
       "npc_id": 127767,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1636,10 +1762,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Vixx the Collector",
       "npc_id": 127882,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1648,10 +1776,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Twilight-Harbinger Tharuul",
       "npc_id": 127906,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1660,10 +1790,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Void-Blade Zedaat",
       "npc_id": 127911,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1672,10 +1804,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Void Manifestation",
       "npc_id": 127949,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1684,10 +1818,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Unstable Voidparticle",
       "npc_id": 128055,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1696,10 +1832,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadow Creeper",
       "npc_id": 128056,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1708,10 +1846,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Voidstalker Runt",
       "npc_id": 128057,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1720,10 +1860,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Irate Skyfin",
       "npc_id": 128058,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1732,10 +1874,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Flaying Voidsliver",
       "npc_id": 128059,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1744,10 +1888,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Chaotic Darkseer",
       "npc_id": 128061,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1756,10 +1902,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Wild Imp",
       "npc_id": 143622,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1768,10 +1916,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "The Primus",
       "npc_id": 177570,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1780,10 +1930,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Mawsworn Ravager",
       "npc_id": 178373,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1792,10 +1944,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Mawsworn Ripper",
       "npc_id": 178374,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1804,10 +1958,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Past Self",
       "npc_id": 185800,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1816,10 +1972,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Thing From Beyond",
       "npc_id": 189988,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1828,10 +1986,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lindormi",
       "npc_id": 197915,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1840,10 +2000,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Diabolic Imp",
       "npc_id": 219161,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1852,10 +2014,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Infernal Fragment",
       "npc_id": 226790,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1864,10 +2028,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Pit Lord",
       "npc_id": 228574,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1876,10 +2042,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Overlord",
       "npc_id": 228575,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1888,10 +2056,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Mother of Chaos",
       "npc_id": 228576,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1900,10 +2070,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Xal'atath",
       "npc_id": 229227,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1912,10 +2084,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Orb of Ascendance",
       "npc_id": 229296,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1924,10 +2098,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lesser Ghoul",
       "npc_id": 237409,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1936,10 +2112,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Manifested Timeways",
       "npc_id": 248958,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1948,10 +2126,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Evil You",
       "npc_id": 249058,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1960,10 +2140,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Doomguard",
       "npc_id": 250785,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1972,10 +2154,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dundun",
       "npc_id": 251069,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1984,10 +2168,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dread Shade",
       "npc_id": 251422,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1996,6 +2182,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Void-Infused Destroyer",
       "npc_id": 252756,
@@ -2073,7 +2260,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2082,10 +2270,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Future Self",
       "npc_id": 253466,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2094,10 +2284,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Antoran Jailer",
       "npc_id": 255147,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2106,10 +2298,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dryad",
       "npc_id": 255261,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2118,6 +2312,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Void Tentacle",
       "npc_id": 256424,
@@ -2156,7 +2351,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2165,6 +2361,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shadowguard Champion",
       "npc_id": 256574,
@@ -2235,7 +2432,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2244,10 +2442,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fel Ravager",
       "npc_id": 258587,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2256,10 +2456,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lindormi",
       "npc_id": 259053,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2268,10 +2470,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lady Sacrolash",
       "npc_id": 260076,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2280,10 +2484,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Warlock Alythess",
       "npc_id": 260077,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     }
   ],
   "dungeon": {

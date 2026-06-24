@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T06:09:59.665Z",
+    "extracted_at": "2026-06-24T09:19:41.889Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -46,10 +46,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Darkglare",
       "npc_id": 103673,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -58,10 +60,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Captain Garrick",
       "npc_id": 209057,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -70,10 +74,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Meredy Huntswell",
       "npc_id": 209059,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -82,10 +88,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Austin Huxworth",
       "npc_id": 209065,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -94,10 +102,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Crenna Earth-Daughter",
       "npc_id": 209072,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -106,10 +116,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shuja Grimaxe",
       "npc_id": 214390,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -118,10 +130,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Blood Beast",
       "npc_id": 217228,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -130,10 +144,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Archmage Kel'Thuzad",
       "npc_id": 227223,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -142,10 +158,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Emberdawn",
       "npc_id": 231606,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -154,6 +172,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Kalis",
       "npc_id": 231626,
@@ -232,7 +251,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -241,10 +261,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Latch",
       "npc_id": 231629,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -253,6 +275,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Commander Kroluk",
       "npc_id": 231631,
@@ -296,7 +319,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -305,6 +329,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Restless Heart",
       "npc_id": 231636,
@@ -346,7 +371,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -355,10 +381,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Territorial Dragonhawk",
       "npc_id": 232056,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -367,6 +395,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Apex Lynx",
       "npc_id": 232063,
@@ -405,7 +434,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -414,6 +444,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Creeping Spindleweb",
       "npc_id": 232067,
@@ -454,7 +485,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -463,6 +495,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Restless Steward",
       "npc_id": 232070,
@@ -546,7 +579,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -555,10 +589,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Spellguard Magus",
       "npc_id": 232113,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -567,10 +603,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Windrunner Soldier",
       "npc_id": 232116,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -579,6 +617,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Flaming Updraft",
       "npc_id": 232118,
@@ -662,7 +701,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -671,6 +711,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Swiftshot Archer",
       "npc_id": 232119,
@@ -713,7 +754,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -722,6 +764,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Phantasmal Mystic",
       "npc_id": 232146,
@@ -768,7 +811,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -777,10 +821,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lingering Marauder",
       "npc_id": 232147,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -789,6 +835,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Spectral Axethrower",
       "npc_id": 232148,
@@ -830,7 +877,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -839,6 +887,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Ardent Cutthroat",
       "npc_id": 232171,
@@ -964,7 +1013,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -973,6 +1023,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fervent Apothecary",
       "npc_id": 232173,
@@ -1016,7 +1067,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1025,10 +1077,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Devoted Woebringer",
       "npc_id": 232175,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1037,10 +1091,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Flesh Behemoth",
       "npc_id": 232176,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1049,10 +1105,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Zealous Reaver",
       "npc_id": 232232,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1061,10 +1119,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Loyal Worg",
       "npc_id": 232283,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1073,10 +1133,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Haunting Grunt",
       "npc_id": 232446,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1085,10 +1147,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Spectral Axethrower",
       "npc_id": 232447,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1097,10 +1161,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Phantasmal Mystic",
       "npc_id": 234061,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1109,10 +1175,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lirath Windrunner",
       "npc_id": 235081,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1121,6 +1189,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Bloated Lasher",
       "npc_id": 236894,
@@ -1167,7 +1236,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1176,10 +1246,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Scouting Trapper",
       "npc_id": 238049,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1188,10 +1260,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Ethereal Brannmorpher",
       "npc_id": 245374,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1200,10 +1274,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dread Shade",
       "npc_id": 251422,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1212,10 +1288,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Desperate Soul",
       "npc_id": 254505,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1224,10 +1302,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Haunting Grunt",
       "npc_id": 258868,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1236,10 +1316,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lindormi",
       "npc_id": 259053,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     }
   ],
   "dungeon": {

@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T06:09:59.665Z",
+    "extracted_at": "2026-06-24T09:19:41.889Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -46,10 +46,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Ymirjar Skycaller",
       "npc_id": 31260,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -58,10 +60,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Ick",
       "npc_id": 36476,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -70,10 +74,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Krick",
       "npc_id": 36477,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -82,10 +88,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Forgemaster Garfrost",
       "npc_id": 36494,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -94,10 +102,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Scourgelord Tyrannus",
       "npc_id": 36658,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -106,10 +116,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Rimefang",
       "npc_id": 36661,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -118,10 +130,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alliance Slave",
       "npc_id": 36764,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -130,10 +144,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alliance Slave",
       "npc_id": 36765,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -142,10 +158,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alliance Slave",
       "npc_id": 36766,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -154,10 +172,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alliance Slave",
       "npc_id": 36767,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -166,10 +186,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Horde Slave",
       "npc_id": 36770,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -178,10 +200,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Horde Slave",
       "npc_id": 36771,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -190,10 +214,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Horde Slave",
       "npc_id": 36772,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -202,10 +228,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Horde Slave",
       "npc_id": 36773,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -214,10 +242,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Deathwhisper Necrolyte",
       "npc_id": 36788,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -226,10 +256,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Scourgelord Tyrannus",
       "npc_id": 36794,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -238,10 +270,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Wrathbone Laborer",
       "npc_id": 36830,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -250,10 +284,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Ymirjar Wrathbringer",
       "npc_id": 36840,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -262,10 +298,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fallen Warrior",
       "npc_id": 36841,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -274,10 +312,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Wrathbone Coldwraith",
       "npc_id": 36842,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -286,10 +326,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Disturbed Glacial Revenant",
       "npc_id": 36874,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -298,10 +340,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Wrathbone Skeleton",
       "npc_id": 36877,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -310,10 +354,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Plagueborn Horror",
       "npc_id": 36879,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -322,10 +368,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Skeletal Slave",
       "npc_id": 36881,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -334,10 +382,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Geist Ambusher",
       "npc_id": 36886,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -346,10 +396,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Rescued Alliance Slave",
       "npc_id": 36888,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -358,10 +410,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Rescued Horde Slave",
       "npc_id": 36889,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -370,10 +424,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Iceborn Proto-Drake",
       "npc_id": 36891,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -382,10 +438,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Ymirjar Deathbringer",
       "npc_id": 36892,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -394,10 +452,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Ymirjar Flamebearer",
       "npc_id": 36893,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -406,10 +466,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Stonespine Gargoyle",
       "npc_id": 36896,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -418,10 +480,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Wrathbone Siegesmith",
       "npc_id": 36907,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -430,10 +494,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lady Sylvanas Windrunner",
       "npc_id": 36990,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -442,10 +508,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lady Jaina Proudmoore",
       "npc_id": 36993,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -454,10 +522,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Coliseum Champion",
       "npc_id": 37496,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -466,10 +536,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Coliseum Champion",
       "npc_id": 37497,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -478,10 +550,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Coliseum Champion",
       "npc_id": 37498,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -490,10 +564,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Freed Alliance Slave",
       "npc_id": 37572,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -502,10 +578,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Freed Alliance Slave",
       "npc_id": 37575,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -514,10 +592,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Freed Alliance Slave",
       "npc_id": 37576,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -526,10 +606,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Freed Horde Slave",
       "npc_id": 37577,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -538,10 +620,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Freed Horde Slave",
       "npc_id": 37578,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -550,10 +634,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Freed Horde Slave",
       "npc_id": 37579,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -562,10 +648,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Martin Victus",
       "npc_id": 37580,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -574,10 +662,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Gorkun Ironskull",
       "npc_id": 37581,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -586,10 +676,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Archmage Koreln",
       "npc_id": 37582,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -598,10 +690,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dark Ranger Kalira",
       "npc_id": 37583,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -610,10 +704,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Coliseum Champion",
       "npc_id": 37584,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -622,10 +718,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Coliseum Champion",
       "npc_id": 37587,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -634,10 +732,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Coliseum Champion",
       "npc_id": 37588,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -646,10 +746,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Martin Victus",
       "npc_id": 37591,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -658,10 +760,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Gorkun Ironskull",
       "npc_id": 37592,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -670,10 +774,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Hungering Ghoul",
       "npc_id": 37711,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -682,10 +788,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Deathwhisper Shadowcaster",
       "npc_id": 37712,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -694,10 +802,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Deathwhisper Torturer",
       "npc_id": 37713,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -706,10 +816,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Wrathbone Sorcerer",
       "npc_id": 37728,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -718,10 +830,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Wrathbone Reaver",
       "npc_id": 37729,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -730,10 +844,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Sindragosa",
       "npc_id": 37755,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -742,10 +858,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Archmage Elandra",
       "npc_id": 37774,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -754,10 +872,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dark Ranger Loralen",
       "npc_id": 37779,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -766,10 +886,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lady Jaina Proudmoore",
       "npc_id": 38188,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -778,10 +900,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lady Sylvanas Windrunner",
       "npc_id": 38189,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -790,10 +914,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fallen Warrior",
       "npc_id": 38487,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -802,10 +928,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Treant",
       "npc_id": 54983,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -814,10 +942,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dreadstalker",
       "npc_id": 98035,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -826,10 +956,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Darkglare",
       "npc_id": 103673,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -838,10 +970,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Wild Imp",
       "npc_id": 143622,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -850,10 +984,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Paintbot Green",
       "npc_id": 155185,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -862,10 +998,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Blitz",
       "npc_id": 197564,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -874,10 +1012,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lindormi",
       "npc_id": 197915,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -886,10 +1026,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Blood Beast",
       "npc_id": 217228,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -898,10 +1040,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Diabolic Imp",
       "npc_id": 219161,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -910,10 +1054,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Highlord Darion Mograine",
       "npc_id": 221632,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -922,10 +1068,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "King Thoras Trollbane",
       "npc_id": 221635,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -934,10 +1082,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Voidwraith",
       "npc_id": 224466,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -946,10 +1096,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Infernal Fragment",
       "npc_id": 226790,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -958,10 +1110,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Pit Lord",
       "npc_id": 228574,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -970,10 +1124,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Overlord",
       "npc_id": 228575,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -982,10 +1138,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Mother of Chaos",
       "npc_id": 228576,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -994,10 +1152,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Xal'atath",
       "npc_id": 229227,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1006,10 +1166,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Orb of Ascendance",
       "npc_id": 229296,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1018,10 +1180,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Voidbound Emissary",
       "npc_id": 229537,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1030,10 +1194,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Spirit Wolf",
       "npc_id": 233037,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1042,10 +1208,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Xal'atath",
       "npc_id": 236933,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1054,10 +1222,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lesser Ghoul",
       "npc_id": 237409,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1066,10 +1236,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Doomguard",
       "npc_id": 250785,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1078,10 +1250,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dundun",
       "npc_id": 251069,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1090,10 +1264,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dread Shade",
       "npc_id": 251422,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1102,10 +1278,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Deathwhisper Necrolyte",
       "npc_id": 252551,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1114,10 +1292,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lumbering Plaguehorror",
       "npc_id": 252555,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1126,10 +1306,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Leaping Geist",
       "npc_id": 252559,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1138,6 +1320,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dreadpulse Lich",
       "npc_id": 252563,
@@ -1183,7 +1366,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1192,10 +1376,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Glacieth",
       "npc_id": 252564,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1204,10 +1390,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Wrathbone Enforcer",
       "npc_id": 252565,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1216,6 +1404,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Rimebone Coldwraith",
       "npc_id": 252566,
@@ -1299,7 +1488,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1308,6 +1498,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Gloombound Shadebringer",
       "npc_id": 252567,
@@ -1354,7 +1545,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1363,10 +1555,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Risen Soldier",
       "npc_id": 252602,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1375,6 +1569,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Arcanist Cadaver",
       "npc_id": 252603,
@@ -1421,7 +1616,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1430,10 +1626,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Ymirjar Graveblade",
       "npc_id": 252610,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1442,6 +1640,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Krick",
       "npc_id": 252621,
@@ -1525,7 +1724,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1534,6 +1734,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Forgemaster Garfrost",
       "npc_id": 252635,
@@ -1685,7 +1886,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1694,6 +1896,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": true,
+      "is_boss_add": false,
       "level": null,
       "name": "Scourgelord Tyrannus",
       "npc_id": 252648,
@@ -1732,7 +1935,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1741,6 +1945,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Rimefang",
       "npc_id": 252653,
@@ -1782,7 +1987,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1791,10 +1997,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fallen Soldier",
       "npc_id": 252708,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1803,10 +2011,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alliance Captive",
       "npc_id": 252710,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1815,10 +2025,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alliance Captive",
       "npc_id": 252789,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1827,10 +2039,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Escaping Soldier",
       "npc_id": 252823,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1839,10 +2053,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alliance Soldier",
       "npc_id": 252970,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1851,10 +2067,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Alliance Mage",
       "npc_id": 252971,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1863,10 +2081,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lady Jaina Proudmoore",
       "npc_id": 253641,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1875,10 +2095,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Martin Victus",
       "npc_id": 253643,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1887,10 +2109,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Martin Victus",
       "npc_id": 253665,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1899,10 +2123,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Desperate Soul",
       "npc_id": 254505,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1911,6 +2137,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Rotling",
       "npc_id": 254684,
@@ -1947,7 +2174,8 @@
           "target_roles": null,
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -1956,6 +2184,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Scourge Plaguespreader",
       "npc_id": 254691,
@@ -2001,7 +2230,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2010,6 +2240,7 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Shade of Krick",
       "npc_id": 255037,
@@ -2051,7 +2282,8 @@
           ],
           "unavoidable": false
         }
-      ]
+      ],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2060,10 +2292,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Antoran Jailer",
       "npc_id": 255147,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2072,10 +2306,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Dryad",
       "npc_id": 255363,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2084,10 +2320,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lesser Ghoul",
       "npc_id": 258578,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2096,10 +2334,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Fel Ravager",
       "npc_id": 258587,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2108,10 +2348,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lindormi",
       "npc_id": 259053,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2120,10 +2362,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Lady Sacrolash",
       "npc_id": 260076,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     },
     {
       "base_health": null,
@@ -2132,10 +2376,12 @@
       "display_id": null,
       "forces": null,
       "is_boss": false,
+      "is_boss_add": false,
       "level": null,
       "name": "Grand Warlock Alythess",
       "npc_id": 260077,
-      "spells": []
+      "spells": [],
+      "summoned_by": null
     }
   ],
   "dungeon": {
