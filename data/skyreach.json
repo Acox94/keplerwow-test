@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T18:36:06.127Z",
+    "extracted_at": "2026-06-24T18:47:06.928Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -84,6 +84,7 @@
       "npc_id": 75964,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -119,6 +120,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -154,6 +156,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 1000,
           "coaching_note": null,
           "completion_effect": null,
@@ -189,6 +192,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 1000,
           "coaching_note": null,
           "completion_effect": null,
@@ -224,6 +228,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -264,6 +269,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -299,6 +305,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -334,6 +341,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -369,6 +377,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -404,6 +413,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -443,6 +453,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -478,6 +489,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -513,6 +525,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -555,6 +568,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -733,6 +747,7 @@
       "npc_id": 76141,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": "Araknath smashes the ground on ONE side — move to the unsmashed side; the impact area also stacks a damage-taken debuff on anyone caught.",
           "completion_effect": null,
@@ -774,6 +789,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -814,6 +830,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -849,6 +866,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -884,6 +902,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -924,6 +943,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -959,6 +979,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -994,6 +1015,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1065,6 +1087,7 @@
       "npc_id": 76143,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 1000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1100,6 +1123,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1135,6 +1159,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 1000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1170,6 +1195,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1205,6 +1231,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Rukhran rains flaming quills on everyone in line of sight — break LoS behind cover (a pillar / the terrain) to avoid the ticks.",
           "completion_effect": null,
@@ -1247,6 +1274,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1282,6 +1310,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1322,6 +1351,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1481,6 +1511,7 @@
       "npc_id": 76266,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1516,6 +1547,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1558,6 +1590,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1593,6 +1626,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1824,6 +1858,7 @@
       "npc_id": 78932,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 4700,
           "coaching_note": null,
           "completion_effect": null,
@@ -1887,6 +1922,7 @@
       "npc_id": 78933,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1960,6 +1996,7 @@
       "npc_id": 79303,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2002,6 +2039,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2058,6 +2096,7 @@
       "npc_id": 79462,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 5000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2129,6 +2168,7 @@
       "npc_id": 79466,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,

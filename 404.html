@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T18:36:33.595Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T18:47:54.107Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -329,6 +329,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
         coaching_note: s.coaching_note,
         secondary_of: s.secondary_of,
         secondary_of_name: s.secondary_of != null ? spellNameById.get(s.secondary_of) ?? null : null,
+        cast_order: s.cast_order,
         dispel_detonates: s.dispel_detonates,
         freedom_partial: s.freedom_partial,
         cast_time_ms: s.cast_time_ms,
@@ -1453,7 +1454,7 @@ function notesRoleAdvice(cast, note, group) {
 function buildWarnings(r, group) {
   const w = [];
   const list = (ts) => ts.map((t) => labelCast(t)).join(", ");
-  const subj = (ts) => ts.map((t) => ({ spell_name: t.spell_name, npc_name: t.npc_name, count: t.count, is_boss: t.is_boss, is_boss_add: t.is_boss_add, summoned_by_name: t.summoned_by_name, secondary_of_name: t.secondary_of_name, target_roles: t.target_roles }));
+  const subj = (ts) => ts.map((t) => ({ spell_name: t.spell_name, npc_name: t.npc_name, count: t.count, is_boss: t.is_boss, is_boss_add: t.is_boss_add, summoned_by_name: t.summoned_by_name, secondary_of_name: t.secondary_of_name, target_roles: t.target_roles, cast_order: t.cast_order }));
   const targetingByKey = new Map(r.targeting.map((tt) => [castKey(tt.cast), tt]));
   const landsOn = (ts) => {
     const roles = /* @__PURE__ */ new Set();
@@ -6363,6 +6364,11 @@ var CreatureSpell = external_exports.object({
   // is the PRIMARY's spell_id; the engine attributes the secondary to it ("Stygian Ichor — from Hulking
   // Fragment"). null = a primary/standalone cast.
   secondary_of: external_exports.number().int().nullable().default(null),
+  // EDITORIAL — CAST ORDER: this cast's position in the boss's casting CYCLE (1 = cast first, 2 = next, …),
+  // derived from a WCL "Casts (as events)" timeline (the order each distinct mechanic first appears). Lets the
+  // UI present a boss's mechanics CHRONOLOGICALLY (who → what → when) instead of by severity. null = unordered
+  // (sorts after the ordered casts). Hand-set for now; could be auto-derived from the observed-cadence timeline.
+  cast_order: external_exports.number().int().nullable().default(null),
   // EDITORIAL — REMOVAL TRIGGERS THE EFFECT: dispelling this debuff detonates it (same as letting it expire),
   // so it is NOT a dispel target. The engine drops it from the dispel/survive dimensions and routes the answer
   // to the cast's coaching_note (spread/position), per the prevent>avoid>remove>survive precedence. Default false.
@@ -6650,6 +6656,8 @@ var ExportedSpell = external_exports.object({
   coaching_note: external_exports.string().nullable().default(null),
   // EDITORIAL — SECONDARY EFFECT: the PRIMARY spell_id this cast is a consequence of (see CreatureSpell.secondary_of); null = primary.
   secondary_of: external_exports.number().int().nullable().default(null),
+  // EDITORIAL — CAST ORDER in the boss's cycle (see CreatureSpell.cast_order); null = unordered (sorts last).
+  cast_order: external_exports.number().int().nullable().default(null),
   // EDITORIAL — dispelling this debuff detonates it (see CreatureSpell.dispel_detonates); the engine drops it
   // from the dispel/survive dimensions and answers it via the coaching_note. Default false.
   dispel_detonates: external_exports.boolean().default(false),
@@ -6899,8 +6907,12 @@ function renderReport(rep) {
     if ((w.subjects?.length ?? 0) > 0) return !w.role_advice || lens in w.role_advice;
     return false;
   });
+  const castOrderOf = (w) => {
+    const orders = (w.subjects ?? []).map((s) => s.cast_order).filter((o) => o != null);
+    return orders.length ? Math.min(...orders) : Number.MAX_SAFE_INTEGER;
+  };
   const sections = SOURCE_SECTIONS.map(({ source, label }) => {
-    const ws = visible.filter((w) => w.source === source).sort((a, b) => SEV_RANK[a.severity] - SEV_RANK[b.severity]);
+    const ws = visible.filter((w) => w.source === source).sort((a, b) => source === "boss" ? castOrderOf(a) - castOrderOf(b) || SEV_RANK[a.severity] - SEV_RANK[b.severity] : SEV_RANK[a.severity] - SEV_RANK[b.severity]);
     const refCards = source === "boss" && state.showBoss ? rep.boss_reference.map(referenceCard) : [];
     if (ws.length === 0 && refCards.length === 0) return "";
     return `<h3 class="section-head">${label} <span class="section-count">${ws.length + refCards.length}</span></h3>

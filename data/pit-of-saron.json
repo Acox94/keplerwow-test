@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T18:36:06.127Z",
+    "extracted_at": "2026-06-24T18:47:06.928Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -69,6 +69,7 @@
       "npc_id": 36476,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -104,6 +105,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -139,6 +141,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -176,6 +179,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -216,6 +220,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -256,6 +261,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1647,6 +1653,7 @@
       "npc_id": 252563,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1737,6 +1744,7 @@
       "npc_id": 252566,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -1782,6 +1790,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1838,6 +1847,7 @@
       "npc_id": 252567,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -1914,6 +1924,7 @@
       "npc_id": 252603,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 5000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1990,6 +2001,7 @@
       "npc_id": 252621,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2030,6 +2042,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2065,6 +2078,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2100,6 +2114,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 10000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2145,6 +2160,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2185,6 +2201,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2236,6 +2253,7 @@
       "npc_id": 252635,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2276,6 +2294,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2311,6 +2330,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2349,6 +2369,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2389,6 +2410,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2429,6 +2451,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -2469,6 +2492,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Shards of ice — move out; being hit applies a +50% Frost damage-taken debuff (and snares you), so the next Frost hit lands amplified.",
           "completion_effect": null,
@@ -2514,6 +2538,7 @@
           }
         },
         {
+          "cast_order": null,
           "cast_time_ms": 5000,
           "coaching_note": "The overloaded forge pulses a Frost-damage-taken debuff that stacks every 0.5s for 14s — line-of-sight it behind a Saronite Ore chunk to block it completely. The stacks make follow-up Frost damage lethal, so never eat it.",
           "completion_effect": null,
@@ -2555,6 +2580,7 @@
           }
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2612,6 +2638,7 @@
       "npc_id": 252648,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": "Tyrannus knocks away his target (the tank) and applies a +200% Shadow damage-taken debuff. While it's up the tank can't avoid his Shadow follow-up — it lands ~tripled and can one-shot, so MITIGATE the window with a large damage-reduction cooldown / a pre-planned ally external on the tank.",
           "completion_effect": null,
@@ -2654,6 +2681,7 @@
           }
         },
         {
+          "cast_order": null,
           "cast_time_ms": 5000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2689,6 +2717,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": "Targeted (likely the tank); leaves a 10yd avoidable ground pool — everyone else move out.",
           "completion_effect": null,
@@ -2726,6 +2755,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2761,6 +2791,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2817,6 +2848,7 @@
       "npc_id": 252653,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -3023,6 +3055,7 @@
       "npc_id": 254684,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -3074,6 +3107,7 @@
       "npc_id": 254691,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -3134,6 +3168,7 @@
       "npc_id": 255037,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Channeled Curse-root + snare on 2–3 players — decurse or Blessing of Freedom to break it.",
           "completion_effect": null,

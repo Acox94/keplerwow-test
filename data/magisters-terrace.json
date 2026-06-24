@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T18:36:06.127Z",
+    "extracted_at": "2026-06-24T18:47:06.928Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -279,6 +279,7 @@
       "npc_id": 231865,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -314,6 +315,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -349,6 +351,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -384,6 +387,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -423,6 +427,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Volatile orbs — sidestep them. Critical: a hit deals Shadow damage AND snares you, and the snare can cost you the next dodge. Treat it as a hard-dodge.",
           "completion_effect": null,
@@ -465,6 +470,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -502,6 +508,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": "Degentrius smashes their current target — Shadow splash + a knockback to everyone near the tank. Non-tanks stay spread off the tank; pre-position so the knockback doesn't punt you into the next pack.",
           "completion_effect": null,
@@ -543,6 +550,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -580,6 +588,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "The pool left behind when Hulking Fragment's Embedded Splinters are removed or expire — a ground damage zone. Move out of it.",
           "completion_effect": null,
@@ -650,6 +659,7 @@
       "npc_id": 232369,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -695,6 +705,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3500,
           "coaching_note": null,
           "completion_effect": null,
@@ -751,6 +762,7 @@
       "npc_id": 234062,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -805,6 +817,7 @@
       "npc_id": 234064,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -956,6 +969,7 @@
       "npc_id": 234486,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1027,6 +1041,7 @@
       "npc_id": 239636,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1062,6 +1077,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Ground pool spawned by Cosmic Sting — don't stand in it.",
           "completion_effect": null,
@@ -1102,6 +1118,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": "Gemellus channels a vacuum on a player and pulls them in — move OUT against the pull. Anyone dragged in takes Cosmic Radiation (heavy ticking Shadow damage).",
           "completion_effect": null,
@@ -1144,6 +1161,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "The fail-damage for Astral Grasp — heavy ticking Shadow damage on whoever gets pulled into Gemellus. You don't dodge this directly; avoid it by moving out of Astral Grasp's pull.",
           "completion_effect": null,
@@ -1184,6 +1202,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1219,6 +1238,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1254,6 +1274,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": "Stings a player and drops a Void Secretions pool at their feet — bait it to the edge, away from where the group stands.",
           "completion_effect": null,
@@ -1310,6 +1331,7 @@
       "npc_id": 240973,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": "Heavy unavoidable DoT — heal/mitigate through.",
           "completion_effect": null,
@@ -1441,6 +1463,7 @@
       "npc_id": 249086,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1481,6 +1504,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1619,6 +1643,7 @@
       "npc_id": 251861,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,

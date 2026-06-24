@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T18:36:06.127Z",
+    "extracted_at": "2026-06-24T18:47:06.928Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -99,6 +99,7 @@
       "npc_id": 122056,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -141,6 +142,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -176,6 +178,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 5000,
           "coaching_note": null,
           "completion_effect": null,
@@ -211,6 +214,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -246,6 +250,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 10000,
           "coaching_note": null,
           "completion_effect": null,
@@ -281,6 +286,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 1500,
           "coaching_note": null,
           "completion_effect": null,
@@ -332,6 +338,7 @@
       "npc_id": 122313,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -371,6 +378,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -406,6 +414,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 1500,
           "coaching_note": null,
           "completion_effect": null,
@@ -441,6 +450,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -476,6 +486,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -511,6 +522,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -546,6 +558,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -581,6 +594,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -616,6 +630,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 5000,
           "coaching_note": null,
           "completion_effect": null,
@@ -657,6 +672,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 5000,
           "coaching_note": null,
           "completion_effect": null,
@@ -699,6 +715,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -739,6 +756,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -776,6 +794,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -813,6 +832,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3500,
           "coaching_note": null,
           "completion_effect": null,
@@ -866,6 +886,7 @@
       "npc_id": 122316,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -901,6 +922,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -936,6 +958,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -971,6 +994,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1006,6 +1030,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1041,6 +1066,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1076,6 +1102,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1111,6 +1138,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1146,6 +1174,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1186,6 +1215,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1223,6 +1253,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1258,6 +1289,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 6000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1293,6 +1325,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1346,6 +1379,7 @@
       "npc_id": 122319,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1401,6 +1435,7 @@
       "npc_id": 122322,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1502,6 +1537,7 @@
       "npc_id": 122404,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1563,6 +1599,7 @@
       "npc_id": 122405,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1608,6 +1645,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1724,6 +1762,7 @@
       "npc_id": 122413,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1763,6 +1802,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1814,6 +1854,7 @@
       "npc_id": 122421,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1869,6 +1910,7 @@
       "npc_id": 122423,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1908,6 +1950,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2036,6 +2079,7 @@
       "npc_id": 122571,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": "Afflicts players with a Shadow vulnerability — +20% Shadow damage taken. Dispel it (Magic) before the next big Shadow hit lands amplified.",
           "completion_effect": null,
@@ -2196,6 +2240,7 @@
       "npc_id": 124171,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2235,6 +2280,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": "A chain-snare on a player that also pulses Shadow damage to anyone within 4 yds (40% snare) — pre-spread off the chained player; the snare clears with Blessing of Freedom or any movement-freeing ability.",
           "completion_effect": null,
@@ -2308,6 +2354,7 @@
       "npc_id": 124729,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2343,6 +2390,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2378,6 +2426,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2413,6 +2462,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2448,6 +2498,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2488,6 +2539,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2523,6 +2575,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2558,6 +2611,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2593,6 +2647,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2628,6 +2683,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2663,6 +2719,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2700,6 +2757,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2735,6 +2793,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2775,6 +2834,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2815,6 +2875,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2850,6 +2911,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2885,6 +2947,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 10000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2920,6 +2983,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "L'ura opens void rifts; every 3rd cycle she fires a lance from each at her current target — a tank-buster that scales with the number of rifts. Tank actives/externals; the more rifts open, the bigger the hit.",
           "completion_effect": null,
@@ -2957,6 +3021,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -3158,6 +3223,7 @@
       "npc_id": 125340,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 5000,
           "coaching_note": null,
           "completion_effect": null,
@@ -3904,6 +3970,7 @@
       "npc_id": 252756,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 4500,
           "coaching_note": null,
           "completion_effect": null,
@@ -3941,6 +4008,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -4044,6 +4112,7 @@
       "npc_id": 256424,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 700,
           "coaching_note": null,
           "completion_effect": null,
@@ -4101,6 +4170,7 @@
       "npc_id": 256574,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "The Shadowguard Champion charges its target and slams when they're at range, stacking a bleed — stay close (in melee) to deny the charge; don't kite it.",
           "completion_effect": null,
@@ -4138,6 +4208,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,

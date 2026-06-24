@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T18:36:06.127Z",
+    "extracted_at": "2026-06-24T18:47:06.928Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -54,6 +54,7 @@
       "npc_id": 1531,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -455,6 +456,7 @@
       "npc_id": 242964,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -531,6 +533,7 @@
       "npc_id": 247570,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -566,6 +569,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "A frozen patch left where a Freezing Trap triggers — Frost ticks to anyone within and it slides you around. Clear it, and mind the slip near other hazards.",
           "completion_effect": null,
@@ -608,6 +612,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 10000,
           "coaching_note": null,
           "completion_effect": null,
@@ -643,6 +648,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Punish for failing to dodge Carrion Swoop — sidestep that frontal to prevent it. (Muro'jin + Nekraxx duo: Nekraxx's Carrion Swoop knocks you up, Muro'jin's axe then hits + knocks you further.)",
           "completion_effect": null,
@@ -685,6 +691,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -725,6 +732,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -764,6 +772,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -801,6 +810,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -854,6 +864,7 @@
       "npc_id": 247572,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -896,6 +907,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 1500,
           "coaching_note": null,
           "completion_effect": null,
@@ -936,6 +948,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 4500,
           "coaching_note": null,
           "completion_effect": null,
@@ -978,6 +991,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1013,6 +1027,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1064,6 +1079,7 @@
       "npc_id": 248595,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1104,6 +1120,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1139,6 +1156,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 1000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1177,6 +1195,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1212,6 +1231,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Unavoidable party AoE even when the mechanic is resolved correctly — heal through.",
           "completion_effect": null,
@@ -1252,6 +1272,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1292,6 +1313,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1330,6 +1352,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -1370,6 +1393,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Masses of soul ichor flow across the dais — sidestep them; damage only lands on players struck.",
           "completion_effect": null,
@@ -1412,6 +1436,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1452,6 +1477,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1503,6 +1529,7 @@
       "npc_id": 248605,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Rak'tul's engorged form pulses Shadow damage to the whole party every ~6s and ejects Volatile Essences — heal the unavoidable pulse, dodge the ejected essences.",
           "completion_effect": null,
@@ -1543,6 +1570,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Ejected by Deathgorged Vessel — these burst on impact where they land; sidestep the impact radius.",
           "completion_effect": null,
@@ -1585,6 +1613,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1623,6 +1652,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Rak'tul leap-slams repeatedly — dodge each impact; every slam plants a Soulbind Totem where it lands.",
           "completion_effect": null,
@@ -1665,6 +1695,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "A pool of spectral essence — move out; standing in it ticks heavy Shadow AND ramps your damage taken by 30%.",
           "completion_effect": null,
@@ -1711,6 +1742,7 @@
           }
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1746,6 +1778,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1786,6 +1819,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1821,6 +1855,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1861,6 +1896,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1898,6 +1934,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1994,6 +2031,7 @@
       "npc_id": 248692,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": "self-resurrection",
@@ -2093,6 +2131,7 @@
       "npc_id": 249024,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -2136,6 +2175,7 @@
           "vulnerability": null
         },
         {
+          "cast_order": null,
           "cast_time_ms": 3250,
           "coaching_note": null,
           "completion_effect": null,
@@ -2194,6 +2234,7 @@
       "npc_id": 249025,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2267,6 +2308,7 @@
       "npc_id": 249036,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -2403,6 +2445,7 @@
       "npc_id": 251674,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2475,6 +2518,7 @@
       "npc_id": 253302,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -2548,6 +2592,7 @@
       "npc_id": 253458,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2621,6 +2666,7 @@
       "npc_id": 253473,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2699,6 +2745,7 @@
       "npc_id": 253701,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2813,6 +2860,7 @@
       "npc_id": 254740,
       "spells": [
         {
+          "cast_order": null,
           "cast_time_ms": 1000,
           "coaching_note": null,
           "completion_effect": null,
