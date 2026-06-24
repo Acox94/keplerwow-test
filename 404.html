@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T12:41:18.735Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T15:15:20.568Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -317,6 +317,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
         positioning: s.positioning,
         dot: s.dot,
         displacement: s.displacement,
+        vulnerability: s.vulnerability,
         tank_buster: s.tank_buster,
         is_lethal: s.is_lethal,
         scales_to_lethal: s.scales_to_lethal,
@@ -353,6 +354,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
   const notes = analyzeNotes(threats);
   const cc_on_party = analyzeCcOnParty(threats);
   const displacement = analyzeDisplacement(threats);
+  const vulnerability = analyzeVulnerability(threats, groupSpecs, coveredTypes);
   const tank_buster = analyzeTankBusters(threats, groupSpecs);
   const target_drop = analyzeTargetDrop(threats, groupSpecs);
   const dps_survival = analyzeDpsSurvival(threats, groupSpecs);
@@ -400,6 +402,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
     movement,
     cc_on_party,
     displacement,
+    vulnerability,
     tank_buster,
     target_drop,
     dps_survival,
@@ -411,7 +414,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
     notes,
     boss_reference,
     // Skill gate: an expert sees only the essentials; learning + experienced also get the coaching/heads-ups.
-    warnings: buildWarnings({ dispels, stops, soothe, misplays, awareness, throughput, scaling, targeting, movement, cc_on_party, displacement, tank_buster, target_drop, dps_survival, pet_choice, composition, kick_timing, channel_timing, completion_effect, notes }, groupSpecs).filter((wn) => !wn.coaching || skill !== "expert")
+    warnings: buildWarnings({ dispels, stops, soothe, misplays, awareness, throughput, scaling, targeting, movement, cc_on_party, displacement, vulnerability, tank_buster, target_drop, dps_survival, pet_choice, composition, kick_timing, channel_timing, completion_effect, notes }, groupSpecs).filter((wn) => !wn.coaching || skill !== "expert")
   };
 }
 function normalizePull(pull) {
@@ -645,6 +648,35 @@ function analyzeDisplacement(threats) {
   for (const t of threats) {
     if (t.displacement.length === 0) continue;
     out.push({ cast: t, kinds: t.displacement });
+  }
+  return { threats: out };
+}
+function schoolsOverlap(castSchool, vulnSchool) {
+  if (vulnSchool === "all") return true;
+  return castSchool.split(",").map((s) => s.trim().toLowerCase()).includes(vulnSchool.trim().toLowerCase());
+}
+function analyzeVulnerability(threats, group, coveredTypes) {
+  const lethal = threats.filter((t) => t.is_lethal);
+  const groupHasInterrupt = group.some((s) => s.rollups.has_interrupt);
+  const groupHasStop = groupHasInterrupt || group.some((s) => s.rollups.stops_available > 0);
+  const out = [];
+  for (const t of threats) {
+    const v = t.vulnerability;
+    if (!v) continue;
+    let removal;
+    let removal_covered;
+    if (t.dispel_type !== "None" && !t.dispel_detonates) {
+      removal = "dispel";
+      removal_covered = coveredTypes.has(t.dispel_type);
+    } else if (t.is_interruptible || t.is_stoppable) {
+      removal = "stop";
+      removal_covered = t.is_stoppable ? groupHasStop : groupHasInterrupt;
+    } else {
+      removal = "none";
+      removal_covered = false;
+    }
+    const amplified_casts = lethal.filter((o) => castKey(o) !== castKey(t) && schoolsOverlap(o.school, v.school));
+    out.push({ cast: t, school: v.school, pct: v.pct, stacks: v.stacks, removal, removal_covered, amplified_casts });
   }
   return { threats: out };
 }
@@ -1716,6 +1748,22 @@ function buildWarnings(r, group) {
       coaching: lethal ? void 0 : true,
       subjects: subj([dt.cast]),
       message: `${name} ${displacementVerb(dt.kinds)} your party${on}${lethal ? " (lethal)" : ""} \u2014 ${displacementConsequence(dt.kinds, backlineKnockback)}.`
+    });
+  }
+  for (const vt of r.vulnerability.threats) {
+    const name = labelCast(vt.cast);
+    const schoolWord = vt.school === "all" ? "" : `${vt.school} `;
+    const amp = `ramps ${schoolWord}damage taken +${vt.pct}%${vt.stacks ? " (stacks)" : ""}`;
+    const combo = vt.amplified_casts.length ? ` \u2014 amplifies ${list(vt.amplified_casts)} (a +${vt.pct}% bigger hit${vt.removal_covered ? "" : " with no way to soften it"})` : "";
+    const removalText = vt.removal === "dispel" ? vt.removal_covered ? "dispel it to clear the amp" : `no ${vt.cast.dispel_type} dispel in the comp \u2014 the amp lingers` : vt.removal === "stop" ? vt.removal_covered ? "stop the cast (kick/CC) to deny the amp" : "no kick/CC to stop the cast \u2014 it lands" : "no removal \u2014 pre-plan an external/personal for the amplified hit";
+    const lethalCombo = vt.amplified_casts.length > 0;
+    const severity = lethalCombo && !vt.removal_covered ? "critical" : lethalCombo && vt.removal_covered || vt.stacks && !vt.removal_covered ? "warning" : "caution";
+    w.push({
+      severity,
+      category: "vulnerability",
+      coaching: severity === "caution" ? true : void 0,
+      subjects: subj([vt.cast]),
+      message: `${name} ${amp}${combo} \u2014 ${removalText}.`
     });
   }
   if (r.misplays.scatter_abilities.length > 0) {
@@ -6195,6 +6243,14 @@ var ObservedChannelStop = external_exports.object({
 }).strict();
 var PositioningTech = external_exports.enum(["move_out", "frontal", "line_of_sight", "spread", "stack", "soak", "bait"]);
 var DisplacementKind = external_exports.enum(["knockback", "pull", "cast_pushback"]);
+var Vulnerability = external_exports.object({
+  school: SchoolName,
+  // amplified school ('Shadow', 'Fire', 'Physical', 'Frost', …) or the literal 'all'
+  pct: external_exports.number().int(),
+  // +% damage taken
+  stacks: external_exports.boolean().default(false)
+  // repeated applications compound
+}).strict();
 var CreatureSpell = external_exports.object({
   npc_id: external_exports.number().int(),
   spell_id: external_exports.number().int(),
@@ -6219,6 +6275,11 @@ var CreatureSpell = external_exports.object({
   dot: external_exports.boolean().default(false),
   // DB2-derived (knock effects) / EDITORIAL: the cast knocks back / pulls / pushes back your cast.
   displacement: external_exports.array(DisplacementKind).default([]),
+  // EDITORIAL — a VULNERABILITY/amplifier: this cast increases damage taken (+pct% of `school`, or 'all'), so a
+  // following same-school hit lands amplified. Often little/no direct damage itself (tool-invisible to the
+  // danger/death/kick accelerators), so it's hand-set from the tooltip. The engine's vulnerability dimension
+  // pairs it with same-school lethal casts in the pull and routes the answer to removal/external. null = not one.
+  vulnerability: Vulnerability.nullable().default(null),
   // MEASURED (target_roles == [tank] + heavy single-target hit): a TANK BUSTER — its answer is the
   // tank's active mitigation / an external, not dodge/heal. First-class so the engine can later check
   // the comp has an external for the lethal ones. Gated on the targeting join; default false.
@@ -6516,6 +6577,9 @@ var ExportedSpell = external_exports.object({
   positioning: external_exports.array(PositioningTech).default([]),
   dot: external_exports.boolean().default(false),
   displacement: external_exports.array(DisplacementKind).default([]),
+  // EDITORIAL vulnerability/amplifier (see CreatureSpell.vulnerability); "+pct% [school] damage taken" that
+  // the engine pairs with same-school lethal casts in the pull. null = not an amplifier.
+  vulnerability: Vulnerability.nullable().default(null),
   tank_buster: external_exports.boolean().default(false),
   is_lethal: external_exports.boolean(),
   scales_to_lethal: external_exports.boolean(),

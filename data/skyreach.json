@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T12:39:01.300Z",
+    "extracted_at": "2026-06-24T15:10:12.074Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -113,7 +113,8 @@
           "spell_id": 153123,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -146,7 +147,8 @@
           "spell_id": 153139,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 1000,
@@ -179,7 +181,8 @@
           "spell_id": 153315,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 1000,
@@ -212,7 +215,8 @@
           "spell_id": 153544,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2000,
@@ -250,7 +254,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": true
+          "unavoidable": true,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -283,7 +288,8 @@
           "spell_id": 153759,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -316,7 +322,8 @@
           "spell_id": 156793,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -349,7 +356,8 @@
           "spell_id": 165731,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -382,7 +390,8 @@
           "spell_id": 165733,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -419,7 +428,8 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -452,7 +462,8 @@
           "spell_id": 1255472,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -485,7 +496,8 @@
           "spell_id": 1255473,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -525,7 +537,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -565,7 +578,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -705,14 +719,14 @@
       "spells": [
         {
           "cast_time_ms": 3000,
-          "coaching_note": null,
+          "coaching_note": "Araknath smashes the ground on ONE side — move to the unsmashed side; the impact area also stacks a damage-taken debuff on anyone caught.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": true,
@@ -723,7 +737,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -738,7 +754,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4000,
@@ -776,7 +793,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -809,7 +827,8 @@
           "spell_id": 154139,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -842,7 +861,8 @@
           "spell_id": 154150,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -880,7 +900,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -913,7 +934,8 @@
           "spell_id": 1279002,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4000,
@@ -946,7 +968,8 @@
           "spell_id": 1281874,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -984,7 +1007,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1048,7 +1072,8 @@
           "spell_id": 153794,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1081,7 +1106,8 @@
           "spell_id": 153795,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 1000,
@@ -1114,7 +1140,8 @@
           "spell_id": 153810,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2000,
@@ -1147,11 +1174,12 @@
           "spell_id": 153896,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Rukhran rains flaming quills on everyone in line of sight — break LoS behind cover (a pillar / the terrain) to avoid the ticks.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1169,7 +1197,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "line_of_sight"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1185,7 +1215,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1218,7 +1249,8 @@
           "spell_id": 160149,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -1256,7 +1288,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -1292,7 +1325,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1446,7 +1480,8 @@
           "spell_id": 153954,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -1486,7 +1521,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1519,7 +1555,8 @@
           "spell_id": 1253538,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -1552,7 +1589,8 @@
           "spell_id": 1253840,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1793,7 +1831,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1849,7 +1888,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1920,7 +1960,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1958,7 +1999,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2012,7 +2054,8 @@
           "spell_id": 152953,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2086,7 +2129,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null

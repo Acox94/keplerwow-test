@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T12:39:01.300Z",
+    "extracted_at": "2026-06-24T15:10:12.074Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -398,7 +398,8 @@
           "spell_id": 344663,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -435,7 +436,8 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -475,7 +477,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -508,7 +511,8 @@
           "spell_id": 374361,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4000,
@@ -546,7 +550,8 @@
             "melee_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -579,7 +584,8 @@
           "spell_id": 388901,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -612,7 +618,8 @@
           "spell_id": 388951,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -645,7 +652,8 @@
           "spell_id": 389011,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2000,
@@ -683,7 +691,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -720,7 +729,8 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -753,7 +763,8 @@
           "spell_id": 1279418,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -788,7 +799,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -823,7 +835,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -902,7 +915,8 @@
           "spell_id": 181089,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -935,7 +949,8 @@
           "spell_id": 344663,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2000,
@@ -968,7 +983,8 @@
           "spell_id": 376448,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2000,
@@ -1001,7 +1017,8 @@
           "spell_id": 376467,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -1036,7 +1053,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2500,
@@ -1074,7 +1092,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1112,15 +1131,18 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
-          "coaching_note": null,
+          "coaching_note": "Crawth faces a random player and flaps — get out of the frontal; it damages and knocks back everyone in the cone (pre-position so the knockback is safe).",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
-          "displacement": [],
+          "displacement": [
+            "knockback"
+          ],
           "dot": false,
           "freedom_partial": false,
           "is_aoe": false,
@@ -1134,7 +1156,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "frontal"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1149,7 +1173,8 @@
             "melee_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1182,7 +1207,8 @@
           "spell_id": 377182,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1215,7 +1241,8 @@
           "spell_id": 389481,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1248,7 +1275,8 @@
           "spell_id": 389483,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1281,7 +1309,8 @@
           "spell_id": 393211,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1314,7 +1343,8 @@
           "spell_id": 397210,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 20000,
@@ -1352,7 +1382,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1390,7 +1421,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1428,7 +1460,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1466,7 +1499,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1580,7 +1614,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1662,7 +1697,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2500,
@@ -1695,11 +1731,12 @@
           "spell_id": 386173,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Explosive mana on up to a few players (Arcane DoT) — spread out so the on-expiration detonation doesn't catch teammates; it leaves a Corrupted Mana pool where it goes off, so drop it away from the group.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1717,7 +1754,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "spread"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1732,18 +1771,19 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "The Arcane pool left where a Mana Bomb detonates — move out; it ticks Arcane and snares anyone inside.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": true,
@@ -1754,14 +1794,16 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Arcane",
-          "secondary_of": null,
+          "secondary_of": 386181,
           "spell_id": 386201,
           "tank_buster": false,
           "target_roles": [
@@ -1770,7 +1812,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1803,7 +1846,8 @@
           "spell_id": 387691,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -1841,7 +1885,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1879,7 +1924,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1993,7 +2039,8 @@
           "spell_id": 388392,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2051,7 +2098,8 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2122,7 +2170,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": true
+          "unavoidable": true,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2181,7 +2230,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2245,11 +2295,12 @@
           "spell_id": 344663,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 1000,
-          "coaching_note": null,
+          "coaching_note": "The tank stomp also brands the tank with +100% Physical damage taken — the next physical hit lands DOUBLED, so don't let it chain into another big physical (tank actives/externals, or trade the next swing).",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -2280,7 +2331,12 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": {
+            "pct": 100,
+            "school": "Physical",
+            "stacks": false
+          }
         },
         {
           "cast_time_ms": 2500,
@@ -2320,15 +2376,18 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Seeds sprout under every player's feet — step off your seed before it bursts (it damages and knocks back anyone nearby), then it leaves a dormant Hungry Lasher.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
-          "displacement": [],
+          "displacement": [
+            "knockback"
+          ],
           "dot": false,
           "freedom_partial": false,
           "is_aoe": false,
@@ -2342,7 +2401,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -2358,11 +2419,12 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
-          "coaching_note": null,
+          "coaching_note": "At 100 energy the dormant Lashers (the seeds Germinate planted) erupt from the ground — move off the seed spots before they burst free (it's avoidable; the damage is at the Lasher locations, not party-wide).",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -2380,7 +2442,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -2396,7 +2460,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2429,7 +2494,8 @@
           "spell_id": 390297,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2467,7 +2533,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": true
+          "unavoidable": true,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2521,7 +2588,8 @@
           "spell_id": 396640,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2554,7 +2622,8 @@
           "spell_id": 396721,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": 196482
@@ -2638,7 +2707,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2916,7 +2986,8 @@
             "melee_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null

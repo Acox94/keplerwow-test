@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T12:39:01.300Z",
+    "extracted_at": "2026-06-24T15:10:12.074Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -88,7 +88,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -492,7 +493,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -556,18 +558,19 @@
           "spell_id": 1243741,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "A frozen patch left where a Freezing Trap triggers — Frost ticks to anyone within and it slides you around. Clear it, and mind the slip near other hazards.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": true,
@@ -578,14 +581,16 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
-          "secondary_of": null,
+          "secondary_of": 1243741,
           "spell_id": 1243751,
           "tank_buster": false,
           "target_roles": [
@@ -594,7 +599,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 10000,
@@ -627,15 +633,18 @@
           "spell_id": 1249789,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": "Punish for failing to dodge Carrion Swoop — sidestep that frontal to prevent it.",
+          "coaching_note": "Punish for failing to dodge Carrion Swoop — sidestep that frontal to prevent it. (Muro'jin + Nekraxx duo: Nekraxx's Carrion Swoop knocks you up, Muro'jin's axe then hits + knocks you further.)",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
-          "displacement": [],
+          "displacement": [
+            "knockback"
+          ],
           "dot": false,
           "freedom_partial": false,
           "is_aoe": false,
@@ -656,7 +665,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
-          "secondary_of": null,
+          "secondary_of": 1249479,
           "spell_id": 1249989,
           "tank_buster": false,
           "target_roles": [
@@ -665,7 +674,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -703,7 +713,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -740,7 +751,8 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2500,
@@ -775,7 +787,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -810,7 +823,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -866,7 +880,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 1500,
@@ -904,7 +919,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4500,
@@ -944,7 +960,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -977,7 +994,8 @@
           "spell_id": 1249769,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1010,7 +1028,8 @@
           "spell_id": 1249948,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1064,7 +1083,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1097,7 +1117,8 @@
           "spell_id": 1251204,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 1000,
@@ -1133,7 +1154,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1166,7 +1188,8 @@
           "spell_id": 1251598,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1204,7 +1227,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": true
+          "unavoidable": true,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1242,7 +1266,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1278,7 +1303,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2500,
@@ -1316,11 +1342,12 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Masses of soul ichor flow across the dais — sidestep them; damage only lands on players struck.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1338,7 +1365,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1354,7 +1383,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1392,7 +1422,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1425,7 +1456,8 @@
           "spell_id": 1266706,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1445,7 +1477,7 @@
       "spells": [
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Rak'tul's engorged form pulses Shadow damage to the whole party every ~6s and ejects Volatile Essences — heal the unavoidable pulse, dodge the ejected essences.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1463,9 +1495,7 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": 5,
-          "positioning": [
-            "move_out"
-          ],
+          "positioning": [],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1481,11 +1511,12 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": true
+          "unavoidable": true,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Ejected by Deathgorged Vessel — these burst on impact where they land; sidestep the impact radius.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1503,14 +1534,16 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": 1.2,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1248863,
           "spell_id": 1248980,
           "tank_buster": false,
           "target_roles": [
@@ -1519,7 +1552,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1555,11 +1589,12 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Rak'tul leap-slams repeatedly — dodge each impact; every slam plants a Soulbind Totem where it lands.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1577,7 +1612,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1593,18 +1630,19 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "A pool of spectral essence — move out; standing in it ticks heavy Shadow AND ramps your damage taken by 30%.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": false,
@@ -1615,7 +1653,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1631,7 +1671,12 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": {
+            "pct": 30,
+            "school": "all",
+            "stacks": false
+          }
         },
         {
           "cast_time_ms": 3000,
@@ -1664,7 +1709,8 @@
           "spell_id": 1253788,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1702,7 +1748,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1735,7 +1782,8 @@
           "spell_id": 1253909,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1773,7 +1821,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1808,7 +1857,8 @@
           "target_roles": [
             "healer"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1841,7 +1891,8 @@
           "spell_id": 1279517,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1938,7 +1989,8 @@
           "spell_id": 1257716,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2040,7 +2092,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3250,
@@ -2080,7 +2133,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2136,7 +2190,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2210,7 +2265,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2340,7 +2396,8 @@
             "melee_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2411,7 +2468,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2482,7 +2540,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": true
+          "unavoidable": true,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2558,7 +2617,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2625,7 +2685,8 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2744,7 +2805,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null

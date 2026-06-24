@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T12:39:01.300Z",
+    "extracted_at": "2026-06-24T15:10:12.074Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -203,7 +203,8 @@
           "spell_id": 465904,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -239,7 +240,8 @@
             "healer",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 1500,
@@ -276,7 +278,8 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -309,7 +312,8 @@
           "spell_id": 467120,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -342,11 +346,12 @@
           "spell_id": 469633,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Emberdawn breathes a fire cone toward a player — clear the frontal.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -364,7 +369,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "frontal"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -380,7 +387,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -413,7 +421,8 @@
           "spell_id": 1252548,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -472,11 +481,12 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Kalis channels a stacking party-wide debuff that ramps everyone's damage taken (and chips Shadow each tick) — it can't be player-kicked; the ONLY stop is Latch's Heaving Yank hooking Kalis. Resolve that bait or the stacks keep climbing.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -510,7 +520,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -543,11 +554,12 @@
           "spell_id": 1219551,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Curses random players — Dark Entities fixate on them. Answer in order: DECURSE it (removes the fixate); no curse-dispel in comp → CC the entities; no curse AND no CC up → the cursed player kites the entities away from the group.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "Curse",
@@ -576,7 +588,8 @@
           "spell_id": 1253834,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -596,14 +609,14 @@
       "spells": [
         {
           "cast_time_ms": 4000,
-          "coaching_note": null,
+          "coaching_note": "Latch bombards all players with bile impacts — spread so impacts don't overlap, then move out of them. Each forms a Gunk Splatter pool and applies the Splattered DoT.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": true,
@@ -614,7 +627,10 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "spread",
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -630,18 +646,19 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Bile pools left by Splattering Spew — move out; standing in them also amplifies the damage you take from the next Splattering Spew.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": true,
@@ -652,14 +669,16 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Nature",
-          "secondary_of": null,
+          "secondary_of": 472745,
           "spell_id": 472777,
           "tank_buster": false,
           "target_roles": [
@@ -668,15 +687,18 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Latch hooks a RANDOM (non-tank) player and pulls the first thing the hook hits to him. The targeted player interposes Kalis so the hook catches KALIS instead — that interrupts Debilitating Shriek and you avoid the pull. Fail it and you're yanked in → Heaving Chop (stun) AND the Shriek keeps stacking.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
-          "displacement": [],
+          "displacement": [
+            "pull"
+          ],
           "dot": false,
           "freedom_partial": false,
           "is_aoe": false,
@@ -690,7 +712,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "bait"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -701,7 +725,8 @@
           "spell_id": 472793,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2000,
@@ -736,7 +761,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -769,7 +795,8 @@
           "spell_id": 474075,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -802,7 +829,8 @@
           "spell_id": 1219551,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -840,7 +868,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -891,7 +920,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -924,7 +954,8 @@
           "spell_id": 467815,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4000,
@@ -962,11 +993,12 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Kroluk fixates a random player and spins toward them, damaging anyone within range until his warparty is dead — the fixated player baits him AWAY from the group while everyone else clears the spin's path.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -984,7 +1016,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "bait"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1000,18 +1034,19 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
-          "coaching_note": null,
+          "coaching_note": "Kroluk leaps to the furthest player and slams an AoE (+ DoT) at the impact — clear the landing radius. The impact also shakes loose Falling Rubble.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": true,
@@ -1022,7 +1057,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1038,7 +1075,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1076,7 +1114,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -1109,7 +1148,8 @@
           "spell_id": 1217094,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1142,7 +1182,8 @@
           "spell_id": 1250851,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -1175,7 +1216,8 @@
           "spell_id": 1251981,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 5000,
@@ -1208,7 +1250,8 @@
           "spell_id": 1253026,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4000,
@@ -1241,18 +1284,19 @@
           "spell_id": 1270620,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Debris shaken loose by Reckless Leap — rains down in patches; move out of the impacts.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": true,
@@ -1272,7 +1316,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Nature",
-          "secondary_of": null,
+          "secondary_of": 472053,
           "spell_id": 1283357,
           "tank_buster": false,
           "target_roles": [
@@ -1281,7 +1325,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1330,11 +1375,12 @@
           "spell_id": 468429,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": "Failure-punish — big hit + 4s stun; don't fail the mechanic that triggers it.",
+          "coaching_note": "An expanding ring of wind — touching it is a big hit + 4s stun. Dodge it by getting launched airborne with Turbulent Arrows (they knock players up when touched) so the ring passes under you.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1352,7 +1398,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": 1,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1368,7 +1416,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1406,11 +1455,12 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2500,
-          "coaching_note": null,
+          "coaching_note": "Knocks the primary target and brands them +40% Physical damage taken — the follow-up physical hits land amplified.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1442,7 +1492,12 @@
             "melee_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": {
+            "pct": 40,
+            "school": "Physical",
+            "stacks": false
+          }
         },
         {
           "cast_time_ms": 0,
@@ -1480,7 +1535,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1518,7 +1574,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1556,7 +1613,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1594,7 +1652,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1627,7 +1686,8 @@
           "spell_id": 1282932,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1693,7 +1753,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1746,7 +1807,8 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1805,7 +1867,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1843,7 +1906,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1930,7 +1994,8 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1970,7 +2035,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2025,7 +2091,8 @@
             "melee_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2084,7 +2151,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2153,7 +2221,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2212,7 +2281,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2255,7 +2325,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2293,7 +2364,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2349,7 +2421,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2528,7 +2601,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null

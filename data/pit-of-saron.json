@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T12:39:01.300Z",
+    "extracted_at": "2026-06-24T15:10:12.074Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -98,7 +98,8 @@
           "spell_id": 69021,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -131,7 +132,8 @@
           "spell_id": 1264192,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4000,
@@ -166,7 +168,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -204,7 +207,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2500,
@@ -242,7 +246,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -280,7 +285,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1673,7 +1679,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1762,7 +1769,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1800,7 +1808,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1859,7 +1868,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1933,7 +1943,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2002,7 +2013,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2035,7 +2047,8 @@
           "spell_id": 1264186,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4000,
@@ -2068,7 +2081,8 @@
           "spell_id": 1264363,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 10000,
@@ -2111,7 +2125,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2149,7 +2164,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2182,7 +2198,8 @@
           "spell_id": 1279668,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2236,7 +2253,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2269,7 +2287,8 @@
           "spell_id": 1261315,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2305,7 +2324,8 @@
             "healer",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2343,7 +2363,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2381,7 +2402,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": true
+          "unavoidable": true,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2500,
@@ -2419,11 +2441,12 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Shards of ice — move out; being hit brands you +50% Frost damage taken (and snares you), so the next Frost hit lands amplified.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "Magic",
@@ -2458,7 +2481,12 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": {
+            "pct": 50,
+            "school": "Frost",
+            "stacks": false
+          }
         },
         {
           "cast_time_ms": 5000,
@@ -2493,7 +2521,12 @@
           "spell_id": 1262029,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": {
+            "pct": 75,
+            "school": "Frost",
+            "stacks": true
+          }
         },
         {
           "cast_time_ms": 0,
@@ -2532,7 +2565,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2552,7 +2586,7 @@
       "spells": [
         {
           "cast_time_ms": 2500,
-          "coaching_note": null,
+          "coaching_note": "Tyrannus knocks away and brands his target with +200% Shadow damage taken — a follow-up Shadow hit on the branded player can one-shot. Peel/clear or external the branded target before the next Shadow cast lands.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -2583,7 +2617,12 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": {
+            "pct": 200,
+            "school": "Shadow",
+            "stacks": false
+          }
         },
         {
           "cast_time_ms": 5000,
@@ -2616,7 +2655,8 @@
           "spell_id": 1263406,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2000,
@@ -2651,7 +2691,8 @@
           "spell_id": 1263671,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -2684,7 +2725,8 @@
           "spell_id": 1263756,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
@@ -2722,7 +2764,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2776,7 +2819,8 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -2975,7 +3019,8 @@
           "spell_id": 1262930,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -3033,7 +3078,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -3087,7 +3133,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null

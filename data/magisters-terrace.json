@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T12:39:01.300Z",
+    "extracted_at": "2026-06-24T15:10:12.074Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -308,7 +308,8 @@
           "spell_id": 1214714,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2500,
@@ -341,7 +342,8 @@
           "spell_id": 1215087,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -374,7 +376,8 @@
           "spell_id": 1215161,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -411,11 +414,12 @@
             "melee_dps",
             "ranged_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Volatile orbs — sidestep them. Critical: a hit deals Shadow damage AND snares you, and the snare can cost you the next dodge. Treat it as a hard-dodge.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -433,7 +437,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": 1,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -449,7 +455,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -484,15 +491,18 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3000,
-          "coaching_note": null,
+          "coaching_note": "Degentrius smashes their current target — Shadow splash + a knockback to everyone near the tank. Non-tanks stay spread off the tank; pre-position so the knockback doesn't punt you into the next pack.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
-          "displacement": [],
+          "displacement": [
+            "knockback"
+          ],
           "dot": false,
           "freedom_partial": false,
           "is_aoe": false,
@@ -506,7 +516,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "spread"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -519,7 +531,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -554,7 +567,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -591,7 +605,8 @@
           "target_roles": [
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -665,7 +680,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 3500,
@@ -703,7 +719,8 @@
           "spell_id": 468966,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -755,7 +772,8 @@
             "melee_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -814,7 +832,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -958,7 +977,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1022,7 +1042,8 @@
           "spell_id": 1223936,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1033,7 +1054,7 @@
           "displacement": [],
           "dot": true,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": true,
@@ -1053,18 +1074,19 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1284954,
           "spell_id": 1224104,
           "tank_buster": false,
           "target_roles": [
             "healer",
             "melee_dps"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4000,
-          "coaching_note": null,
+          "coaching_note": "Gemellus channels a vacuum on a player and pulls them in — move OUT against the pull. Anyone dragged in takes Cosmic Radiation (heavy ticking Shadow damage).",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1082,8 +1104,10 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
-          "priority": "reference",
+          "positioning": [
+            "move_out"
+          ],
+          "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
@@ -1098,11 +1122,12 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "The fail-damage for Astral Grasp — heavy ticking Shadow damage on whoever gets pulled into Gemellus. You don't dodge this directly; avoid it by moving out of Astral Grasp's pull.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1127,7 +1152,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1224299,
           "spell_id": 1224401,
           "tank_buster": false,
           "target_roles": [
@@ -1136,7 +1161,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 0,
@@ -1169,7 +1195,8 @@
           "spell_id": 1253707,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 2000,
@@ -1202,11 +1229,12 @@
           "spell_id": 1253709,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4000,
-          "coaching_note": null,
+          "coaching_note": "Stings a player and drops a Void Secretions pool at their feet — bait it to the edge, away from where the group stands.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -1240,7 +1268,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1294,7 +1323,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": true
+          "unavoidable": true,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1423,7 +1453,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         },
         {
           "cast_time_ms": 4000,
@@ -1468,7 +1499,8 @@
             "ranged_dps",
             "tank"
           ],
-          "unavoidable": true
+          "unavoidable": true,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
@@ -1597,7 +1629,8 @@
           "spell_id": 1254294,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false
+          "unavoidable": false,
+          "vulnerability": null
         }
       ],
       "summoned_by": null
