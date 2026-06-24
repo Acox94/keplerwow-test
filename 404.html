@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T16:28:53.021Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T16:32:56.543Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -678,7 +678,7 @@ function analyzeVulnerability(threats, group, coveredTypes) {
       removal_covered = false;
     }
     const amplified_casts = lethal.filter((o) => castKey(o) !== castKey(t) && schoolsOverlap(o.school, v.school));
-    out.push({ cast: t, school: v.school, pct: v.pct, stacks: v.stacks, removal, removal_covered, amplified_casts });
+    out.push({ cast: t, school: v.school, pct: v.pct, stacks: v.stacks, duration_s: v.duration_s, removal, removal_covered, amplified_casts });
   }
   return { threats: out };
 }
@@ -1755,7 +1755,8 @@ function buildWarnings(r, group) {
   for (const vt of r.vulnerability.threats) {
     const name = labelCast(vt.cast);
     const schoolWord = vt.school === "all" ? "" : `${vt.school} `;
-    const amp = `ramps ${schoolWord}damage taken +${vt.pct}%${vt.stacks ? " (stacks)" : ""}`;
+    const forWindow = vt.duration_s ? ` for ${vt.duration_s}s` : "";
+    const amp = `ramps ${schoolWord}damage taken +${vt.pct}%${forWindow}${vt.stacks ? " (stacks)" : ""}`;
     const combo = vt.amplified_casts.length ? ` \u2014 amplifies ${list(vt.amplified_casts)} (a +${vt.pct}% bigger hit${vt.removal_covered ? "" : " with no way to soften it"})` : "";
     const removalText = vt.removal === "dispel" ? vt.removal_covered ? "dispel it to clear the amp" : `no ${vt.cast.dispel_type} dispel in the comp \u2014 the amp lingers` : vt.removal === "stop" ? vt.removal_covered ? "stop the cast (kick/CC) to deny the amp" : "no kick/CC to stop the cast \u2014 it lands" : "no removal \u2014 pre-plan an external/personal for the amplified hit";
     const lethalCombo = vt.amplified_casts.length > 0;
@@ -6250,8 +6251,12 @@ var Vulnerability = external_exports.object({
   // amplified school ('Shadow', 'Fire', 'Physical', 'Frost', …) or the literal 'all'
   pct: external_exports.number().int(),
   // +% damage taken
-  stacks: external_exports.boolean().default(false)
+  stacks: external_exports.boolean().default(false),
   // repeated applications compound
+  // How long the debuff lasts, in seconds (the tooltip's "for N sec") — so the engine can name the window
+  // a tank must cover with an equal-length mitigation. EDITORIAL for now (the duration index isn't in the
+  // cached DB2 — needs SpellDuration to be data-backed). Omit for a zone/stacking amp with no fixed timer.
+  duration_s: external_exports.number().int().positive().optional()
 }).strict();
 var CreatureSpell = external_exports.object({
   npc_id: external_exports.number().int(),
