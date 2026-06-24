@@ -61,12 +61,7 @@
     .classgroup { margin-top: 10px; }
     .classgroup > .cls { font-size: 11px; color: var(--ink-dim); text-transform: uppercase; letter-spacing: .5px; margin: 8px 0 3px; }
 
-    .actions { margin: 18px 0; }
-    button.run {
-      background: var(--accent); color: #0c1220; border: none; border-radius: 8px;
-      padding: 10px 20px; font-size: 14px; font-weight: 700; cursor: pointer;
-    }
-    button.run:disabled { opacity: .4; cursor: not-allowed; }
+    .report-title { font-size: 17px; font-weight: 650; margin: 24px 0 12px; letter-spacing: .2px; }
 
     /* ---- comp: 5 role rows, each a dropdown of the role-eligible specs ----- */
     .comp-row { display: grid; grid-template-columns: 58px 1fr; gap: 10px; align-items: center; margin-bottom: 8px; }
@@ -117,7 +112,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T07:06:53.335Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T07:10:48.036Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -150,10 +145,7 @@
       </section>
     </div>
 
-    <div class="actions">
-      <button class="run" id="analyze">Analyze pull</button>
-    </div>
-
+    <h2 class="report-title">Pull Analysis</h2>
     <section id="report"></section>
   </main>
 
@@ -6283,13 +6275,12 @@ function renderChips() {
       runAnalysis();
     };
   });
-  $("analyze").disabled = state.pull.size === 0;
 }
 function runAnalysis() {
   const d = state.dungeon;
   if (!d) return;
   if (state.pull.size === 0) {
-    $("report").innerHTML = "";
+    $("report").innerHTML = '<div class="empty">Pick a mob from the pull to see its analysis \u2014 it updates live as you change the pull, comp, or skill tier.</div>';
     return;
   }
   const pull = [...state.pull.entries()].map(([npc_id, count]) => ({ npc_id, count }));
@@ -6345,7 +6336,6 @@ $("skill-tabs").querySelectorAll(".tab").forEach((btn) => {
     runAnalysis();
   };
 });
-$("analyze").onclick = runAnalysis;
 async function boot() {
   await loadIndex();
   if (state.index.length) await loadDungeon(state.index[0].slug);
