@@ -100,9 +100,17 @@
     .w.warning  { border-left-color: var(--warn); } .w.warning  .sev { color: var(--warn); }
     .w.caution  { border-left-color: var(--caution); } .w.caution .sev { color: var(--caution); }
     .w.info     { border-left-color: var(--info); } .w.info     .sev { color: var(--info); }
+    /* read-only boss-mechanic reference card (the internal guide) — muted, dashed, not a warning */
+    .w.reference { border-left-style: dashed; border-left-color: var(--ink-dim); opacity: .92; }
+    .w.reference .sev { color: var(--ink-dim); }
+    .w.reference .ref-attrs { color: var(--ink-dim); }
     .empty { color: var(--ink-dim); font-style: italic; padding: 14px; }
 
     /* role filter (Tank/Healer/DPS lens) + Boss/Trash sections + per-card role badges */
+    .filter-bar { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 6px; }
+    .boss-toggle { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-dim); font-size: 12.5px; cursor: pointer; user-select: none; }
+    .boss-toggle input { cursor: pointer; }
+    .boss-toggle-n { background: var(--panel-2); border-radius: 10px; padding: 0 7px; font-size: 11px; }
     .role-filter { display: flex; gap: 6px; margin-bottom: 6px; }
     .rf {
       background: var(--panel-2); color: var(--ink-dim); border: 1px solid var(--line);
@@ -130,7 +138,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T09:21:17.381Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T09:42:17.402Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -312,6 +320,30 @@ function analyzePull(dungeon, pull, group, opts = {}) {
   const dps_survival = analyzeDpsSurvival(threats, groupSpecs);
   const pet_choice = analyzePetChoice(groupSpecs, dispels, stops);
   const composition = analyzeComposition(groupSpecs);
+  const boss_reference = [];
+  for (const m of members) {
+    const c = creatureById.get(m.npc_id);
+    if (!c || !(c.is_boss || c.is_boss_add)) continue;
+    for (const s of c.spells) {
+      if (s.priority === "priority") continue;
+      boss_reference.push({
+        npc_id: c.npc_id,
+        npc_name: c.name,
+        is_boss_add: c.is_boss_add,
+        summoned_by_name: c.summoned_by != null ? creatureById.get(c.summoned_by)?.name ?? null : null,
+        spell_id: s.spell_id,
+        spell_name: s.name,
+        count: m.count,
+        school: s.school,
+        dispel_type: s.dispel_type,
+        cast_time_ms: s.cast_time_ms,
+        is_interruptible: s.is_interruptible,
+        is_stoppable: s.is_stoppable,
+        is_aoe: s.is_aoe,
+        is_channeled: s.is_channeled
+      });
+    }
+  }
   return {
     dungeon: { dungeon_id: dungeon.dungeon.dungeon_id, name: dungeon.dungeon.name },
     build: { patch_version: dungeon.build_info.patch_version, build_number: dungeon.build_info.build_number },
@@ -339,6 +371,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
     channel_timing,
     completion_effect,
     notes,
+    boss_reference,
     // Skill gate: an expert sees only the essentials; learning + experienced also get the coaching/heads-ups.
     warnings: buildWarnings({ dispels, stops, soothe, misplays, awareness, throughput, scaling, targeting, movement, cc_on_party, displacement, tank_buster, target_drop, dps_survival, pet_choice, composition, kick_timing, channel_timing, completion_effect, notes }, groupSpecs).filter((wn) => !wn.coaching || skill !== "expert")
   };
@@ -5985,7 +6018,7 @@ var DispelType = external_exports.enum([
 ]);
 var Role = external_exports.enum(["Tank", "Healer", "DPS"]);
 var PartyRole = external_exports.enum(["tank", "healer", "melee_dps", "ranged_dps"]);
-var Priority = external_exports.enum(["trivial", "priority"]);
+var Priority = external_exports.enum(["trivial", "priority", "reference"]);
 var CreatureTypeName = external_exports.enum([
   "Beast",
   "Dragonkin",
@@ -6497,6 +6530,8 @@ var state = {
   skill: "experienced",
   roleFilter: "all",
   // Tank/Healer/DPS lens over the report
+  showBoss: true,
+  // "Show boss mechanics" — list the uncurated boss/add casts (the reference guide)
   lastReport: null
   // kept so a filter click can re-render without re-analyzing
 };
@@ -6638,6 +6673,26 @@ function warningCard(w, lens) {
     </div>
   </div>`;
 }
+function referenceCard(e) {
+  const add = e.is_boss_add ? ` <span class="w-add">${e.summoned_by_name ? `${esc(e.summoned_by_name)}'s add` : "boss add"}</span>` : "";
+  const attrs = [e.cast_time_ms > 0 ? `${(e.cast_time_ms / 1e3).toFixed(1)}s cast` : "instant"];
+  if (e.is_channeled) attrs.push("channeled");
+  if (e.school && e.school !== "Physical") attrs.push(e.school);
+  if (e.dispel_type && e.dispel_type !== "None") attrs.push(`${e.dispel_type} debuff`);
+  if (e.is_interruptible) attrs.push("interruptible");
+  if (e.is_stoppable) attrs.push("CC-stoppable");
+  if (e.is_aoe) attrs.push("AoE");
+  return `<div class="w reference">
+    <div class="w-subjects"><span class="w-spell">${esc(e.spell_name)}${e.count > 1 ? ` \xD7${e.count}` : ""}</span> <span class="w-npc">(${esc(e.npc_name)})</span>${add}</div>
+    <div class="w-body">
+      <div class="sev">ref</div>
+      <div>
+        <div class="msg">Boss mechanic \u2014 not curated yet. <span class="ref-attrs">${esc(attrs.join(" \xB7 "))}</span></div>
+        <div class="cat"><span class="role-badge all">Reference</span><span class="cat-name">boss guide</span></div>
+      </div>
+    </div>
+  </div>`;
+}
 function renderReport(rep) {
   state.lastReport = rep;
   const pullStr = rep.pull.map((c) => c.count > 1 ? `${c.name} \xD7${c.count}` : c.name).join(", ") || "(empty)";
@@ -6648,16 +6703,20 @@ function renderReport(rep) {
     <div class="sub"><b>Comp:</b> ${esc(groupStr)}</div>
     <div class="sub"><b>Skill:</b> ${esc(rep.skill)} \xB7 build ${rep.build.patch_version}.${rep.build.build_number}${rep.unknown_npcs.length ? ` \xB7 <span class="short">unknown npc_ids skipped: ${rep.unknown_npcs.join(", ")}</span>` : ""}</div>
   </div>`;
-  const filterBar = `<div class="role-filter">${ROLE_FILTERS.map((r) => `<button class="rf ${state.roleFilter === r ? "active" : ""}" data-role="${r}">${r === "all" ? "All" : ROLE_LABEL2[r]}</button>`).join("")}</div>`;
+  const filterBar = `<div class="filter-bar">
+    <div class="role-filter">${ROLE_FILTERS.map((r) => `<button class="rf ${state.roleFilter === r ? "active" : ""}" data-role="${r}">${r === "all" ? "All" : ROLE_LABEL2[r]}</button>`).join("")}</div>
+    ${rep.boss_reference.length ? `<label class="boss-toggle"><input type="checkbox" id="boss-mech-toggle"${state.showBoss ? " checked" : ""}/> Show boss mechanics <span class="boss-toggle-n">${rep.boss_reference.length}</span></label>` : ""}
+  </div>`;
   const lens = state.roleFilter;
   const visible = rep.warnings.filter(
     (w) => lens === "all" || w.roles.length === 0 || w.roles.includes(lens) || (w.subjects?.length ?? 0) > 0
   );
   const sections = SOURCE_SECTIONS.map(({ source, label }) => {
     const ws = visible.filter((w) => w.source === source).sort((a, b) => SEV_RANK[a.severity] - SEV_RANK[b.severity]);
-    if (ws.length === 0) return "";
-    return `<h3 class="section-head">${label} <span class="section-count">${ws.length}</span></h3>
-      <div class="warnings">${ws.map((w) => warningCard(w, state.roleFilter)).join("")}</div>`;
+    const refCards = source === "boss" && state.showBoss ? rep.boss_reference.map(referenceCard) : [];
+    if (ws.length === 0 && refCards.length === 0) return "";
+    return `<h3 class="section-head">${label} <span class="section-count">${ws.length + refCards.length}</span></h3>
+      <div class="warnings">${ws.map((w) => warningCard(w, state.roleFilter)).join("")}${refCards.join("")}</div>`;
   }).join("");
   const body = sections || `<div class="empty">No actionable warnings${state.roleFilter !== "all" ? " for this role" : " \u2014 this comp covers everything this pull throws"}.</div>`;
   $("report").innerHTML = head + filterBar + body + budgetPanel(rep);
@@ -6667,6 +6726,11 @@ function renderReport(rep) {
       if (state.lastReport) renderReport(state.lastReport);
     };
   });
+  const bossToggle = document.getElementById("boss-mech-toggle");
+  if (bossToggle) bossToggle.onchange = () => {
+    state.showBoss = bossToggle.checked;
+    if (state.lastReport) renderReport(state.lastReport);
+  };
 }
 function budgetPanel(rep) {
   const s = rep.stops;
