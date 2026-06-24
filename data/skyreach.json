@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T19:19:58.792Z",
+    "extracted_at": "2026-06-24T23:15:50.348Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -228,7 +228,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -305,7 +305,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 4,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -413,7 +413,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -568,7 +568,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -747,7 +747,7 @@
       "npc_id": 76141,
       "spells": [
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 3000,
           "coaching_note": "Araknath smashes the ground on ONE side — move to the unsmashed side; the impact area also stacks a damage-taken debuff on anyone caught.",
           "completion_effect": null,
@@ -789,7 +789,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1015,7 +1015,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1231,7 +1231,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 0,
           "coaching_note": "Rukhran rains flaming quills on everyone in line of sight — break LoS behind cover (a pillar / the terrain) to avoid the ticks.",
           "completion_effect": null,
@@ -1310,7 +1310,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1351,7 +1351,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1511,7 +1511,7 @@
       "npc_id": 76266,
       "spells": [
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1547,7 +1547,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1590,7 +1590,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1626,7 +1626,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 4,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,

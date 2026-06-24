@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T19:19:58.792Z",
+    "extracted_at": "2026-06-24T23:15:50.348Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2001,7 +2001,7 @@
       "npc_id": 252621,
       "spells": [
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2078,7 +2078,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2114,7 +2114,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 10000,
           "coaching_note": null,
           "completion_effect": null,
@@ -2253,7 +2253,7 @@
       "npc_id": 252635,
       "spells": [
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2330,7 +2330,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2451,7 +2451,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 4,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -2538,7 +2538,7 @@
           }
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 5000,
           "coaching_note": "The overloaded forge pulses a Frost-damage-taken debuff that stacks every 0.5s for 14s — line-of-sight it behind a Saronite Ore chunk to block it completely. The stacks make follow-up Frost damage lethal, so never eat it.",
           "completion_effect": null,
@@ -2638,7 +2638,7 @@
       "npc_id": 252648,
       "spells": [
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 2500,
           "coaching_note": "Tyrannus knocks away his target (the tank) and applies a +200% Shadow damage-taken debuff. While it's up the tank can't avoid his Shadow follow-up — it lands ~tripled and can one-shot, so MITIGATE the window with a large damage-reduction cooldown / a pre-planned ally external on the tank.",
           "completion_effect": null,
@@ -2755,7 +2755,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 4,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -2791,7 +2791,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,

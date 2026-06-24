@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T19:19:58.792Z",
+    "extracted_at": "2026-06-24T23:15:50.348Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -409,7 +409,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 0,
           "coaching_note": "Marks random players with Arcane energy for 6s — on expiry it detonates on everyone within 8yd. Marked players spread out before it expires; don't dispel until they're clear (dispelling also detonates it).",
           "completion_effect": null,
@@ -488,7 +488,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 4,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -637,7 +637,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 2000,
           "coaching_note": null,
           "completion_effect": null,
@@ -754,7 +754,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -984,7 +984,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1022,7 +1022,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -1104,7 +1104,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 3000,
           "coaching_note": "Crawth faces a random player and flaps — get out of the frontal; it damages and knocks back everyone in the cone (pre-position so the knockback is safe).",
           "completion_effect": null,
@@ -1328,7 +1328,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 4,
           "cast_time_ms": 20000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1410,7 +1410,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 5,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -1655,7 +1655,7 @@
       "npc_id": 194181,
       "spells": [
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 4000,
           "coaching_note": null,
           "completion_effect": null,
@@ -1694,7 +1694,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -1730,7 +1730,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 0,
           "coaching_note": "Explosive mana on up to a few players (Arcane DoT) — spread out so the on-expiration detonation doesn't catch teammates; it leaves a Corrupted Mana pool where it goes off, so drop it away from the group.",
           "completion_effect": null,
@@ -1772,7 +1772,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 0,
           "coaching_note": "The Arcane pool left where a Mana Bomb detonates — move out; it ticks Arcane and snares anyone inside.",
           "completion_effect": null,
@@ -1851,7 +1851,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 4,
           "cast_time_ms": 3000,
           "coaching_note": null,
           "completion_effect": null,

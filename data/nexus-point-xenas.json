@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T19:19:58.792Z",
+    "extracted_at": "2026-06-24T23:15:50.348Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -114,7 +114,7 @@
       "npc_id": 241539,
       "spells": [
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -154,7 +154,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 0,
           "coaching_note": "Charges a random player with a stacking Arcane DoT (heavy damage if left to tick) — the charged player runs into a Leyline Array conduit to make the circuit recoil and clear it (brief self-stun).",
           "completion_effect": null,
@@ -195,7 +195,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 5000,
           "coaching_note": null,
           "completion_effect": null,
@@ -236,7 +236,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 4,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -375,7 +375,7 @@
       "npc_id": 241546,
       "spells": [
         {
-          "cast_order": null,
+          "cast_order": 2,
           "cast_time_ms": 0,
           "coaching_note": null,
           "completion_effect": null,
@@ -416,7 +416,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 3000,
           "coaching_note": "Lothraxion's double-slash on his current target carves a Radiant Scar into the ground — move off the scar it leaves (a Holy DoT zone).",
           "completion_effect": null,
@@ -456,7 +456,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 1,
           "cast_time_ms": 0,
           "coaching_note": "The ground brand left by Searing Rend — Holy ticks to anyone within; move out of it.",
           "completion_effect": null,
@@ -499,7 +499,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 3,
           "cast_time_ms": 7500,
           "coaching_note": "Energy-gated (100 energy): Lothraxion hides among his Fractured Images and channels Holy damage into the core until interrupted — find the real Lothraxion and interrupt him to stop it.",
           "completion_effect": null,
