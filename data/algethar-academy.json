@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T15:34:08.192Z",
+    "extracted_at": "2026-06-24T16:15:33.645Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2300,7 +2300,7 @@
         },
         {
           "cast_time_ms": 1000,
-          "coaching_note": "The tank stomp also brands the tank with +100% Physical damage taken — the next physical hit lands DOUBLED, so don't let it chain into another big physical (tank actives/externals, or trade the next swing).",
+          "coaching_note": "The tank stomp also brands the tank with +100% Physical damage taken — the next physical hit on the tank lands DOUBLED. The tank pops a major defensive (or pre-plan an ally external onto them) for that follow-up; don't let another big physical land while the brand is up. (Trading the hit isn't a casual option — it needs a DPS to taunt AND immunity-soak the doubled swing, a high-risk play for experienced groups only.)",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
