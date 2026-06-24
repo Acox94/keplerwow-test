@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T12:17:35.019Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T12:41:18.735Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -240,6 +240,8 @@ function analyzePull(dungeon, pull, group, opts = {}) {
   const members = normalizePull(pull);
   const creatureById = new Map(dungeon.creatures.map((c) => [c.npc_id, c]));
   const specById = new Map(dungeon.specs.map((s) => [s.spec_id, s]));
+  const spellNameById = /* @__PURE__ */ new Map();
+  for (const c of dungeon.creatures) for (const s of c.spells) spellNameById.set(s.spell_id, s.name);
   const unavoidableAddsBySummoner = /* @__PURE__ */ new Map();
   for (const c of dungeon.creatures) {
     if (!c.is_boss_add || c.summoned_by == null || c.avoidable) continue;
@@ -323,6 +325,8 @@ function analyzePull(dungeon, pull, group, opts = {}) {
         is_channeled: s.is_channeled,
         completion_effect: s.completion_effect,
         coaching_note: s.coaching_note,
+        secondary_of: s.secondary_of,
+        secondary_of_name: s.secondary_of != null ? spellNameById.get(s.secondary_of) ?? null : null,
         dispel_detonates: s.dispel_detonates,
         freedom_partial: s.freedom_partial,
         cast_time_ms: s.cast_time_ms,
@@ -1371,7 +1375,7 @@ function dpsSurvivalAdvice(st) {
 function buildWarnings(r, group) {
   const w = [];
   const list = (ts) => ts.map((t) => labelCast(t)).join(", ");
-  const subj = (ts) => ts.map((t) => ({ spell_name: t.spell_name, npc_name: t.npc_name, count: t.count, is_boss: t.is_boss, is_boss_add: t.is_boss_add, summoned_by_name: t.summoned_by_name, target_roles: t.target_roles }));
+  const subj = (ts) => ts.map((t) => ({ spell_name: t.spell_name, npc_name: t.npc_name, count: t.count, is_boss: t.is_boss, is_boss_add: t.is_boss_add, summoned_by_name: t.summoned_by_name, secondary_of_name: t.secondary_of_name, target_roles: t.target_roles }));
   const targetingByKey = new Map(r.targeting.map((tt) => [castKey(tt.cast), tt]));
   const landsOn = (ts) => {
     const roles = /* @__PURE__ */ new Set();
@@ -6237,6 +6241,11 @@ var CreatureSpell = external_exports.object({
   // Surfaced by the engine's `notes` dimension as a coaching line. DISTINCT from `notes` above, which
   // is the curator's internal scratchpad (provenance / DB2 caveats) and is NEVER shown to the player.
   coaching_note: external_exports.string().nullable().default(null),
+  // EDITORIAL — SECONDARY EFFECT: this cast is not something the boss directly casts but a CONSEQUENCE of a
+  // PRIMARY cast (a pool left when a debuff is removed, an add a summon spawns, a death-burst). `secondary_of`
+  // is the PRIMARY's spell_id; the engine attributes the secondary to it ("Stygian Ichor — from Hulking
+  // Fragment"). null = a primary/standalone cast.
+  secondary_of: external_exports.number().int().nullable().default(null),
   // EDITORIAL — REMOVAL TRIGGERS THE EFFECT: dispelling this debuff detonates it (same as letting it expire),
   // so it is NOT a dispel target. The engine drops it from the dispel/survive dimensions and routes the answer
   // to the cast's coaching_note (spread/position), per the prevent>avoid>remove>survive precedence. Default false.
@@ -6517,6 +6526,8 @@ var ExportedSpell = external_exports.object({
   // EDITORIAL player-facing coaching note (see CreatureSpell.coaching_note); surfaced by the engine's
   // `notes` dimension. null = none. (The internal `notes` field is never shown to the player.)
   coaching_note: external_exports.string().nullable().default(null),
+  // EDITORIAL — SECONDARY EFFECT: the PRIMARY spell_id this cast is a consequence of (see CreatureSpell.secondary_of); null = primary.
+  secondary_of: external_exports.number().int().nullable().default(null),
   // EDITORIAL — dispelling this debuff detonates it (see CreatureSpell.dispel_detonates); the engine drops it
   // from the dispel/survive dimensions and answers it via the coaching_note. Default false.
   dispel_detonates: external_exports.boolean().default(false),
@@ -6706,7 +6717,8 @@ var SOURCE_SECTIONS = [
 function warningCard(w, lens) {
   const subjects = w.subjects?.length ? `<div class="w-subjects">${w.subjects.map((s) => {
     const add = s.is_boss_add ? ` <span class="w-add">${s.summoned_by_name ? `${esc(s.summoned_by_name)}'s add` : "boss add"}</span>` : "";
-    return `<span class="w-spell">${esc(s.spell_name)}${s.count > 1 ? ` \xD7${s.count}` : ""}</span> <span class="w-npc">(${esc(s.npc_name)})</span>${add}`;
+    const from = s.secondary_of_name ? ` <span class="w-add">from ${esc(s.secondary_of_name)}</span>` : "";
+    return `<span class="w-spell">${esc(s.spell_name)}${s.count > 1 ? ` \xD7${s.count}` : ""}</span> <span class="w-npc">(${esc(s.npc_name)})</span>${add}${from}`;
   }).join(", ")}</div>` : "";
   const roleMsg = lens !== "all" ? w.role_advice?.[lens] : void 0;
   const msg = roleMsg ?? w.message;

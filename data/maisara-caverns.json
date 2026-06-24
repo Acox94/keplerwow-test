@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T12:16:02.718Z",
+    "extracted_at": "2026-06-24T12:39:01.300Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -79,6 +79,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1254175,
           "tank_buster": false,
           "target_roles": [
@@ -482,6 +483,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1266381,
           "tank_buster": false,
           "target_roles": [
@@ -550,6 +552,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Frost",
+          "secondary_of": null,
           "spell_id": 1243741,
           "tank_buster": false,
           "target_roles": null,
@@ -582,6 +585,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1243751,
           "tank_buster": false,
           "target_roles": [
@@ -619,6 +623,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1249789,
           "tank_buster": false,
           "target_roles": null,
@@ -651,6 +656,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1249989,
           "tank_buster": false,
           "target_roles": [
@@ -688,6 +694,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Nature,Shadow",
+          "secondary_of": null,
           "spell_id": 1260643,
           "tank_buster": false,
           "target_roles": [
@@ -725,6 +732,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Nature,Shadow",
+          "secondary_of": null,
           "spell_id": 1260709,
           "tank_buster": false,
           "target_roles": [
@@ -761,6 +769,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1266480,
           "tank_buster": false,
           "target_roles": [
@@ -795,6 +804,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1266488,
           "tank_buster": true,
           "target_roles": [
@@ -847,6 +857,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1243900,
           "tank_buster": false,
           "target_roles": [
@@ -884,6 +895,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Nature,Shadow",
+          "secondary_of": null,
           "spell_id": 1246666,
           "tank_buster": false,
           "target_roles": [
@@ -923,6 +935,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1249479,
           "tank_buster": false,
           "target_roles": [
@@ -960,6 +973,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1249769,
           "tank_buster": false,
           "target_roles": null,
@@ -992,6 +1006,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1249948,
           "tank_buster": false,
           "target_roles": null,
@@ -1040,6 +1055,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1250708,
           "tank_buster": false,
           "target_roles": [
@@ -1077,6 +1093,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1251204,
           "tank_buster": false,
           "target_roles": null,
@@ -1109,6 +1126,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1251554,
           "tank_buster": false,
           "target_roles": [
@@ -1144,6 +1162,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1251598,
           "tank_buster": false,
           "target_roles": null,
@@ -1176,6 +1195,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1251811,
           "tank_buster": false,
           "target_roles": [
@@ -1213,6 +1233,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1251813,
           "tank_buster": false,
           "target_roles": [
@@ -1250,6 +1271,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1251833,
           "tank_buster": false,
           "target_roles": [
@@ -1285,6 +1307,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1252054,
           "tank_buster": false,
           "target_roles": [
@@ -1322,6 +1345,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1252611,
           "tank_buster": false,
           "target_roles": [
@@ -1359,6 +1383,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1264987,
           "tank_buster": false,
           "target_roles": [
@@ -1396,6 +1421,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1266706,
           "tank_buster": false,
           "target_roles": null,
@@ -1446,6 +1472,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": true,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1248863,
           "tank_buster": false,
           "target_roles": [
@@ -1483,6 +1510,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1248980,
           "tank_buster": false,
           "target_roles": [
@@ -1520,6 +1548,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1251023,
           "tank_buster": false,
           "target_roles": [
@@ -1555,6 +1584,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1252675,
           "tank_buster": false,
           "target_roles": [
@@ -1592,6 +1622,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1253779,
           "tank_buster": false,
           "target_roles": [
@@ -1629,6 +1660,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1253788,
           "tank_buster": false,
           "target_roles": null,
@@ -1661,6 +1693,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1253844,
           "tank_buster": false,
           "target_roles": [
@@ -1698,6 +1731,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1253909,
           "tank_buster": false,
           "target_roles": null,
@@ -1730,6 +1764,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1259810,
           "tank_buster": false,
           "target_roles": [
@@ -1767,6 +1802,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1266188,
           "tank_buster": false,
           "target_roles": [
@@ -1801,6 +1837,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1279517,
           "tank_buster": false,
           "target_roles": null,
@@ -1897,6 +1934,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1257716,
           "tank_buster": false,
           "target_roles": null,
@@ -1995,6 +2033,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Frost,Shadow",
+          "secondary_of": null,
           "spell_id": 1264327,
           "tank_buster": false,
           "target_roles": [
@@ -2032,6 +2071,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Frost",
+          "secondary_of": null,
           "spell_id": 1271623,
           "tank_buster": false,
           "target_roles": [
@@ -2087,6 +2127,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1259651,
           "tank_buster": false,
           "target_roles": [
@@ -2160,6 +2201,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1259255,
           "tank_buster": false,
           "target_roles": [
@@ -2291,6 +2333,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1254010,
           "tank_buster": false,
           "target_roles": [
@@ -2359,6 +2402,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Fire",
+          "secondary_of": null,
           "spell_id": 1258806,
           "tank_buster": false,
           "target_roles": [
@@ -2429,6 +2473,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1259882,
           "tank_buster": false,
           "target_roles": [
@@ -2504,6 +2549,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1259182,
           "tank_buster": false,
           "target_roles": [
@@ -2572,6 +2618,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1259794,
           "tank_buster": false,
           "target_roles": [
@@ -2688,6 +2735,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1263292,
           "tank_buster": false,
           "target_roles": [

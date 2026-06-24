@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T12:16:02.718Z",
+    "extracted_at": "2026-06-24T12:39:01.300Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -304,6 +304,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1214714,
           "tank_buster": false,
           "target_roles": null,
@@ -336,6 +337,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1215087,
           "tank_buster": false,
           "target_roles": null,
@@ -368,6 +370,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1215161,
           "tank_buster": false,
           "target_roles": null,
@@ -400,6 +403,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1215897,
           "tank_buster": false,
           "target_roles": [
@@ -436,6 +440,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1269631,
           "tank_buster": false,
           "target_roles": [
@@ -473,6 +478,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1271066,
           "tank_buster": false,
           "target_roles": [
@@ -507,6 +513,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1280113,
           "tank_buster": false,
           "target_roles": [
@@ -541,6 +548,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1284627,
           "tank_buster": true,
           "target_roles": [
@@ -550,14 +558,14 @@
         },
         {
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "The pool left behind when Hulking Fragment's Embedded Splinters are removed or expire — a ground damage zone. Move out of it.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "freedom_partial": false,
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": false,
@@ -568,13 +576,16 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "move_out"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": 1280113,
           "spell_id": 1284628,
           "tank_buster": false,
           "target_roles": [
@@ -645,6 +656,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Arcane",
+          "secondary_of": null,
           "spell_id": 468962,
           "tank_buster": false,
           "target_roles": [
@@ -687,6 +699,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Arcane",
+          "secondary_of": null,
           "spell_id": 468966,
           "tank_buster": false,
           "target_roles": null,
@@ -735,6 +748,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Arcane",
+          "secondary_of": null,
           "spell_id": 1282055,
           "tank_buster": false,
           "target_roles": [
@@ -791,6 +805,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1248327,
           "tank_buster": false,
           "target_roles": [
@@ -934,6 +949,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": true,
           "school": "Holy",
+          "secondary_of": null,
           "spell_id": 1255187,
           "tank_buster": false,
           "target_roles": [
@@ -1002,6 +1018,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1223936,
           "tank_buster": false,
           "target_roles": null,
@@ -1036,6 +1053,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1224104,
           "tank_buster": false,
           "target_roles": [
@@ -1071,6 +1089,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1224299,
           "tank_buster": false,
           "target_roles": [
@@ -1108,6 +1127,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1224401,
           "tank_buster": false,
           "target_roles": [
@@ -1145,6 +1165,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1253707,
           "tank_buster": false,
           "target_roles": null,
@@ -1177,6 +1198,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
+          "secondary_of": null,
           "spell_id": 1253709,
           "tank_buster": false,
           "target_roles": null,
@@ -1209,6 +1231,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1284954,
           "tank_buster": false,
           "target_roles": [
@@ -1262,6 +1285,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Arcane",
+          "secondary_of": null,
           "spell_id": 1244907,
           "tank_buster": false,
           "target_roles": [
@@ -1390,6 +1414,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1245068,
           "tank_buster": false,
           "target_roles": [
@@ -1434,6 +1459,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
+          "secondary_of": null,
           "spell_id": 1264693,
           "tank_buster": false,
           "target_roles": [
@@ -1567,6 +1593,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Fire",
+          "secondary_of": null,
           "spell_id": 1254294,
           "tank_buster": false,
           "target_roles": null,
