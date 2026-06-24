@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T18:16:29.320Z",
+    "extracted_at": "2026-06-24T18:18:39.187Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2344,7 +2344,7 @@
         },
         {
           "cast_time_ms": 1000,
-          "coaching_note": "The tank stomp applies a +100% Physical damage-taken DEBUFF for 9s. The tank can't dodge the follow-up swings (the boss keeps hitting them) — they have to MITIGATE the window, so use a large damage-reduction cooldown that lasts about as long as the debuff (~9s) to cover the doubled hits. (Trading it out — a DPS taunts and immunity-soaks the doubled swing — is a high-risk, experienced-only alternative, not the default.)",
+          "coaching_note": "The tank stomp applies a +100% Physical damage-taken DEBUFF for 9s. The tank can't dodge the follow-up swings (the boss keeps hitting them), so the tank MITIGATES the window with a large damage-reduction cooldown lasting about as long as the debuff (~9s) to cover the doubled hits. (Trading it out — a DPS taunts and immunity-soaks the doubled swing — is a high-risk, experienced-only alternative, not the default.)",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
