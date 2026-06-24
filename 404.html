@@ -129,7 +129,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T08:42:04.283Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T08:50:48.986Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -6624,8 +6624,9 @@ function renderReport(rep) {
     <div class="sub"><b>Skill:</b> ${esc(rep.skill)} \xB7 build ${rep.build.patch_version}.${rep.build.build_number}${rep.unknown_npcs.length ? ` \xB7 <span class="short">unknown npc_ids skipped: ${rep.unknown_npcs.join(", ")}</span>` : ""}</div>
   </div>`;
   const filterBar = `<div class="role-filter">${ROLE_FILTERS.map((r) => `<button class="rf ${state.roleFilter === r ? "active" : ""}" data-role="${r}">${r === "all" ? "All" : ROLE_LABEL2[r]}</button>`).join("")}</div>`;
+  const lens = state.roleFilter;
   const visible = rep.warnings.filter(
-    (w) => state.roleFilter === "all" || w.roles.length === 0 || w.roles.includes(state.roleFilter)
+    (w) => lens === "all" || w.roles.length === 0 || w.roles.includes(lens) || (w.subjects?.length ?? 0) > 0
   );
   const sections = SOURCE_SECTIONS.map(({ source, label }) => {
     const ws = visible.filter((w) => w.source === source).sort((a, b) => SEV_RANK[a.severity] - SEV_RANK[b.severity]);
