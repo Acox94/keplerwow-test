@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T18:47:06.928Z",
+    "extracted_at": "2026-06-24T19:19:58.792Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2408,7 +2408,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": 4,
+          "cast_order": 6,
           "cast_time_ms": 3000,
           "coaching_note": "At 100 energy the dormant Lashers (the seeds Germinate planted) erupt from the ground — move off the seed spots before they burst free (it's avoidable; the damage is at the Lasher locations, not party-wide).",
           "completion_effect": null,
@@ -2508,7 +2508,7 @@
       "npc_id": 196548,
       "spells": [
         {
-          "cast_order": null,
+          "cast_order": 4,
           "cast_time_ms": 2500,
           "coaching_note": null,
           "completion_effect": null,
@@ -2549,7 +2549,7 @@
           "vulnerability": null
         },
         {
-          "cast_order": null,
+          "cast_order": 5,
           "cast_time_ms": 0,
           "coaching_note": "On death the Ancient Branch bursts after 3.5s, healing nearby ENEMIES for a large amount — kill it away from the boss and other mobs. It also removes all Splinterbark stacks from players within 8 yds.",
           "completion_effect": null,
