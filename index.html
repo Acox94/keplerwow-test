@@ -101,6 +101,14 @@
     .w.warning  { border-left-color: var(--warn); } .w.warning  .sev { color: var(--warn); }
     .w.caution  { border-left-color: var(--caution); } .w.caution .sev { color: var(--caution); }
     .w.info     { border-left-color: var(--info); } .w.info     .sev { color: var(--info); }
+    /* COMBINED cast panel: one header + several warning rows. Each row's severity colors ITS OWN sev label
+       (overrides the panel-level color above for a mixed panel), and rows are divided. */
+    .w .sev.critical { color: var(--crit); } .w .sev.warning { color: var(--warn); }
+    .w .sev.caution { color: var(--caution); } .w .sev.info { color: var(--info); }
+    .w-rows .w-body { padding: 9px 0; }
+    .w-rows .w-body:first-child { padding-top: 0; }
+    .w-rows .w-body:last-child { padding-bottom: 0; }
+    .w-rows .w-body + .w-body { border-top: 1px solid var(--line); }
     /* read-only boss-mechanic reference card (the internal guide) — muted, dashed, not a warning */
     .w.reference { border-left-style: dashed; border-left-color: var(--ink-dim); opacity: .92; }
     .w.reference .sev { color: var(--ink-dim); }
@@ -139,7 +147,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T18:47:54.107Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T19:14:31.251Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -6844,25 +6852,52 @@ var SOURCE_SECTIONS = [
   { source: "trash", label: "Trash Mechanics" },
   { source: "group", label: "Group / Comp" }
 ];
-function warningCard(w, lens) {
-  const subjects = w.subjects?.length ? `<div class="w-subjects">${w.subjects.map((s) => {
+function subjectHeader(subjects) {
+  if (!subjects.length) return "";
+  return `<div class="w-subjects">${subjects.map((s) => {
     const add = s.is_boss_add ? ` <span class="w-add">${s.summoned_by_name ? `${esc(s.summoned_by_name)}'s add` : "boss add"}</span>` : "";
     const from = s.secondary_of_name ? ` <span class="w-add">from ${esc(s.secondary_of_name)}</span>` : "";
     return `<span class="w-spell">${esc(s.spell_name)}${s.count > 1 ? ` \xD7${s.count}` : ""}</span> <span class="w-npc">(${esc(s.npc_name)})</span>${add}${from}`;
-  }).join(", ")}</div>` : "";
+  }).join(", ")}</div>`;
+}
+function warningRow(w, lens) {
   const roleMsg = lens !== "all" ? w.role_advice?.[lens] : void 0;
   const msg = roleMsg ?? w.message;
   const badges = lens !== "all" && w.roles.length ? `<span class="role-badge ${lens}">${ROLE_LABEL2[lens]}</span>` : w.roles.length ? w.roles.map((r) => `<span class="role-badge ${r}">${ROLE_LABEL2[r]}</span>`).join("") : '<span class="role-badge all">All</span>';
-  return `<div class="w ${w.severity}">
-    ${subjects}
-    <div class="w-body">
-      <div class="sev">${w.severity}</div>
+  return `<div class="w-body">
+      <div class="sev ${w.severity}">${w.severity}</div>
       <div>
         <div class="msg">${esc(msg)}</div>
         <div class="cat">${badges}<span class="cat-name">${esc(w.category)}</span>${w.coaching ? '<span class="coach">coaching</span>' : ""}</div>
       </div>
-    </div>
-  </div>`;
+    </div>`;
+}
+function warningCard(w, lens) {
+  return `<div class="w ${w.severity}">${subjectHeader(w.subjects ?? [])}${warningRow(w, lens)}</div>`;
+}
+function castGroupCard(subject, warnings, lens) {
+  const topSev = warnings.map((w) => w.severity).sort((a, b) => SEV_RANK[a] - SEV_RANK[b])[0];
+  const rows = warnings.map((w) => warningRow(w, lens)).join("");
+  return `<div class="w ${topSev}">${subjectHeader([subject])}<div class="w-rows">${rows}</div></div>`;
+}
+function groupBySubject(ws) {
+  const out = [];
+  const idx = /* @__PURE__ */ new Map();
+  for (const w of ws) {
+    const subs = w.subjects ?? [];
+    if (subs.length !== 1) {
+      out.push({ subject: null, warnings: [w] });
+      continue;
+    }
+    const key = `${subs[0].spell_name}|${subs[0].npc_name}`;
+    const at = idx.get(key);
+    if (at != null) out[at].warnings.push(w);
+    else {
+      idx.set(key, out.length);
+      out.push({ subject: subs[0], warnings: [w] });
+    }
+  }
+  return out;
 }
 function referenceCard(e) {
   const add = e.is_boss_add ? ` <span class="w-add">${e.summoned_by_name ? `${esc(e.summoned_by_name)}'s add` : "boss add"}</span>` : "";
@@ -6913,10 +6948,12 @@ function renderReport(rep) {
   };
   const sections = SOURCE_SECTIONS.map(({ source, label }) => {
     const ws = visible.filter((w) => w.source === source).sort((a, b) => source === "boss" ? castOrderOf(a) - castOrderOf(b) || SEV_RANK[a.severity] - SEV_RANK[b.severity] : SEV_RANK[a.severity] - SEV_RANK[b.severity]);
+    const groups = groupBySubject(ws);
+    const cards = groups.map((g) => g.subject ? castGroupCard(g.subject, g.warnings, state.roleFilter) : warningCard(g.warnings[0], state.roleFilter));
     const refCards = source === "boss" && state.showBoss ? rep.boss_reference.map(referenceCard) : [];
-    if (ws.length === 0 && refCards.length === 0) return "";
-    return `<h3 class="section-head">${label} <span class="section-count">${ws.length + refCards.length}</span></h3>
-      <div class="warnings">${ws.map((w) => warningCard(w, state.roleFilter)).join("")}${refCards.join("")}</div>`;
+    if (cards.length === 0 && refCards.length === 0) return "";
+    return `<h3 class="section-head">${label} <span class="section-count">${cards.length + refCards.length}</span></h3>
+      <div class="warnings">${cards.join("")}${refCards.join("")}</div>`;
   }).join("");
   const body = sections || `<div class="empty">No actionable warnings${state.roleFilter !== "all" ? " for this role" : " \u2014 this comp covers everything this pull throws"}.</div>`;
   $("report").innerHTML = head + filterBar + body + budgetPanel(rep);
