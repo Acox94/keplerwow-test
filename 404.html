@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T11:42:40.827Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T11:54:22.923Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -1603,7 +1603,7 @@ function buildWarnings(r, group) {
       message: `Enrage present (${list(r.soothe.enrages)}) but no group spec can soothe.`
     });
   }
-  const unpreventableLethal = r.awareness.unpreventable_lethal.filter((t) => t.positioning.length === 0 && !t.dispel_detonates);
+  const unpreventableLethal = r.awareness.unpreventable_lethal.filter((t) => t.positioning.length === 0 && !t.dispel_detonates && !t.tank_buster);
   if (unpreventableLethal.length > 0) {
     w.push({
       severity: "critical",
