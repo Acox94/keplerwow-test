@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T17:55:06.145Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T18:05:50.373Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -1409,6 +1409,33 @@ function dpsSurvivalAdvice(st) {
   }
   return out;
 }
+function vulnerabilityAdvice(vt, group) {
+  const sch = vt.school === "all" ? "" : `${vt.school} `;
+  const win = vt.duration_s ? ` for ~${vt.duration_s}s` : "";
+  const hit = new Set((vt.cast.target_roles ?? []).map(coarseRole));
+  if (vt.cast.tank_buster) hit.add("tank");
+  const partyWide = hit.size === 0;
+  const takesIt = (R) => partyWide || hit.has(R);
+  const tankAffected = partyWide || hit.has("tank");
+  const canDispel = (R) => vt.removal === "dispel" && group.some((s) => coarseRole(s.party_role) === R && s.removals.some((rm) => rm.dispel_type === vt.cast.dispel_type));
+  const hasAllyExternal = (R) => group.some((s) => coarseRole(s.party_role) === R && s.externals.some((e) => e.target === "ally" && !e.passive));
+  const out = {};
+  for (const R of ROLE_TAGS) {
+    const parts = [];
+    if (canDispel(R)) parts.push(`dispel it to clear the +${vt.pct}% amp`);
+    if (R === "tank") {
+      if (takesIt("tank")) parts.push(`your follow-up ${sch}hits are amplified +${vt.pct}%${win} \u2014 mitigate the window with a long damage-reduction cooldown`);
+    } else if (takesIt(R)) {
+      parts.push(`you take amplified ${sch}damage${win} \u2014 have a personal ready for the next hit`);
+    } else if (hasAllyExternal(R) && tankAffected) {
+      parts.push(`external the tank for the amplified hit`);
+    } else if (R === "healer" && tankAffected) {
+      parts.push(`heal the tank hard through the amplified window`);
+    }
+    if (parts.length) out[R] = parts.join("; ").replace(/^./, (c) => c.toUpperCase()) + ".";
+  }
+  return out;
+}
 function buildWarnings(r, group) {
   const w = [];
   const list = (ts) => ts.map((t) => labelCast(t)).join(", ");
@@ -1769,6 +1796,7 @@ function buildWarnings(r, group) {
       category: "vulnerability",
       coaching: severity === "caution" ? true : void 0,
       subjects: subj([vt.cast]),
+      role_advice: vulnerabilityAdvice(vt, group),
       message: `${name} ${amp}${combo} \u2014 ${removalText}.`
     });
   }
