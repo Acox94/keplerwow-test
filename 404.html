@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T16:32:56.543Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T16:44:06.369Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -332,6 +332,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
         dispel_detonates: s.dispel_detonates,
         freedom_partial: s.freedom_partial,
         cast_time_ms: s.cast_time_ms,
+        duration_ms: s.duration_ms,
         recast_cooldown_ms: s.recast_cooldown_ms,
         target_roles: s.target_roles,
         observed_kick_point: s.observed_kick_point,
@@ -678,7 +679,8 @@ function analyzeVulnerability(threats, group, coveredTypes) {
       removal_covered = false;
     }
     const amplified_casts = lethal.filter((o) => castKey(o) !== castKey(t) && schoolsOverlap(o.school, v.school));
-    out.push({ cast: t, school: v.school, pct: v.pct, stacks: v.stacks, duration_s: v.duration_s, removal, removal_covered, amplified_casts });
+    const duration_s = v.duration_s ?? (t.duration_ms != null ? Math.round(t.duration_ms / 1e3) : void 0);
+    out.push({ cast: t, school: v.school, pct: v.pct, stacks: v.stacks, duration_s, removal, removal_covered, amplified_casts });
   }
   return { threats: out };
 }
@@ -6210,6 +6212,9 @@ var Spell = external_exports.object({
   // DB2  SpellCategories.Mechanic -> SpellMechanic (null = none)
   cast_time_ms: external_exports.number().int(),
   // DB2  SpellMisc.CastingTimeIndex -> SpellCastTimes.Base
+  // DB2  SpellMisc.DurationIndex -> SpellDuration.Duration (ms); null = no finite duration (-1 infinite / no row).
+  // The aura/effect duration — feeds the vulnerability window ("ramps … for Ns"). Defaulted null for back-compat.
+  duration_ms: external_exports.number().int().nullable().default(null),
   is_channeled: external_exports.boolean(),
   // LOCKED  SpellMisc.Attributes_1 & 0x4
   is_interruptible: external_exports.boolean(),
@@ -6567,6 +6572,8 @@ var ExportedSpell = external_exports.object({
   mechanic: MechanicName.nullable(),
   school: SchoolName,
   cast_time_ms: external_exports.number().int(),
+  // DB2 aura/effect duration in ms (see Spell.duration_ms); null = no finite duration. Feeds the vuln window.
+  duration_ms: external_exports.number().int().nullable().default(null),
   is_channeled: external_exports.boolean(),
   is_interruptible: external_exports.boolean(),
   is_stoppable: external_exports.boolean(),
