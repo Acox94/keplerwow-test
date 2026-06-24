@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T10:53:44.111Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T11:32:09.220Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -248,7 +248,15 @@ function analyzePull(dungeon, pull, group, opts = {}) {
     unavoidableAddsBySummoner.set(c.summoned_by, list);
   }
   const summonedAddIds = /* @__PURE__ */ new Set();
+  const autoIncludedIds = /* @__PURE__ */ new Set();
   const pulledIds = new Set(members.map((m) => m.npc_id));
+  for (const m of [...members]) {
+    const c = creatureById.get(m.npc_id);
+    if (!c?.is_boss_add || c.summoned_by == null || pulledIds.has(c.summoned_by) || !creatureById.has(c.summoned_by)) continue;
+    pulledIds.add(c.summoned_by);
+    autoIncludedIds.add(c.summoned_by);
+    members.push({ npc_id: c.summoned_by, count: 1 });
+  }
   for (const m of [...members]) {
     for (const add of unavoidableAddsBySummoner.get(m.npc_id) ?? []) {
       if (pulledIds.has(add.npc_id)) continue;
@@ -266,10 +274,12 @@ function analyzePull(dungeon, pull, group, opts = {}) {
       continue;
     }
     const summoned = summonedAddIds.has(c.npc_id);
+    const autoIncluded = summoned || autoIncludedIds.has(c.npc_id);
     resolvedPull.push({
       npc_id: c.npc_id,
       name: c.name,
       count: m.count,
+      ...autoIncluded ? { auto_included: true } : {},
       ...summoned ? { summoned: true, summoned_by_name: c.summoned_by != null ? creatureById.get(c.summoned_by)?.name ?? void 0 : void 0 } : {}
     });
   }
@@ -6725,7 +6735,10 @@ function referenceCard(e) {
 }
 function renderReport(rep) {
   state.lastReport = rep;
-  const pullStr = rep.pull.map((c) => `${esc(c.name)}${c.count > 1 ? ` \xD7${c.count}` : ""}${c.summoned ? ` <span class="summoned-tag">+ summoned${c.summoned_by_name ? ` by ${esc(c.summoned_by_name)}` : ""}</span>` : ""}`).join(", ") || "(empty)";
+  const pullStr = rep.pull.map((c) => {
+    const tag = c.summoned ? ` <span class="summoned-tag">+ summoned${c.summoned_by_name ? ` by ${esc(c.summoned_by_name)}` : ""}</span>` : c.auto_included ? ' <span class="summoned-tag">+ encounter</span>' : "";
+    return `${esc(c.name)}${c.count > 1 ? ` \xD7${c.count}` : ""}${tag}`;
+  }).join(", ") || "(empty)";
   const groupStr = rep.group.map((s) => `${s.class} ${s.spec_name}`).join(", ") || "(no comp)";
   const head = `<div class="report-head">
     <div class="title">${esc(rep.dungeon.name)}</div>
