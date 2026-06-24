@@ -101,6 +101,23 @@
     .w.info     { border-left-color: var(--info); } .w.info     .sev { color: var(--info); }
     .empty { color: var(--ink-dim); font-style: italic; padding: 14px; }
 
+    /* role filter (Tank/Healer/DPS lens) + Boss/Trash sections + per-card role badges */
+    .role-filter { display: flex; gap: 6px; margin-bottom: 6px; }
+    .rf {
+      background: var(--panel-2); color: var(--ink-dim); border: 1px solid var(--line);
+      border-radius: 20px; padding: 5px 14px; font-size: 12.5px; cursor: pointer; font-family: inherit;
+    }
+    .rf:hover { border-color: var(--accent); color: var(--ink); }
+    .rf.active { background: var(--accent); color: #0c1220; border-color: var(--accent); font-weight: 650; }
+    .section-head { font-size: 12.5px; text-transform: uppercase; letter-spacing: .6px; color: var(--ink-dim); margin: 18px 0 9px; }
+    .section-count { color: var(--ink); background: var(--panel-2); border-radius: 10px; padding: 0 7px; font-size: 11px; margin-left: 4px; }
+    .role-badge { font-size: 9.5px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; padding: 1px 6px; border-radius: 4px; margin-right: 5px; }
+    .role-badge.tank   { background: #2b4a73; color: #cfe2ff; }
+    .role-badge.healer { background: #1f5135; color: #c7f0d6; }
+    .role-badge.dps    { background: #5e2b2b; color: #ffd0d0; }
+    .role-badge.all    { background: var(--panel-2); color: var(--ink-dim); }
+    .cat-name { color: var(--ink-dim); }
+
     .budget { margin-top: 16px; }
     .budget table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
     .budget td { padding: 5px 8px; border-top: 1px solid var(--line); }
@@ -112,7 +129,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T07:10:48.036Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T07:44:03.776Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -235,6 +252,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
       threats.push({
         npc_id: c.npc_id,
         npc_name: c.name,
+        is_boss: c.is_boss,
         spell_id: s.spell_id,
         spell_name: s.name,
         count: m.count,
@@ -1025,7 +1043,7 @@ function analyzeNotes(threats) {
 function buildWarnings(r) {
   const w = [];
   const list = (ts) => ts.map((t) => labelCast(t)).join(", ");
-  const subj = (ts) => ts.map((t) => ({ spell_name: t.spell_name, npc_name: t.npc_name, count: t.count }));
+  const subj = (ts) => ts.map((t) => ({ spell_name: t.spell_name, npc_name: t.npc_name, count: t.count, is_boss: t.is_boss, target_roles: t.target_roles }));
   const targetingByKey = new Map(r.targeting.map((tt) => [castKey(tt.cast), tt]));
   const landsOn = (ts) => {
     const roles = /* @__PURE__ */ new Set();
@@ -1499,7 +1517,27 @@ function buildWarnings(r) {
   if (broughtBuffs.length > 0) {
     w.push({ severity: "info", category: "composition", coaching: true, message: `Raid buffs covered: ${broughtBuffs.join(", ")}.` });
   }
-  return w.sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]);
+  return w.map((x) => ({ ...x, ...classifyWarning(x) })).sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]);
+}
+var RESPONSIBLE = {
+  interrupt: ["dps"],
+  cc: ["dps"],
+  throughput: ["dps"],
+  kick_timing: ["dps"],
+  channel_timing: ["dps"],
+  completion_effect: ["dps"],
+  dispel: ["healer"],
+  soothe: ["dps"],
+  tank_buster: ["tank"],
+  survive: ["healer"]
+};
+function classifyWarning(w) {
+  const subs = w.subjects ?? [];
+  const source = subs.length === 0 ? "group" : subs.some((s) => s.is_boss) ? "boss" : "trash";
+  const roles = /* @__PURE__ */ new Set();
+  for (const s of subs) for (const tr of s.target_roles ?? []) roles.add(tr === "tank" ? "tank" : tr === "healer" ? "healer" : "dps");
+  for (const r of RESPONSIBLE[w.category] ?? []) roles.add(r);
+  return { source, roles: [...roles] };
 }
 var BUFF_LABEL = {
   lust: "Bloodlust",
@@ -6175,7 +6213,11 @@ var state = {
   // npc_id -> count
   // 5 fixed role slots [Tank, Healer, DPS 1, DPS 2, DPS 3]; null = empty. Engine group = the non-null ones.
   compSlots: [null, null, null, null, null],
-  skill: "experienced"
+  skill: "experienced",
+  roleFilter: "all",
+  // Tank/Healer/DPS lens over the report
+  lastReport: null
+  // kept so a filter click can re-render without re-analyzing
 };
 var $ = (id) => document.getElementById(id);
 async function loadIndex() {
@@ -6289,7 +6331,29 @@ function runAnalysis() {
   renderReport(report);
 }
 var SEV_RANK = { critical: 0, warning: 1, caution: 2, info: 3 };
+var ROLE_FILTERS = ["all", "tank", "healer", "dps"];
+var ROLE_LABEL2 = { tank: "Tank", healer: "Healer", dps: "DPS" };
+var SOURCE_SECTIONS = [
+  { source: "boss", label: "Boss Mechanics" },
+  { source: "trash", label: "Trash Mechanics" },
+  { source: "group", label: "Group / Comp" }
+];
+function warningCard(w) {
+  const subjects = w.subjects?.length ? `<div class="w-subjects">${w.subjects.map((s) => `<span class="w-spell">${esc(s.spell_name)}${s.count > 1 ? ` \xD7${s.count}` : ""}</span> <span class="w-npc">(${esc(s.npc_name)})</span>`).join(", ")}</div>` : "";
+  const badges = w.roles.length ? w.roles.map((r) => `<span class="role-badge ${r}">${ROLE_LABEL2[r]}</span>`).join("") : '<span class="role-badge all">All</span>';
+  return `<div class="w ${w.severity}">
+    ${subjects}
+    <div class="w-body">
+      <div class="sev">${w.severity}</div>
+      <div>
+        <div class="msg">${esc(w.message)}</div>
+        <div class="cat">${badges}<span class="cat-name">${esc(w.category)}</span>${w.coaching ? '<span class="coach">coaching</span>' : ""}</div>
+      </div>
+    </div>
+  </div>`;
+}
 function renderReport(rep) {
+  state.lastReport = rep;
   const pullStr = rep.pull.map((c) => c.count > 1 ? `${c.name} \xD7${c.count}` : c.name).join(", ") || "(empty)";
   const groupStr = rep.group.map((s) => `${s.class} ${s.spec_name}`).join(", ") || "(no comp)";
   const head = `<div class="report-head">
@@ -6298,21 +6362,24 @@ function renderReport(rep) {
     <div class="sub"><b>Comp:</b> ${esc(groupStr)}</div>
     <div class="sub"><b>Skill:</b> ${esc(rep.skill)} \xB7 build ${rep.build.patch_version}.${rep.build.build_number}${rep.unknown_npcs.length ? ` \xB7 <span class="short">unknown npc_ids skipped: ${rep.unknown_npcs.join(", ")}</span>` : ""}</div>
   </div>`;
-  const sorted = [...rep.warnings].sort((a, b) => SEV_RANK[a.severity] - SEV_RANK[b.severity]);
-  const subjectsRow = (w) => w.subjects?.length ? `<div class="w-subjects">${w.subjects.map((s) => `<span class="w-spell">${esc(s.spell_name)}${s.count > 1 ? ` \xD7${s.count}` : ""}</span> <span class="w-npc">(${esc(s.npc_name)})</span>`).join(", ")}</div>` : "";
-  const warnings = sorted.length ? `<div class="warnings">${sorted.map(
-    (w) => `<div class="w ${w.severity}">
-            ${subjectsRow(w)}
-            <div class="w-body">
-              <div class="sev">${w.severity}</div>
-              <div>
-                <div class="msg">${esc(w.message)}</div>
-                <div class="cat">${esc(w.category)}${w.coaching ? '<span class="coach">coaching</span>' : ""}</div>
-              </div>
-            </div>
-          </div>`
-  ).join("")}</div>` : `<div class="empty">No actionable warnings \u2014 this comp covers everything this pull throws.</div>`;
-  $("report").innerHTML = head + warnings + budgetPanel(rep);
+  const filterBar = `<div class="role-filter">${ROLE_FILTERS.map((r) => `<button class="rf ${state.roleFilter === r ? "active" : ""}" data-role="${r}">${r === "all" ? "All" : ROLE_LABEL2[r]}</button>`).join("")}</div>`;
+  const visible = rep.warnings.filter(
+    (w) => state.roleFilter === "all" || w.roles.length === 0 || w.roles.includes(state.roleFilter)
+  );
+  const sections = SOURCE_SECTIONS.map(({ source, label }) => {
+    const ws = visible.filter((w) => w.source === source).sort((a, b) => SEV_RANK[a.severity] - SEV_RANK[b.severity]);
+    if (ws.length === 0) return "";
+    return `<h3 class="section-head">${label} <span class="section-count">${ws.length}</span></h3>
+      <div class="warnings">${ws.map(warningCard).join("")}</div>`;
+  }).join("");
+  const body = sections || `<div class="empty">No actionable warnings${state.roleFilter !== "all" ? " for this role" : " \u2014 this comp covers everything this pull throws"}.</div>`;
+  $("report").innerHTML = head + filterBar + body + budgetPanel(rep);
+  $("report").querySelectorAll(".rf").forEach((btn) => {
+    btn.onclick = () => {
+      state.roleFilter = btn.dataset.role;
+      if (state.lastReport) renderReport(state.lastReport);
+    };
+  });
 }
 function budgetPanel(rep) {
   const s = rep.stops;
