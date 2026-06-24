@@ -139,7 +139,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T17:51:40.543Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-24T17:55:06.145Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -1377,7 +1377,7 @@ function tankBusterAdvice(tb) {
   }
   for (const R of ["healer", "dps"]) {
     const mine = myAbilities(allies, R);
-    if (R === "dps" && !mine) continue;
+    if (!mine && (R === "dps" || !lethal)) continue;
     if (!lethal) {
       out[R] = mine ? `Tank-buster \u2014 have ${mine} ready on the tank if it spikes.` : `Tank-buster on the tank \u2014 their actives cover it; ${R === "healer" ? "top them right after" : "keep DPSing"}.`;
     } else if (mine) {
@@ -1823,10 +1823,12 @@ function buildWarnings(r, group) {
     });
   }
   for (const tb of r.tank_buster.threats) {
-    if (!tb.cast.is_lethal) continue;
     const name = labelCast(tb.cast);
     const tbAdvice = tankBusterAdvice(tb);
-    if (tb.ally_answers.length > 0) {
+    if (!tb.cast.is_lethal) {
+      const hint = tb.ally_answers.length ? `, with an external (${externalList(tb.ally_answers)}) if it spikes` : "";
+      w.push({ severity: "info", category: "tank_buster", coaching: true, subjects: subj([tb.cast]), role_advice: tbAdvice, message: `${name} is a tank-buster \u2014 tank actives cover it${hint}.` });
+    } else if (tb.ally_answers.length > 0) {
       w.push({
         severity: "warning",
         category: "tank_buster",
