@@ -109,6 +109,16 @@
     .w-rows .w-body:first-child { padding-top: 0; }
     .w-rows .w-body:last-child { padding-bottom: 0; }
     .w-rows .w-body + .w-body { border-top: 1px solid var(--line); }
+    /* CONSOLIDATED cast card (one cast = one card): header (name + severity chip) -> description -> role rows */
+    .w.consolidated .w-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: 9px; }
+    .w.consolidated .w-title { font-size: 13px; line-height: 1.4; }
+    .w.consolidated .w-head .sev { font-size: 10.5px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; white-space: nowrap; }
+    .w.consolidated .w-desc { font-size: 13.5px; line-height: 1.5; margin-bottom: 11px; }
+    .w-roles { display: flex; flex-direction: column; gap: 9px; }
+    .w-role { display: grid; grid-template-columns: 58px 1fr; gap: 10px; align-items: start; font-size: 13px; line-height: 1.45; }
+    .w-role .role-badge { justify-self: start; margin-right: 0; }
+    .w-role.w-everyone { grid-template-columns: 1fr; } /* universal row: no role badge, full width */
+    .w-role-msg { color: var(--ink); }
     /* read-only boss-mechanic reference card (the internal guide) — muted, dashed, not a warning */
     .w.reference { border-left-style: dashed; border-left-color: var(--ink-dim); opacity: .92; }
     .w.reference .sev { color: var(--ink-dim); }
@@ -147,7 +157,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T06:29:25.498Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T09:28:58.230Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -431,7 +441,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
     notes,
     boss_reference,
     // Skill gate: an expert sees only the essentials; learning + experienced also get the coaching/heads-ups.
-    warnings: buildWarnings({ dispels, stops, soothe, misplays, awareness, throughput, scaling, targeting, movement, cc_on_party, displacement, vulnerability, tank_buster, target_drop, dps_survival, pet_choice, composition, kick_timing, channel_timing, completion_effect, notes }, groupSpecs).filter((wn) => !wn.coaching || skill !== "expert")
+    warnings: buildWarnings({ dispels, stops, soothe, misplays, awareness, throughput, scaling, targeting, movement, cc_on_party, displacement, vulnerability, tank_buster, target_drop, dps_survival, pet_choice, composition, kick_timing, channel_timing, completion_effect, notes, threats }, groupSpecs).filter((wn) => !wn.coaching || skill !== "expert")
   };
 }
 function normalizePull(pull) {
@@ -700,9 +710,12 @@ function analyzeVulnerability(threats, group, coveredTypes) {
   return { threats: out };
 }
 function analyzeTankBusters(threats, group) {
-  const allyExternals = [];
-  for (const s of group) for (const ext of s.externals) if (ext.target === "ally" && !ext.passive) allyExternals.push({ spec: s, ext });
   const tankSpec = group.find((s) => s.party_role === "tank") ?? null;
+  const allyExternals = [];
+  for (const s of group) {
+    if (s === tankSpec) continue;
+    for (const ext of s.externals) if (ext.target === "ally" && !ext.passive) allyExternals.push({ spec: s, ext });
+  }
   const tankSelfExternals = (tankSpec?.externals ?? []).filter((e) => e.target === "self" && !e.passive);
   const dangerByNpc = /* @__PURE__ */ new Map();
   for (const t of threats) dangerByNpc.set(t.npc_id, t.count);
@@ -715,7 +728,7 @@ function analyzeTankBusters(threats, group) {
   const out = [];
   for (const t of threats) {
     if (!t.tank_buster) continue;
-    const ally_answers = allyExternals.filter((a) => covers(a.ext, t.school)).map((a) => answer(a.spec, a.ext));
+    const ally_answers = allyExternals.filter((a) => covers(a.ext, t.school)).map((a) => answer(a.spec, a.ext)).sort((x, y) => MECH_RANK[x.mechanism] - MECH_RANK[y.mechanism]);
     const covering = tankSpec ? tankSelfExternals.filter((e) => covers(e, t.school)) : [];
     const reductions = covering.filter((e) => e.mechanism === "reduction");
     const tankScoped = reductions.some((e) => e.scope === "single") && reductions.some((e) => e.scope === "all");
@@ -777,7 +790,8 @@ function analyzeDpsSurvival(threats, group) {
   const personal_specs = squishies.flatMap((s) => personalsOf(s).map((e) => answer(s, e)));
   const out = [];
   for (const t of threats) {
-    if (!t.is_lethal || t.tank_buster || t.positioning.length > 0 || t.dispel_detonates) continue;
+    const dodgeableAoe = t.is_aoe && !t.unavoidable && !(t.mechanic !== null && PARTY_CC_WORD[t.mechanic] !== void 0);
+    if (!t.is_lethal || t.tank_buster || t.positioning.length > 0 || t.dispel_detonates || dodgeableAoe) continue;
     const measured = t.target_roles !== null && t.target_roles.length > 0;
     const hitRoles = measured ? t.target_roles.filter((r) => r !== "tank") : null;
     if (measured && hitRoles.length === 0) continue;
@@ -1300,7 +1314,13 @@ function immunityDispelAdvice(dt, removals) {
   for (const R of ROLE_TAGS) {
     const amAnswerer = answerers.some((a) => a.role === R);
     const phrase = answerersPhrase(answerers, R);
-    out[R] = amAnswerer ? `Your only ${dt} removal is ${phrase} \u2014 it clears it but DROPS ALL THREAT on the target; never on the tank without a taunt ready (/cancelaura macro).` : `No standard ${dt} dispel \u2014 ${phrase} is the only removal, but it drops threat, so it won't be used on the tank. Plan to heal through it otherwise.`;
+    if (!amAnswerer) {
+      out[R] = `No standard ${dt} dispel \u2014 ${phrase} is the only removal, but it drops threat, so it won't be used on the tank. Plan to heal through it otherwise.`;
+    } else if (R === "tank") {
+      out[R] = `Your only ${dt} removal is ${phrase} \u2014 it clears it but DROPS ALL THREAT: never use it on yourself as the tank without a /cancelaura macro and a plan to regain aggro immediately.`;
+    } else {
+      out[R] = `Your only ${dt} removal is ${phrase} \u2014 it clears it but DROPS ALL THREAT on its target. EXTREME CAUTION: do not use it on your tank without coordination.`;
+    }
   }
   return out;
 }
@@ -1357,6 +1377,7 @@ function movementAdvice(mt, group) {
   const verb = impairVerb(mt.mechanic);
   const selfOnly = mt.coverage === "self";
   const lethalTail = mt.lethal_if_unfreed ? " \u2014 lethal if not freed, so be fast" : "";
+  const condTail = mt.coverage === "conditional" ? " (conditional/unreliable \u2014 position as a backup)" : "";
   const out = {};
   for (const R of ROLE_TAGS) {
     const amFreer = freers.some((a) => a.role === R);
@@ -1372,6 +1393,7 @@ function movementAdvice(mt, group) {
     } else {
       out[R] = `If you get ${verb}, ${answerersPhrase(freers, R)} can free you (ally-castable)${lethalTail}.`;
     }
+    if (condTail && out[R]) out[R] += condTail;
   }
   return out;
 }
@@ -1386,7 +1408,8 @@ function tankBusterAdvice(tb) {
   } else if (tb.tank_self_answer) {
     const a = tb.tank_self_answer;
     const verb = a.mechanism === "immunity" ? "go immune with" : a.mechanism === "death_prevent" ? "survive it with" : "mitigate it with";
-    out.tank = `A LETHAL hit on you with no ally external \u2014 ${verb} your ${a.ability}.`;
+    const scopeNote = tb.tank_self_scoped ? a.scope === "single" ? " (single-target \u2014 brand the lone dangerous creature)" : " (blanket mitigation \u2014 multiple dangerous creatures in the pull)" : "";
+    out.tank = `A LETHAL hit on you with no ally external \u2014 ${verb} your ${a.ability}${scopeNote}.`;
   } else {
     out.tank = "A LETHAL hit on you and the comp brings NO external \u2014 plan your biggest defensive; you have no backup for it.";
   }
@@ -1465,6 +1488,135 @@ function notesRoleAdvice(cast, note, group) {
   for (const R of roles) out[R] = note;
   return out;
 }
+var PARTY_CC_WORD = {
+  fleeing: "fear",
+  silenced: "silence",
+  disoriented: "disorient",
+  stunned: "stun",
+  incapacitated: "incapacitate",
+  charmed: "charm",
+  banished: "banish",
+  sleeping: "sleep"
+};
+function intrinsicSeverity(cast) {
+  const partyCC = cast.mechanic !== null && PARTY_CC_WORD[cast.mechanic] !== void 0;
+  const avoidable = cast.positioning.length > 0 || cast.is_aoe && !cast.unavoidable && !partyCC;
+  if (cast.is_lethal) return avoidable ? "warning" : "critical";
+  if (cast.mechanic !== null && PARTY_CC_WORD[cast.mechanic] && (cast.is_aoe || (cast.party_targets ?? 0) >= 2)) return "warning";
+  return "info";
+}
+function describeType(cast) {
+  if (cast.tank_buster) return "tank-buster";
+  if (cast.mechanic !== null && PARTY_CC_WORD[cast.mechanic]) return `party ${PARTY_CC_WORD[cast.mechanic]}`;
+  if (cast.completion_effect) return `${cast.completion_effect.replace(/^an? /i, "")} cast`;
+  if (cast.mechanic === "rooted") return "root";
+  if (cast.mechanic === "snared") return "snare";
+  if (cast.is_interruptible) return "interruptible cast";
+  if (cast.unavoidable && cast.is_aoe) {
+    if (cast.dot) return cast.dispel_type !== "None" ? `unavoidable party-wide ${cast.dispel_type}` : "unavoidable party-wide damage-over-time";
+    return "unavoidable party-wide hit";
+  }
+  if (cast.positioning.includes("frontal")) return "frontal cone";
+  if (cast.positioning.includes("line_of_sight")) return "line-of-sight cast";
+  if (cast.is_aoe || cast.positioning.length > 0) return "avoidable ground effect";
+  if (cast.displacement.includes("knockback")) return "knockback";
+  if (cast.displacement.includes("pull")) return "pull";
+  if (cast.dispel_type !== "None") return cast.dot ? `${cast.dispel_type} damage-over-time` : `${cast.dispel_type} debuff`;
+  if (cast.dot) return "damage-over-time";
+  if (cast.is_lethal) return "single-target hit";
+  return "cast";
+}
+function describeRiders(cast, type) {
+  const out = [];
+  if (cast.vulnerability) {
+    const v = cast.vulnerability;
+    const sch = v.school === "all" ? "" : `${v.school} `;
+    const dur = cast.duration_ms != null ? ` for ~${Math.round(cast.duration_ms / 1e3)}s` : "";
+    out.push(`ramps your ${sch}damage taken +${v.pct}%${dur}`);
+  }
+  if (cast.displacement.includes("knockback") && type !== "knockback") out.push("knocks you back");
+  if (cast.displacement.includes("pull") && type !== "pull") out.push("pulls you in");
+  if (cast.dispel_type !== "None" && !type.includes(cast.dispel_type) && !type.includes("debuff")) out.push(`applies a ${cast.dispel_type} debuff`);
+  if (cast.dot && !type.includes("damage-over-time") && !type.includes(cast.dispel_type)) out.push("ticks damage over time");
+  if (cast.is_stoppable && cast.is_interruptible) out.push("won't recast if you CC it instead");
+  return out;
+}
+function composeDescription(cast, severity) {
+  const ADJ = { critical: "a critical", warning: "a dangerous", caution: "a", info: "a minor" };
+  const type = describeType(cast);
+  let adj = ADJ[severity];
+  if (adj === "a" && /^[aeiou]/i.test(type)) adj = "an";
+  const riders = describeRiders(cast, type);
+  const tail = riders.length ? ` that also ${joinAnd(riders)}` : "";
+  return `${cast.spell_name} is ${adj} ${type}${tail}.`;
+}
+function stripCastPrefix(message, cast) {
+  const esc2 = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const label = new RegExp(`^${esc2(cast.spell_name)}( \xD7\\d+)? \\(${esc2(cast.npc_name)}\\)\\s*:?\\s*`);
+  let m = message.replace(label, "");
+  m = m.replace(/^is an? [^—]*— /, "");
+  return m.charAt(0).toUpperCase() + m.slice(1);
+}
+function damageLabel(cast) {
+  if (cast.is_lethal) return "heavy";
+  if (cast.tank_buster || cast.unavoidable) return "moderate";
+  return "mild";
+}
+function buildCastCard(cast, members) {
+  const memberFloor = [intrinsicSeverity(cast), ...members.map((m) => m.severity)];
+  const severity = memberFloor.sort((a, b) => SEVERITY_RANK[a] - SEVERITY_RANK[b])[0];
+  const perRole = { tank: [], healer: [], dps: [] };
+  const universal = [];
+  for (const m of members) {
+    const ra = m.role_advice;
+    if (ra && (ra.tank || ra.healer || ra.dps)) {
+      for (const R of ROLE_TAGS) {
+        const v = ra[R];
+        if (v) perRole[R].push(v);
+      }
+    } else if (m.message) {
+      universal.push(stripCastPrefix(m.message, cast));
+    }
+  }
+  const uniq = (a) => [...new Set(a)].join(" ");
+  const anyRole = perRole.tank.length > 0 || perRole.healer.length > 0 || perRole.dps.length > 0;
+  let role_advice;
+  let everyone;
+  if (anyRole) {
+    role_advice = {};
+    for (const R of ROLE_TAGS) if (perRole[R].length) role_advice[R] = uniq(perRole[R]);
+    if (universal.length) everyone = uniq(universal);
+  } else if (universal.length) {
+    everyone = uniq(universal);
+  }
+  const primary = [...members].sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity])[0];
+  const coaching = members.every((m) => m.coaching) && intrinsicSeverity(cast) === "info";
+  return {
+    severity,
+    category: primary.category,
+    consolidated: true,
+    coaching: coaching || void 0,
+    subjects: members[0].subjects,
+    message: composeDescription(cast, severity),
+    role_advice,
+    everyone
+  };
+}
+function tankSurvivalCard(tb, vt) {
+  const cast = tb.cast;
+  const severity = intrinsicSeverity(cast);
+  const message = composeDescription(cast, severity);
+  const allies = tb.ally_answers.map(extAnswerer);
+  const winWord = vt.duration_s ? ` across the full ~${vt.duration_s}s window` : "";
+  const role_advice = {};
+  const tankExt = allies.length ? ` Back it with an external if needed: ${answerersPhrase(allies, "tank")}.` : "";
+  role_advice.tank = `To survive this, hold your strongest damage-reduction cooldown${winWord} \u2014 you can't dodge the amplified follow-up hits.${tankExt}`;
+  const healMine = myAbilities(allies, "healer");
+  role_advice.healer = `This tank-buster hits your tank for ${damageLabel(cast)} damage \u2014 ${healMine ? `have ${healMine} ready for them` : allies.length ? `back the tank with ${answerersPhrase(allies, "healer")}` : "pre-heal hard through the amplified window"}.`;
+  const note = cast.coaching_note?.trim();
+  if (note) role_advice.dps = note;
+  return { severity, category: "tank_buster", consolidated: true, role_advice, message };
+}
 function buildWarnings(r, group) {
   const w = [];
   const list = (ts) => ts.map((t) => labelCast(t)).join(", ");
@@ -1475,6 +1627,14 @@ function buildWarnings(r, group) {
     for (const t of ts) for (const role of targetingByKey.get(castKey(t))?.affected ?? []) roles.add(role);
     return roles.size ? ` \u2014 lands on your ${rolePhrase(orderRoles(roles))}` : "";
   };
+  const vulnByKey = new Map(r.vulnerability.threats.map((v) => [castKey(v.cast), v]));
+  const foldedKeys = /* @__PURE__ */ new Set();
+  for (const tb of r.tank_buster.threats) {
+    const vt = vulnByKey.get(castKey(tb.cast));
+    if (!vt) continue;
+    foldedKeys.add(castKey(tb.cast));
+    w.push({ ...tankSurvivalCard(tb, vt), subjects: subj([tb.cast]) });
+  }
   const { stops } = r;
   if (stops.must_kick_shortfall > 0) {
     w.push({
@@ -1647,6 +1807,7 @@ function buildWarnings(r, group) {
     });
   }
   for (const mn of r.notes.threats) {
+    if (foldedKeys.has(castKey(mn.cast))) continue;
     const lethal = mn.cast.is_lethal || mn.cast.scales_to_lethal;
     w.push({
       // normally coaching (the functional dimension owns the danger); but a dispel_detonates spread-bomb's note IS
@@ -1701,7 +1862,7 @@ function buildWarnings(r, group) {
       message: `Enrage present (${list(r.soothe.enrages)}) but no group spec can soothe.`
     });
   }
-  const unpreventableLethal = r.awareness.unpreventable_lethal.filter((t) => t.positioning.length === 0 && !t.dispel_detonates && !t.tank_buster);
+  const unpreventableLethal = r.awareness.unpreventable_lethal.filter((t) => t.positioning.length === 0 && !t.dispel_detonates && !t.tank_buster && !(t.is_aoe && !t.unavoidable && !(t.mechanic !== null && PARTY_CC_WORD[t.mechanic] !== void 0)));
   if (unpreventableLethal.length > 0) {
     w.push({
       severity: "critical",
@@ -1773,9 +1934,9 @@ function buildWarnings(r, group) {
     const verb = mt.mechanic === "rooted" ? "roots" : "snares";
     const moveAdvice = movementAdvice(mt, group);
     if (mt.coverage === "none") {
-      w.push(mt.lethal_if_unfreed ? { severity: "critical", category: "movement", subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on} and no one in the group can clear ${mt.mechanic} (shapeshift / Blessing of Freedom / Tiger's Lust \u2026) \u2014 lethal if not freed.` } : { severity: "warning", category: "movement", subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} your party${on} and no group spec can remove ${mt.mechanic} \u2014 position to avoid it (no movement freedom for it in the comp).` });
+      w.push(mt.lethal_if_unfreed ? { severity: "critical", category: "movement", subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on} and no one in the group can clear ${mt.mechanic} (shapeshift / Blessing of Freedom / Tiger's Lust \u2026) \u2014 lethal if not freed.` } : { severity: "caution", category: "movement", subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} your party${on} and no group spec can remove ${mt.mechanic} \u2014 position to avoid it (no movement freedom for it in the comp).` });
     } else if (mt.coverage === "ally") {
-      w.push({ severity: "info", category: "movement", coaching: true, subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target \u2014 clearable on anyone by ${freeList(mt.free_specs)} (ally-castable freedom).` });
+      w.push({ severity: "caution", category: "movement", coaching: true, subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target \u2014 clearable on anyone by ${freeList(mt.free_specs)} (ally-castable freedom).` });
     } else if (mt.coverage === "self") {
       w.push({ severity: "caution", category: "movement", coaching: true, subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on} \u2014 only self-clearable (${freeList(mt.free_specs)}); a ${mt.mechanic} player without their own freedom is stuck. Bring an ally-castable freedom or position.` });
     } else {
@@ -1813,6 +1974,7 @@ function buildWarnings(r, group) {
     });
   }
   for (const vt of r.vulnerability.threats) {
+    if (foldedKeys.has(castKey(vt.cast))) continue;
     const name = labelCast(vt.cast);
     const schoolWord = vt.school === "all" ? "" : `${vt.school} `;
     const forWindow = vt.duration_s ? ` for ${vt.duration_s}s` : "";
@@ -1846,41 +2008,8 @@ function buildWarnings(r, group) {
       message: `Group brings fear(s) \u2014 feared mobs may pull extra packs: ${r.misplays.fear_abilities.map((a) => `${a.spell_name} (${a.spec.class} ${a.spec.spec_name})`).join(", ")}.`
     });
   }
-  const mitigableKeys = new Set(r.awareness.mitigable_after.map(castKey));
-  const unavoidableShown = r.awareness.unavoidable_casts.filter((t) => !mitigableKeys.has(castKey(t)));
-  if (unavoidableShown.length > 0) {
-    const lethal = unavoidableShown.some((t) => t.is_lethal);
-    w.push({
-      severity: lethal ? "warning" : "info",
-      category: "awareness",
-      coaching: lethal ? void 0 : true,
-      subjects: subj(unavoidableShown),
-      message: `${sumCount(unavoidableShown)} unavoidable party-wide cast(s) \u2014 heal/mitigate through${lethal ? " (lethal without a cooldown)" : ""}: ${list(unavoidableShown)}.`
-    });
-  }
-  const avoidable = r.awareness.avoidable_casts.filter((t) => !t.dispel_detonates);
-  if (avoidable.length > 0) {
-    const lethal = avoidable.some((t) => t.is_lethal);
-    w.push({
-      severity: lethal ? "caution" : "info",
-      category: "awareness",
-      coaching: lethal ? void 0 : true,
-      subjects: subj(avoidable),
-      message: `${sumCount(avoidable)} avoidable cast(s) \u2014 reposition${lethal ? " (lethal if you stand in it)" : ""}: ${avoidable.map((t) => `${t.spell_name} [${avoidanceHint(t)}]`).join(", ")}.`
-    });
-  }
-  const dotShown = r.awareness.dot_casts.filter((t) => !mitigableKeys.has(castKey(t)));
-  if (dotShown.length > 0) {
-    const removable = dotShown.some((t) => FRIENDLY_DISPEL_TYPES.includes(t.dispel_type));
-    w.push({
-      severity: "info",
-      category: "awareness",
-      coaching: true,
-      subjects: subj(dotShown),
-      message: `${sumCount(dotShown)} damage-over-time cast(s) \u2014 sustained pressure${removable ? " (a removable one can be dispelled to end the ticks)" : ""}: ${list(dotShown)}.`
-    });
-  }
   for (const tb of r.tank_buster.threats) {
+    if (foldedKeys.has(castKey(tb.cast))) continue;
     const name = labelCast(tb.cast);
     const tbAdvice = tankBusterAdvice(tb);
     if (!tb.cast.is_lethal) {
@@ -1982,7 +2111,87 @@ function buildWarnings(r, group) {
   if (broughtBuffs.length > 0) {
     w.push({ severity: "info", category: "composition", coaching: true, message: `Raid buffs covered: ${broughtBuffs.join(", ")}.` });
   }
-  return w.map((x) => ({ ...x, ...classifyWarning(x) })).sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]);
+  const FOLD_CATEGORIES = /* @__PURE__ */ new Set([
+    "targeting",
+    "movement",
+    "cc",
+    "displacement",
+    "vulnerability",
+    "tank_buster",
+    "target_drop",
+    "dps_survival",
+    "kick_timing",
+    "channel_timing",
+    "completion_effect",
+    "notes",
+    "scaling",
+    "dispel",
+    "survive",
+    "soothe"
+  ]);
+  const subjNameKey = (s) => `${s.npc_name}|${s.spell_name}`;
+  const isFoldable = (wn) => !wn.consolidated && (wn.subjects?.length ?? 0) === 1 && FOLD_CATEGORIES.has(wn.category);
+  const cardedNameKeys = /* @__PURE__ */ new Set();
+  for (const wn of w) {
+    if ((wn.consolidated || isFoldable(wn)) && (wn.subjects?.length ?? 0) === 1) cardedNameKeys.add(subjNameKey(wn.subjects[0]));
+  }
+  const notCarded = (t) => !cardedNameKeys.has(`${t.npc_name}|${t.spell_name}`);
+  const mitigableKeys = new Set(r.awareness.mitigable_after.map(castKey));
+  const unavoidableShown = r.awareness.unavoidable_casts.filter((t) => !mitigableKeys.has(castKey(t)) && notCarded(t));
+  if (unavoidableShown.length > 0) {
+    const lethal = unavoidableShown.some((t) => t.is_lethal);
+    w.push({
+      severity: lethal ? "warning" : "info",
+      category: "awareness",
+      coaching: lethal ? void 0 : true,
+      subjects: subj(unavoidableShown),
+      message: `${sumCount(unavoidableShown)} unavoidable party-wide cast(s) \u2014 heal/mitigate through${lethal ? " (lethal without a cooldown)" : ""}: ${list(unavoidableShown)}.`
+    });
+  }
+  const avoidable = r.awareness.avoidable_casts.filter((t) => !t.dispel_detonates && notCarded(t));
+  if (avoidable.length > 0) {
+    const lethal = avoidable.some((t) => t.is_lethal);
+    w.push({
+      severity: lethal ? "caution" : "info",
+      category: "awareness",
+      coaching: lethal ? void 0 : true,
+      subjects: subj(avoidable),
+      message: `${sumCount(avoidable)} avoidable cast(s) \u2014 reposition${lethal ? " (lethal if you stand in it)" : ""}: ${avoidable.map((t) => `${t.spell_name} [${avoidanceHint(t)}]`).join(", ")}.`
+    });
+  }
+  const dotShown = r.awareness.dot_casts.filter((t) => !mitigableKeys.has(castKey(t)) && notCarded(t));
+  if (dotShown.length > 0) {
+    const removable = dotShown.some((t) => FRIENDLY_DISPEL_TYPES.includes(t.dispel_type));
+    w.push({
+      severity: "info",
+      category: "awareness",
+      coaching: true,
+      subjects: subj(dotShown),
+      message: `${sumCount(dotShown)} damage-over-time cast(s) \u2014 sustained pressure${removable ? " (a removable one can be dispelled to end the ticks)" : ""}: ${list(dotShown)}.`
+    });
+  }
+  const threatByName = new Map(r.threats.map((t) => [`${t.npc_name}|${t.spell_name}`, t]));
+  const folded = [];
+  const groupAt = /* @__PURE__ */ new Map();
+  const groupMembers = /* @__PURE__ */ new Map();
+  for (const wn of w) {
+    if (!isFoldable(wn)) {
+      folded.push(wn);
+      continue;
+    }
+    const key = subjNameKey(wn.subjects[0]);
+    if (!groupMembers.has(key)) {
+      groupMembers.set(key, []);
+      groupAt.set(key, folded.length);
+      folded.push(wn);
+    }
+    groupMembers.get(key).push(wn);
+  }
+  for (const [key, members] of groupMembers) {
+    const cast = threatByName.get(key);
+    if (cast) folded[groupAt.get(key)] = buildCastCard(cast, members);
+  }
+  return folded.map((x) => ({ ...x, ...classifyWarning(x) })).sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]);
 }
 var RESPONSIBLE = {
   interrupt: ["dps"],
@@ -6881,7 +7090,23 @@ function warningRow(w, lens) {
 function warningCard(w, lens) {
   return `<div class="w ${w.severity}">${subjectHeader(w.subjects ?? [])}${warningRow(w, lens)}</div>`;
 }
+var ROLE_ROW_ORDER = ["tank", "healer", "dps"];
+function consolidatedCard(subject, w, lens) {
+  const add = subject.is_boss_add ? ` <span class="w-add">${subject.summoned_by_name ? `${esc(subject.summoned_by_name)}'s add` : "boss add"}</span>` : "";
+  const from = subject.secondary_of_name ? ` <span class="w-add">from ${esc(subject.secondary_of_name)}</span>` : "";
+  const rows = ROLE_ROW_ORDER.filter((r) => (lens === "all" || lens === r) && w.role_advice?.[r]).map((r) => `<div class="w-role"><span class="role-badge ${r}">${ROLE_LABEL2[r]}</span><span class="w-role-msg">${esc(w.role_advice[r])}</span></div>`).join("");
+  const everyone = w.everyone ? `<div class="w-role w-everyone"><span class="w-role-msg">${esc(w.everyone)}</span></div>` : "";
+  return `<div class="w ${w.severity} consolidated">
+      <div class="w-head">
+        <div class="w-title"><span class="w-spell">${esc(subject.spell_name)}${subject.count > 1 ? ` \xD7${subject.count}` : ""}</span> <span class="w-npc">(${esc(subject.npc_name)})</span>${add}${from}</div>
+        <span class="sev ${w.severity}">${w.severity}</span>
+      </div>
+      <div class="w-desc">${esc(w.message)}</div>
+      ${everyone || rows ? `<div class="w-roles">${everyone}${rows}</div>` : ""}
+    </div>`;
+}
 function castGroupCard(subject, warnings, lens) {
+  if (warnings.length === 1 && warnings[0].consolidated) return consolidatedCard(subject, warnings[0], lens);
   const topSev = warnings.map((w) => w.severity).sort((a, b) => SEV_RANK[a] - SEV_RANK[b])[0];
   const rows = warnings.map((w) => warningRow(w, lens)).join("");
   return `<div class="w ${topSev}">${subjectHeader([subject])}<div class="w-rows">${rows}</div></div>`;

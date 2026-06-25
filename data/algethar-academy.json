@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T06:28:06.823Z",
+    "extracted_at": "2026-06-25T09:25:44.998Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2280,7 +2280,7 @@
         {
           "cast_order": 1,
           "cast_time_ms": 1000,
-          "coaching_note": "The tank stomp applies a +100% Physical damage-taken DEBUFF for 9s. The tank can't dodge the follow-up swings (the boss keeps hitting them), so the tank MITIGATES the window with a large damage-reduction cooldown lasting about as long as the debuff (~9s) to cover the doubled hits. (Trading it out — a DPS taunts and immunity-soaks the doubled swing — is a high-risk, experienced-only alternative, not the default.)",
+          "coaching_note": "Experienced-only alternative: a DPS taunts off the tank and immunity-soaks the doubled swing, so the tank saves their cooldown — high-risk, not the default.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
@@ -2551,7 +2551,7 @@
         {
           "cast_order": 5,
           "cast_time_ms": 0,
-          "coaching_note": "On death the Ancient Branch bursts after 3.5s, healing nearby ENEMIES for a large amount — kill it away from the boss and other mobs. It also removes all Splinterbark stacks from players within 8 yds.",
+          "coaching_note": "On death the Ancient Branch bursts after 3.5s, healing nearby ENEMIES for a large amount — so kill it away from the boss and other mobs. The burst ALSO strips the boss's stacking Splinterbark Bleed: players SHOULD stand in it (within 8 yds) to clear their stacks — this is how you remove the debuff, so step in for it.",
           "completion_effect": null,
           "dispel_detonates": false,
           "dispel_type": "None",
