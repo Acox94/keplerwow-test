@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T14:00:29.020Z",
+    "extracted_at": "2026-06-25T14:36:47.840Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -854,7 +854,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Nature,Shadow",
-          "secondary_of": null,
+          "secondary_of": 1260643,
           "spell_id": 1260709,
           "tank_buster": false,
           "target_roles": [
@@ -896,7 +896,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
-          "secondary_of": null,
+          "secondary_of": 1266488,
           "spell_id": 1266480,
           "tank_buster": false,
           "target_roles": [
@@ -936,7 +936,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
-          "secondary_of": null,
+          "secondary_of": 1266480,
           "spell_id": 1266488,
           "tank_buster": true,
           "target_roles": [
@@ -1635,7 +1635,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1251811,
           "spell_id": 1266706,
           "tank_buster": false,
           "target_roles": null,
@@ -1865,7 +1865,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1251023,
           "spell_id": 1253779,
           "tank_buster": false,
           "target_roles": [
@@ -1950,7 +1950,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1253788,
           "spell_id": 1253844,
           "tank_buster": false,
           "target_roles": [
@@ -1993,7 +1993,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
-          "secondary_of": null,
+          "secondary_of": 1253788,
           "spell_id": 1253909,
           "tank_buster": false,
           "target_roles": null,
@@ -3297,7 +3297,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1254010,
           "spell_id": 1255629,
           "tank_buster": false,
           "target_roles": null,

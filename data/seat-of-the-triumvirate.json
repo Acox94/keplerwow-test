@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T14:00:29.020Z",
+    "extracted_at": "2026-06-25T14:36:47.840Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2825,7 +2825,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
-          "secondary_of": null,
+          "secondary_of": 247795,
           "spell_id": 245393,
           "tank_buster": false,
           "target_roles": null,
@@ -3412,7 +3412,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1267274,
           "spell_id": 1267207,
           "tank_buster": true,
           "target_roles": [
@@ -3699,7 +3699,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 248829,
           "spell_id": 248831,
           "tank_buster": false,
           "target_roles": null,

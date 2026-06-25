@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T14:00:29.020Z",
+    "extracted_at": "2026-06-25T14:36:47.840Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -273,7 +273,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Arcane",
-          "secondary_of": null,
+          "secondary_of": 1257509,
           "spell_id": 1264040,
           "tank_buster": false,
           "target_roles": [
@@ -359,7 +359,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Arcane",
-          "secondary_of": null,
+          "secondary_of": 1257509,
           "spell_id": 1276485,
           "tank_buster": false,
           "target_roles": [
@@ -638,7 +638,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
-          "secondary_of": null,
+          "secondary_of": 1253848,
           "spell_id": 1282791,
           "tank_buster": false,
           "target_roles": [
@@ -1719,7 +1719,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Physical",
-          "secondary_of": null,
+          "secondary_of": 1253965,
           "spell_id": 1247976,
           "tank_buster": false,
           "target_roles": [

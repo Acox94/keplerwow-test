@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T14:00:29.020Z",
+    "extracted_at": "2026-06-25T14:36:47.840Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -582,7 +582,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Nature",
-          "secondary_of": null,
+          "secondary_of": 1252690,
           "spell_id": 1258140,
           "tank_buster": false,
           "target_roles": [
@@ -966,7 +966,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Fire",
-          "secondary_of": null,
+          "secondary_of": 1252877,
           "spell_id": 154135,
           "tank_buster": false,
           "target_roles": [
@@ -1085,7 +1085,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Fire",
-          "secondary_of": null,
+          "secondary_of": 154139,
           "spell_id": 1252877,
           "tank_buster": false,
           "target_roles": [
@@ -2142,7 +2142,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Fire",
-          "secondary_of": null,
+          "secondary_of": 1253840,
           "spell_id": 154043,
           "tank_buster": false,
           "target_roles": null,

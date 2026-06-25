@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T14:00:29.020Z",
+    "extracted_at": "2026-06-25T14:36:47.840Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -518,7 +518,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Arcane",
-          "secondary_of": null,
+          "secondary_of": 1246446,
           "spell_id": 1224801,
           "tank_buster": false,
           "target_roles": [
@@ -603,7 +603,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Arcane",
-          "secondary_of": null,
+          "secondary_of": 1224801,
           "spell_id": 1225135,
           "tank_buster": false,
           "target_roles": null,
@@ -1022,7 +1022,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1215087,
           "spell_id": 1215161,
           "tank_buster": false,
           "target_roles": null,
@@ -1104,7 +1104,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1215897,
           "spell_id": 1269631,
           "tank_buster": false,
           "target_roles": [
@@ -1231,7 +1231,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Shadow",
-          "secondary_of": null,
+          "secondary_of": 1280113,
           "spell_id": 1284627,
           "tank_buster": true,
           "target_roles": [
@@ -1568,7 +1568,7 @@
           "requires_interrupt": false,
           "scales_to_lethal": false,
           "school": "Arcane",
-          "secondary_of": null,
+          "secondary_of": 1282050,
           "spell_id": 1282053,
           "tank_buster": false,
           "target_roles": null,
