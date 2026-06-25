@@ -163,7 +163,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T14:46:22.630Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T14:55:25.803Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -1517,10 +1517,18 @@ var PARTY_CC_WORD = {
   banished: "banish",
   sleeping: "sleep"
 };
-function intrinsicSeverity(cast) {
+function failGatesLethal(threats) {
+  const parentsOfLethal = /* @__PURE__ */ new Set();
+  for (const t of threats) if ((t.is_lethal || t.scales_to_lethal) && t.secondary_of != null) parentsOfLethal.add(t.secondary_of);
+  const out = /* @__PURE__ */ new Set();
+  for (const t of threats) if (parentsOfLethal.has(t.spell_id) && t.positioning.includes("soak")) out.add(t.spell_id);
+  return out;
+}
+function intrinsicSeverity(cast, gatesLethal = false) {
   const partyCC = cast.mechanic !== null && PARTY_CC_WORD[cast.mechanic] !== void 0;
   const avoidable = cast.positioning.length > 0 || cast.is_aoe && !cast.unavoidable && !partyCC;
   if (cast.is_lethal) return avoidable ? "warning" : "critical";
+  if (gatesLethal) return "warning";
   if (cast.mechanic !== null && PARTY_CC_WORD[cast.mechanic] && (cast.is_aoe || (cast.party_targets ?? 0) >= 2)) return "warning";
   return "info";
 }
@@ -1581,8 +1589,8 @@ function damageLabel(cast) {
   if (cast.tank_buster || cast.unavoidable) return "moderate";
   return "mild";
 }
-function buildCastCard(cast, members) {
-  const memberFloor = [intrinsicSeverity(cast), ...members.map((m) => m.severity)];
+function buildCastCard(cast, members, gatesLethal = false) {
+  const memberFloor = [intrinsicSeverity(cast, gatesLethal), ...members.map((m) => m.severity)];
   const severity = memberFloor.sort((a, b) => SEVERITY_RANK[a] - SEVERITY_RANK[b])[0];
   const perRole = { tank: [], healer: [], dps: [] };
   const universal = [];
@@ -1609,7 +1617,7 @@ function buildCastCard(cast, members) {
     everyone = uniq(universal);
   }
   const primary = [...members].sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity])[0];
-  const coaching = members.every((m) => m.coaching) && intrinsicSeverity(cast) === "info";
+  const coaching = members.every((m) => m.coaching) && intrinsicSeverity(cast, gatesLethal) === "info";
   const seen = /* @__PURE__ */ new Set();
   const high_risk = [];
   for (const hr of [...members.flatMap((m) => m.high_risk ?? []), ...cast.high_risk]) {
@@ -2222,9 +2230,10 @@ function buildWarnings(r, group) {
     }
     groupMembers.get(key).push(wn);
   }
+  const failGates = failGatesLethal(r.threats);
   for (const [key, members] of groupMembers) {
     const cast = threatByName.get(key);
-    if (cast) folded[groupAt.get(key)] = buildCastCard(cast, members);
+    if (cast) folded[groupAt.get(key)] = buildCastCard(cast, members, failGates.has(cast.spell_id));
   }
   return folded.map((x) => ({ ...x, ...classifyWarning(x) })).sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]);
 }
