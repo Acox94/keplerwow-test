@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T14:53:48.552Z",
+    "extracted_at": "2026-06-25T19:56:45.375Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -203,21 +203,6 @@
       "level": null,
       "name": "Mother of Chaos",
       "npc_id": 228576,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Elite",
-      "creature_type": "Humanoid",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Xal'atath",
-      "npc_id": 229227,
       "spells": [],
       "summoned_by": null
     },
@@ -490,7 +475,7 @@
         {
           "cast_order": 1,
           "cast_time_ms": 3000,
-          "coaching_note": null,
+          "coaching_note": "Targeted glaive — pulses to players within a few yards of the marked target and bounces to nearby players. Spread off the marked player so it can't chain; the marked player uses a personal / health pot (lethal at higher keys).",
           "completion_effect": null,
           "description": "Seranel hurls an Arcane infused glaive at a target inflicting ${$s1+$1225796s1} Arcane damage and an additional $1225796s1 Arcane damage every $t2 sec to players within $1225796A2 yards. The glaive bounces to $s3 nearby players.",
           "dispel_detonates": false,
@@ -2440,7 +2425,7 @@
         {
           "cast_order": null,
           "cast_time_ms": 3000,
-          "coaching_note": "Heavy unavoidable DoT — heal/mitigate through.",
+          "coaching_note": "Glaive on a target — heavy Arcane DoT plus a bounce to a nearby player. Spread so it can't bounce; the hit player heals/mitigates through the ticks.",
           "completion_effect": null,
           "description": "Hurls an Arcane infused glaive at a target inflicting $s1 Arcane damage and an additional $s2 Arcane damage every $t2 sec for $d. The glaive bounces to $s3 additional nearby player.",
           "dispel_detonates": false,
@@ -2540,21 +2525,6 @@
       "level": null,
       "name": "Runed Spellbreaker",
       "npc_id": 241444,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Humanoid",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Magician Apprentice",
-      "npc_id": 247982,
       "spells": [],
       "summoned_by": null
     },
@@ -2665,51 +2635,6 @@
           "vulnerability": null
         }
       ],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Critter",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Barley",
-      "npc_id": 249309,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Critter",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Ember",
-      "npc_id": 249310,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Critter",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Kazoo",
-      "npc_id": 249311,
-      "spells": [],
       "summoned_by": null
     },
     {
@@ -3048,21 +2973,6 @@
       "level": null,
       "name": "Fel Ravager",
       "npc_id": 258587,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Dragonkin",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Lindormi",
-      "npc_id": 259053,
       "spells": [],
       "summoned_by": null
     },

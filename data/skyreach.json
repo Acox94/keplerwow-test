@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T14:53:48.552Z",
+    "extracted_at": "2026-06-25T19:56:45.375Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2888,21 +2888,6 @@
     {
       "avoidable": false,
       "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Humanoid",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Reshad",
-      "npc_id": 81273,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
       "classification": "Elite",
       "creature_type": "Humanoid",
       "display_id": null,
@@ -2942,21 +2927,6 @@
       "level": null,
       "name": "Uncharged Construct",
       "npc_id": 86918,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Demon",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Fel Imp",
-      "npc_id": 95139,
       "spells": [],
       "summoned_by": null
     },
@@ -3122,21 +3092,6 @@
       "level": null,
       "name": "Lesser Ghoul",
       "npc_id": 237409,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Not specified",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Podium Dial",
-      "npc_id": 241878,
       "spells": [],
       "summoned_by": null
     },
@@ -3381,21 +3336,6 @@
       "level": null,
       "name": "Fel Ravager",
       "npc_id": 258587,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Dragonkin",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Lindormi",
-      "npc_id": 259053,
       "spells": [],
       "summoned_by": null
     },

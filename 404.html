@@ -163,7 +163,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T14:55:25.803Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T23:02:52.553Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -1524,6 +1524,16 @@ function failGatesLethal(threats) {
   for (const t of threats) if (parentsOfLethal.has(t.spell_id) && t.positioning.includes("soak")) out.add(t.spell_id);
   return out;
 }
+function preventableUpstream(threats) {
+  const byId = new Map(threats.map((t) => [t.spell_id, t]));
+  const out = /* @__PURE__ */ new Map();
+  for (const t of threats) {
+    if (!(t.is_lethal || t.scales_to_lethal) || t.secondary_of == null) continue;
+    const parent = byId.get(t.secondary_of);
+    if (parent?.positioning.includes("soak")) out.set(t.spell_id, parent);
+  }
+  return out;
+}
 function intrinsicSeverity(cast, gatesLethal = false) {
   const partyCC = cast.mechanic !== null && PARTY_CC_WORD[cast.mechanic] !== void 0;
   const avoidable = cast.positioning.length > 0 || cast.is_aoe && !cast.unavoidable && !partyCC;
@@ -1923,10 +1933,20 @@ function buildWarnings(r, group) {
       role_advice: mitigableAfterAdvice(ma, group)
     });
   }
+  const preventable = preventableUpstream(r.threats);
   for (const sc of r.scaling) {
     const name = labelCast(sc.cast);
     const on = landsOn([sc.cast]);
-    if (sc.answer === "survive") {
+    const upstream = preventable.get(sc.cast.spell_id);
+    if (sc.answer === "survive" && upstream) {
+      w.push({
+        severity: "caution",
+        category: "scaling",
+        coaching: true,
+        subjects: subj([sc.cast]),
+        message: `${name} scales to lethal \u2014 prevent it by soaking ${upstream.spell_name} (an unsoaked point erupts into it)${on}. Forgiving now, but build the soak habit before it one-shots at higher keys.`
+      });
+    } else if (sc.answer === "survive") {
       w.push({
         severity: "caution",
         category: "scaling",

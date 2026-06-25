@@ -1,0 +1,6832 @@
+"use strict";
+var KeplerEngine = (() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __export = (target, all) => {
+    for (var name in all)
+      __defProp(target, name, { get: all[name], enumerable: true });
+  };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+  // web/planner-spike/engine-entry.ts
+  var engine_entry_exports = {};
+  __export(engine_entry_exports, {
+    DungeonExport: () => DungeonExport,
+    analyzePull: () => analyzePull
+  });
+
+  // src/engine/engine.ts
+  var FRIENDLY_DISPEL_TYPES = ["Magic", "Curse", "Disease", "Poison", "Bleed"];
+  var STOPPING_MECHANICS = /* @__PURE__ */ new Set([
+    "charmed",
+    "disoriented",
+    "fleeing",
+    "silenced",
+    "asleep",
+    "stunned",
+    "frozen",
+    "incapacitated",
+    "polymorphed",
+    "banished",
+    "shackled",
+    "turned",
+    "horrified",
+    "sapped"
+  ]);
+  function creatureTypeAllowed(condition, creature_type) {
+    const types = condition?.creature_types;
+    return !types || types.length === 0 || types.includes(creature_type);
+  }
+  var MOVEMENT_IMPAIR_MECHANICS = /* @__PURE__ */ new Set(["rooted", "snared"]);
+  var CASTER_ROLES = /* @__PURE__ */ new Set(["healer", "ranged_dps"]);
+  var AVOIDANCE_POSITIONING = /* @__PURE__ */ new Set(["move_out", "frontal", "line_of_sight", "spread"]);
+  var SEVERITY_RANK = { critical: 0, warning: 1, caution: 2, info: 3 };
+  var DEFAULT_INTERRUPT_COOLDOWN_MS = 15e3;
+  var MAX_SIMULTANEOUS_PRIORITY_CASTS = 2;
+  var DR_CATEGORY = {
+    stunned: "stun",
+    frozen: "stun",
+    incapacitated: "incapacitate",
+    polymorphed: "incapacitate",
+    asleep: "incapacitate",
+    sapped: "incapacitate",
+    shackled: "incapacitate",
+    disoriented: "disorient",
+    silenced: "silence",
+    fleeing: "fear",
+    horrified: "fear",
+    turned: "fear",
+    banished: "banish",
+    charmed: "charm"
+  };
+  var DR_SUSTAINED_RATE_PER_MIN = 10;
+  var DR_LADDER = [1, 0.5, 0.25];
+  var DR_RESET_MS = 18e3;
+  var SIM_WINDOW_MS = 18e4;
+  var LONG_KICK_TARGET_PCT = 0.85;
+  var REACT_KICK_PCT = 50;
+  var LONG_KICK_PCT = 70;
+  var MIN_KICK_GAIN_MS = 300;
+  var CHANNEL_REACT_TARGET_MS = 400;
+  function analyzePull(dungeon, pull, group, opts = {}) {
+    const skill = opts.skill ?? "experienced";
+    const members = normalizePull(pull);
+    const creatureById = new Map(dungeon.creatures.map((c) => [c.npc_id, c]));
+    const specById = new Map(dungeon.specs.map((s) => [s.spec_id, s]));
+    const spellNameById = /* @__PURE__ */ new Map();
+    const castOrderBySpellId = /* @__PURE__ */ new Map();
+    for (const c of dungeon.creatures) for (const s of c.spells) {
+      spellNameById.set(s.spell_id, s.name);
+      if (s.cast_order != null) castOrderBySpellId.set(s.spell_id, s.cast_order);
+    }
+    const unavoidableAddsBySummoner = /* @__PURE__ */ new Map();
+    for (const c of dungeon.creatures) {
+      if (!c.is_boss_add || c.summoned_by == null || c.avoidable) continue;
+      const list = unavoidableAddsBySummoner.get(c.summoned_by) ?? [];
+      list.push(c);
+      unavoidableAddsBySummoner.set(c.summoned_by, list);
+    }
+    const summonedAddIds = /* @__PURE__ */ new Set();
+    const autoIncludedIds = /* @__PURE__ */ new Set();
+    const pulledIds = new Set(members.map((m) => m.npc_id));
+    for (const m of [...members]) {
+      const c = creatureById.get(m.npc_id);
+      if (!c?.is_boss_add || c.summoned_by == null || pulledIds.has(c.summoned_by) || !creatureById.has(c.summoned_by)) continue;
+      pulledIds.add(c.summoned_by);
+      autoIncludedIds.add(c.summoned_by);
+      members.push({ npc_id: c.summoned_by, count: 1 });
+    }
+    for (const m of [...members]) {
+      for (const add of unavoidableAddsBySummoner.get(m.npc_id) ?? []) {
+        if (pulledIds.has(add.npc_id)) continue;
+        pulledIds.add(add.npc_id);
+        summonedAddIds.add(add.npc_id);
+        members.push({ npc_id: add.npc_id, count: 1 });
+      }
+    }
+    const unknown_npcs = [];
+    const resolvedPull = [];
+    for (const m of members) {
+      const c = creatureById.get(m.npc_id);
+      if (!c) {
+        unknown_npcs.push(m.npc_id);
+        continue;
+      }
+      const summoned = summonedAddIds.has(c.npc_id);
+      const autoIncluded = summoned || autoIncludedIds.has(c.npc_id);
+      resolvedPull.push({
+        npc_id: c.npc_id,
+        name: c.name,
+        count: m.count,
+        ...autoIncluded ? { auto_included: true } : {},
+        ...summoned ? { summoned: true, summoned_by_name: c.summoned_by != null ? creatureById.get(c.summoned_by)?.name ?? void 0 : void 0 } : {}
+      });
+    }
+    const groupSpecs = [];
+    for (const id of group) {
+      const s = specById.get(id);
+      if (!s) throw new Error(`[engine] unknown spec_id ${id} (not in dungeon.specs)`);
+      groupSpecs.push(s);
+    }
+    const resolvedGroup = groupSpecs.map(toResolvedSpec);
+    const threats = [];
+    for (const m of members) {
+      const c = creatureById.get(m.npc_id);
+      if (!c) continue;
+      for (const s of c.spells) {
+        if (s.priority !== "priority") continue;
+        threats.push({
+          npc_id: c.npc_id,
+          npc_name: c.name,
+          is_boss: c.is_boss,
+          creature_type: c.creature_type,
+          is_boss_add: c.is_boss_add,
+          summoned_by_name: c.summoned_by != null ? creatureById.get(c.summoned_by)?.name ?? null : null,
+          spell_id: s.spell_id,
+          spell_name: s.name,
+          count: m.count,
+          dispel_type: s.dispel_type,
+          mechanic: s.mechanic,
+          school: s.school,
+          is_aoe: s.is_aoe,
+          party_targets: s.party_targets,
+          unavoidable: s.unavoidable,
+          positioning: s.positioning,
+          dot: s.dot,
+          displacement: s.displacement,
+          vulnerability: s.vulnerability,
+          tank_buster: s.tank_buster,
+          is_lethal: s.is_lethal,
+          scales_to_lethal: s.scales_to_lethal,
+          is_interruptible: s.is_interruptible,
+          is_stoppable: s.is_stoppable,
+          is_channeled: s.is_channeled,
+          completion_effect: s.completion_effect,
+          coaching_note: s.coaching_note,
+          high_risk: s.high_risk,
+          secondary_of: s.secondary_of,
+          secondary_of_name: s.secondary_of != null ? spellNameById.get(s.secondary_of) ?? null : null,
+          // A SECONDARY (a pool/add/death-burst) with no explicit cast_order inherits its PRIMARY's, so it slots
+          // right behind the cast that causes it in the timeline (the sort tiebreaker keeps the primary first).
+          cast_order: s.cast_order ?? (s.secondary_of != null ? castOrderBySpellId.get(s.secondary_of) ?? null : null),
+          dispel_detonates: s.dispel_detonates,
+          freedom_partial: s.freedom_partial,
+          cast_time_ms: s.cast_time_ms,
+          duration_ms: s.duration_ms,
+          recast_cooldown_ms: s.recast_cooldown_ms,
+          target_roles: s.target_roles,
+          observed_kick_point: s.observed_kick_point,
+          observed_channel_stop: s.observed_channel_stop
+        });
+      }
+    }
+    const dispels = analyzeDispels(threats, groupSpecs);
+    const stops = analyzeStops(threats, groupSpecs);
+    const soothe = analyzeSoothe(threats, groupSpecs);
+    const misplays = analyzeMisplays(groupSpecs);
+    const coveredTypes = new Set(dispels.filter((d) => d.covered).map((d) => d.dispel_type));
+    const awareness = analyzeAwareness(threats, stops, coveredTypes);
+    const throughput = analyzeThroughput(stops, groupSpecs);
+    const movement = analyzeMovement(threats, groupSpecs);
+    const scaling = analyzeScaling(threats, stops, soothe, coveredTypes, groupSpecs);
+    const targeting = analyzeTargeting(threats, groupSpecs);
+    const kick_timing = analyzeKickTiming(threats, groupSpecs);
+    const channel_timing = analyzeChannelTiming(threats, stops);
+    const completion_effect = analyzeCompletionEffect(threats, stops);
+    const notes = analyzeNotes(threats);
+    const cc_on_party = analyzeCcOnParty(threats);
+    const displacement = analyzeDisplacement(threats);
+    const vulnerability = analyzeVulnerability(threats, groupSpecs, coveredTypes);
+    const tank_buster = analyzeTankBusters(threats, groupSpecs);
+    const target_drop = analyzeTargetDrop(threats, groupSpecs);
+    const dps_survival = analyzeDpsSurvival(threats, groupSpecs);
+    const pet_choice = analyzePetChoice(groupSpecs, dispels, stops);
+    const composition = analyzeComposition(groupSpecs);
+    const allWarnings = buildWarnings({ dispels, stops, soothe, misplays, awareness, throughput, scaling, targeting, movement, cc_on_party, displacement, vulnerability, tank_buster, target_drop, dps_survival, pet_choice, composition, kick_timing, channel_timing, completion_effect, notes, threats }, groupSpecs);
+    const warnedCasts = /* @__PURE__ */ new Set();
+    for (const wn of allWarnings) for (const su of wn.subjects ?? []) warnedCasts.add(`${su.npc_name}\0${su.spell_name}`);
+    const boss_reference = [];
+    for (const m of members) {
+      const c = creatureById.get(m.npc_id);
+      if (!c || !(c.is_boss || c.is_boss_add)) continue;
+      for (const s of c.spells) {
+        if (s.priority === "priority" && warnedCasts.has(`${c.name}\0${s.name}`)) continue;
+        boss_reference.push({
+          npc_id: c.npc_id,
+          npc_name: c.name,
+          is_boss_add: c.is_boss_add,
+          summoned_by_name: c.summoned_by != null ? creatureById.get(c.summoned_by)?.name ?? null : null,
+          spell_id: s.spell_id,
+          spell_name: s.name,
+          count: m.count,
+          school: s.school,
+          dispel_type: s.dispel_type,
+          cast_time_ms: s.cast_time_ms,
+          is_interruptible: s.is_interruptible,
+          is_stoppable: s.is_stoppable,
+          is_aoe: s.is_aoe,
+          is_channeled: s.is_channeled,
+          curated: s.priority === "priority",
+          cast_order: s.cast_order ?? null
+        });
+      }
+    }
+    return {
+      dungeon: { dungeon_id: dungeon.dungeon.dungeon_id, name: dungeon.dungeon.name },
+      build: { patch_version: dungeon.build_info.patch_version, build_number: dungeon.build_info.build_number },
+      skill,
+      pull: resolvedPull,
+      group: resolvedGroup,
+      unknown_npcs,
+      dispels,
+      stops,
+      soothe,
+      misplays,
+      awareness,
+      throughput,
+      scaling,
+      targeting,
+      movement,
+      cc_on_party,
+      displacement,
+      vulnerability,
+      tank_buster,
+      target_drop,
+      dps_survival,
+      pet_choice,
+      composition,
+      kick_timing,
+      channel_timing,
+      completion_effect,
+      notes,
+      boss_reference,
+      // Skill gate: an expert sees only the essentials; learning + experienced also get the coaching/heads-ups.
+      warnings: allWarnings.filter((wn) => !wn.coaching || skill !== "expert")
+    };
+  }
+  function normalizePull(pull) {
+    const counts = /* @__PURE__ */ new Map();
+    for (const m of pull) {
+      const npc_id = typeof m === "number" ? m : m.npc_id;
+      const add = typeof m === "number" ? 1 : m.count;
+      counts.set(npc_id, (counts.get(npc_id) ?? 0) + add);
+    }
+    return [...counts].map(([npc_id, count]) => ({ npc_id, count }));
+  }
+  function toResolvedSpec(s) {
+    return { spec_id: s.spec_id, class: s.class, spec_name: s.spec_name, role: s.role, party_role: s.party_role };
+  }
+  function analyzeDispels(threats, group) {
+    const out = [];
+    for (const dt of FRIENDLY_DISPEL_TYPES) {
+      const casts = threats.filter((t) => t.dispel_type === dt && !t.dispel_detonates);
+      if (casts.length === 0) continue;
+      const required = sumCount(casts);
+      const covering_specs = [];
+      let coveredUnconditional = false;
+      for (const s of group) {
+        const matching = s.removals.filter((r) => r.dispel_type === dt);
+        if (matching.length === 0) continue;
+        covering_specs.push(toResolvedSpec(s));
+        if (matching.some((r) => r.condition === null)) coveredUnconditional = true;
+      }
+      const covered = covering_specs.length > 0;
+      const freedom_covered_casts = casts.filter((c) => freedomRemovesDebuff(c, group));
+      const seenImm = /* @__PURE__ */ new Set();
+      const immunity_removals = [];
+      for (const { spec: s, ext } of immunityRemovalsFor(dt, group)) {
+        const k = `${s.spec_id}:${ext.spell_id}`;
+        if (seenImm.has(k)) continue;
+        seenImm.add(k);
+        immunity_removals.push({ spec: toResolvedSpec(s), ability: ext.name, spell_id: ext.spell_id });
+      }
+      const immunity_covered_casts = immunity_removals.length > 0 ? casts.slice() : [];
+      out.push({
+        dispel_type: dt,
+        required,
+        casts,
+        covering_specs,
+        conditional: covered && !coveredUnconditional,
+        covered,
+        freedom_covered_casts,
+        immunity_covered_casts,
+        immunity_removals
+      });
+    }
+    return out;
+  }
+  function analyzeStops(threats, group) {
+    const must_kick = [];
+    const cc_or_kick = [];
+    const unpreventable = [];
+    for (const t of threats) {
+      if (t.is_stoppable) cc_or_kick.push(t);
+      else if (t.is_interruptible) must_kick.push(t);
+      else unpreventable.push(t);
+    }
+    const interrupt_supply = group.filter((s) => s.rollups.has_interrupt).length;
+    const stoppableTypes = new Set(cc_or_kick.map((t) => t.creature_type));
+    let cc_stop_supply = 0;
+    for (const s of group) {
+      cc_stop_supply += s.control.filter(
+        (c) => c.kind === "cc" && c.mechanic !== null && STOPPING_MECHANICS.has(c.mechanic) && [...stoppableTypes].some((ct) => creatureTypeAllowed(c.condition, ct))
+      ).length;
+    }
+    const must_kick_demand = sumCount(must_kick);
+    const cc_or_kick_demand = sumCount(cc_or_kick);
+    const must_kick_shortfall = Math.max(0, must_kick_demand - interrupt_supply);
+    const spare_interrupts = Math.max(0, interrupt_supply - must_kick_demand);
+    const cc_shortfall = Math.max(0, cc_or_kick_demand - (cc_stop_supply + spare_interrupts));
+    return {
+      must_kick,
+      cc_or_kick,
+      unpreventable,
+      interrupt_supply,
+      cc_stop_supply,
+      must_kick_demand,
+      cc_or_kick_demand,
+      must_kick_shortfall,
+      cc_shortfall,
+      spare_interrupts
+    };
+  }
+  function analyzeSoothe(threats, group) {
+    const enrages = threats.filter((t) => t.dispel_type === "Enrage");
+    const soothe_specs = group.filter((s) => s.rollups.soothe).map(toResolvedSpec);
+    return { enrages, can_soothe: soothe_specs.length > 0, soothe_specs };
+  }
+  function analyzeMisplays(group) {
+    const scatter_abilities = [];
+    const fear_abilities = [];
+    for (const s of group) {
+      const spec = toResolvedSpec(s);
+      for (const d of s.disruptive) {
+        scatter_abilities.push({ spec, spell_id: d.spell_id, spell_name: d.name, note: d.note });
+      }
+      for (const c of s.control) {
+        if (c.kind === "cc" && c.mechanic === "fleeing") {
+          fear_abilities.push({ spec, spell_id: c.spell_id, spell_name: c.name, note: c.note });
+        }
+      }
+    }
+    return { scatter_abilities, fear_abilities };
+  }
+  function answeredByRemoval(t) {
+    return FRIENDLY_DISPEL_TYPES.includes(t.dispel_type) || t.dispel_type === "Enrage" || t.mechanic !== null && MOVEMENT_IMPAIR_MECHANICS.has(t.mechanic);
+  }
+  function analyzeAwareness(threats, stops, coveredTypes) {
+    return {
+      aoe_casts: threats.filter((t) => t.is_aoe),
+      // unavoidable party damage with NO positioning escape -> must heal/mitigate.
+      unavoidable_casts: threats.filter((t) => t.is_aoe && t.unavoidable && t.positioning.length === 0),
+      // answerable by REPOSITIONING: an explicit positioning tag (move/LoS/spread/… — fires even when the
+      // cast measured single-target because it was well-dodged), OR an avoidable AoE with no tag yet — but
+      // NOT a cast already answered by another dimension: a STOP (interruptible/stoppable), a REMOVAL
+      // (a dispellable player debuff / an Enrage soothe), or a Freedom (a root/snare). The bare-is_aoe
+      // fallback exists for well-dodged GROUND hazards (which are never kickable); a kickable/CC-able AoE
+      // channel (Arcane Explosion) is stopped, and a Magic snare-DoT (Permeating Cold) is dispelled/Freed —
+      // you don't sidestep either. Same rule the positioning curation uses (a cast another dimension answers
+      // gets no reposition). An explicit editorial positioning tag still wins.
+      avoidable_casts: threats.filter((t) => t.positioning.length > 0 || t.is_aoe && !t.unavoidable && !t.is_interruptible && !t.is_stoppable && !answeredByRemoval(t)),
+      dot_casts: threats.filter((t) => t.dot),
+      tank_busters: threats.filter((t) => t.tank_buster),
+      lethal_casts: threats.filter((t) => t.is_lethal),
+      unpreventable_lethal: stops.unpreventable.filter((t) => t.is_lethal),
+      // "dispel after it lands" is valid only if the group can remove the type AND the cast can't be
+      // AVOIDED. If you can reposition out of it (a move-out/LoS tag, or a dodgeable AoE), the answer is to
+      // avoid it — not eat-and-dispel; surfacing both would double the SAME cast across two cards (the
+      // reposition line already owns it). A dispellable cast you genuinely can't dodge stays here. (Otherwise
+      // an undispellable unpreventable cast surfaces in the dispel-gap warning instead.)
+      mitigable_after: stops.unpreventable.filter(
+        (t) => coveredTypes.has(t.dispel_type) && t.positioning.length === 0 && !(t.is_aoe && !t.unavoidable)
+      )
+    };
+  }
+  function analyzeScaling(threats, stops, soothe, coveredTypes, group) {
+    const out = [];
+    for (const t of threats) {
+      if (!t.scales_to_lethal) continue;
+      let answer;
+      let covered;
+      if (t.is_interruptible && !t.is_stoppable) {
+        answer = "kick";
+        covered = stops.interrupt_supply > 0;
+      } else if (t.is_stoppable) {
+        answer = "cc";
+        covered = stops.cc_stop_supply > 0 || stops.interrupt_supply > 0;
+      } else if (t.dispel_type === "Enrage") {
+        answer = "soothe";
+        covered = soothe.can_soothe;
+      } else if (FRIENDLY_DISPEL_TYPES.includes(t.dispel_type) && !t.dispel_detonates) {
+        answer = "dispel";
+        covered = coveredTypes.has(t.dispel_type) || freedomRemovesDebuff(t, group) || immunityRemovesDebuff(t, group);
+      } else if (t.mechanic !== null && MOVEMENT_IMPAIR_MECHANICS.has(t.mechanic)) {
+        answer = "free";
+        covered = groupFreesMechanic(group, t.mechanic);
+      } else {
+        answer = "survive";
+        covered = false;
+      }
+      out.push({ cast: t, answer, covered });
+    }
+    return out;
+  }
+  function groupFreesMechanic(group, mechanic) {
+    return group.some((s) => s.movement_freedom.some((m) => m.mechanics.includes(mechanic)));
+  }
+  function freedomRemovesDebuff(t, group) {
+    if (t.freedom_partial) return false;
+    if (t.mechanic === null || !MOVEMENT_IMPAIR_MECHANICS.has(t.mechanic)) return false;
+    return group.some((s) => s.movement_freedom.some((m) => m.mechanics.includes(t.mechanic) && m.target === "ally" && !m.conditional));
+  }
+  var IMMUNITY_DISPEL_SCHOOL = { Bleed: "Physical" };
+  function immunityRemovalsFor(dt, group) {
+    const school = IMMUNITY_DISPEL_SCHOOL[dt];
+    if (!school) return [];
+    const out = [];
+    for (const s of group)
+      for (const ext of s.externals)
+        if (ext.mechanism === "immunity" && ext.target === "ally" && !ext.passive && schoolCovers(ext.condition?.schools, school))
+          out.push({ spec: s, ext });
+    return out;
+  }
+  function immunityRemovesDebuff(t, group) {
+    return immunityRemovalsFor(t.dispel_type, group).length > 0;
+  }
+  function analyzeMovement(threats, group) {
+    const free_specs = group.filter((s) => s.rollups.frees_movement).map(toResolvedSpec);
+    const can_free = free_specs.length > 0;
+    const ally_free = group.some((s) => s.movement_freedom.some((m) => m.target === "ally" && !m.conditional));
+    const out = [];
+    for (const t of threats) {
+      if (t.mechanic === null || !MOVEMENT_IMPAIR_MECHANICS.has(t.mechanic)) continue;
+      const coverers = group.filter((s) => s.movement_freedom.some((m) => m.mechanics.includes(t.mechanic)));
+      const relevant = coverers.flatMap((s) => s.movement_freedom.filter((m) => m.mechanics.includes(t.mechanic)));
+      let coverage;
+      if (relevant.length === 0) coverage = "none";
+      else if (relevant.some((m) => m.target === "ally" && !m.conditional)) coverage = "ally";
+      else if (relevant.some((m) => !m.conditional)) coverage = "self";
+      else coverage = "conditional";
+      out.push({
+        cast: t,
+        mechanic: t.mechanic,
+        coverage,
+        covered: coverage !== "none",
+        ally_free: coverage === "ally",
+        free_specs: coverers.map(toResolvedSpec),
+        lethal_if_unfreed: t.is_lethal
+      });
+    }
+    return { threats: out, can_free, ally_free, free_specs };
+  }
+  function analyzeCcOnParty(threats) {
+    const out = [];
+    for (const t of threats) {
+      if (t.mechanic === null) continue;
+      const category = DR_CATEGORY[t.mechanic];
+      if (!category) continue;
+      const aoe = t.is_aoe || (t.party_targets ?? 0) >= 2;
+      out.push({ cast: t, mechanic: t.mechanic, category, aoe, interruptible: t.is_interruptible });
+    }
+    return { threats: out };
+  }
+  function analyzeDisplacement(threats) {
+    const out = [];
+    for (const t of threats) {
+      if (t.displacement.length === 0) continue;
+      if (t.positioning.some((p) => AVOIDANCE_POSITIONING.has(p))) continue;
+      out.push({ cast: t, kinds: t.displacement });
+    }
+    return { threats: out };
+  }
+  function schoolsOverlap(castSchool, vulnSchool) {
+    if (vulnSchool === "all") return true;
+    return castSchool.split(",").map((s) => s.trim().toLowerCase()).includes(vulnSchool.trim().toLowerCase());
+  }
+  function analyzeVulnerability(threats, group, coveredTypes) {
+    const lethal = threats.filter((t) => t.is_lethal);
+    const groupHasInterrupt = group.some((s) => s.rollups.has_interrupt);
+    const groupHasStop = groupHasInterrupt || group.some((s) => s.rollups.stops_available > 0);
+    const out = [];
+    for (const t of threats) {
+      const v = t.vulnerability;
+      if (!v) continue;
+      let removal;
+      let removal_covered;
+      if (t.dispel_type !== "None" && !t.dispel_detonates) {
+        removal = "dispel";
+        removal_covered = coveredTypes.has(t.dispel_type);
+      } else if (t.is_interruptible || t.is_stoppable) {
+        removal = "stop";
+        removal_covered = t.is_stoppable ? groupHasStop : groupHasInterrupt;
+      } else {
+        removal = "none";
+        removal_covered = false;
+      }
+      const amplified_casts = lethal.filter((o) => castKey(o) !== castKey(t) && schoolsOverlap(o.school, v.school));
+      const duration_s = v.duration_s ?? (t.duration_ms != null ? Math.round(t.duration_ms / 1e3) : void 0);
+      out.push({ cast: t, school: v.school, pct: v.pct, stacks: v.stacks, duration_s, removal, removal_covered, amplified_casts });
+    }
+    return { threats: out };
+  }
+  function analyzeTankBusters(threats, group) {
+    const tankSpec = group.find((s) => s.party_role === "tank") ?? null;
+    const allyExternals = [];
+    for (const s of group) {
+      if (s === tankSpec) continue;
+      for (const ext of s.externals) if (ext.target === "ally" && !ext.passive) allyExternals.push({ spec: s, ext });
+    }
+    const tankSelfExternals = (tankSpec?.externals ?? []).filter((e) => e.target === "self" && !e.passive);
+    const dangerByNpc = /* @__PURE__ */ new Map();
+    for (const t of threats) dangerByNpc.set(t.npc_id, t.count);
+    const dangerousCreatures = [...dangerByNpc.values()].reduce((n, c) => n + c, 0);
+    const aoe = dangerousCreatures >= 2;
+    const answer = (spec, ext) => ({ spec: toResolvedSpec(spec), ability: ext.name, mechanism: ext.mechanism, scope: ext.scope });
+    const covers = (ext, school) => schoolCovers(ext.condition?.schools, school);
+    const isMeleeStopImmunity = (ext) => ext.mechanism === "immunity" && ext.target === "ally" && covers(ext, "Physical");
+    const cheatExt = (tankSpec?.externals ?? []).find((e) => e.passive && e.mechanism === "death_prevent") ?? null;
+    const tank_cheat_death = cheatExt && tankSpec ? answer(tankSpec, cheatExt) : null;
+    const out = [];
+    for (const t of threats) {
+      if (!t.tank_buster) continue;
+      const ally_answers = allyExternals.filter((a) => covers(a.ext, t.school) && !isMeleeStopImmunity(a.ext)).map((a) => answer(a.spec, a.ext)).sort((x, y) => MECH_RANK[x.mechanism] - MECH_RANK[y.mechanism]);
+      const high_risk = [];
+      for (const s of group) for (const ext of s.externals) {
+        if (!isMeleeStopImmunity(ext) || !covers(ext, t.school)) continue;
+        high_risk.push(s === tankSpec ? { role: "tank", text: `${ext.name} on yourself immunes the hit, but it DROPS YOUR AGGRO \u2014 only with a /cancelaura macro and an instant re-taunt.` } : { role: coarseRole(s.party_role), text: `${ext.name} on the tank immunes the hit, but it DROPS THE TANK'S AGGRO \u2014 coordinate the re-taunt.` });
+      }
+      const covering = tankSpec ? tankSelfExternals.filter((e) => covers(e, t.school)) : [];
+      const reductions = covering.filter((e) => e.mechanism === "reduction");
+      const tankScoped = reductions.some((e) => e.scope === "single") && reductions.some((e) => e.scope === "all");
+      const selfExt = pickTankSelf(covering, aoe);
+      out.push({
+        cast: t,
+        ally_answers,
+        tank_self_answer: selfExt && tankSpec ? answer(tankSpec, selfExt) : null,
+        tank_self_scoped: tankScoped,
+        high_risk
+      });
+    }
+    return { threats: out, tank_cheat_death };
+  }
+  function pickTankSelf(covering, aoe) {
+    if (covering.length === 0) return null;
+    const best = [...covering].sort((a, b) => MECH_RANK[a.mechanism] - MECH_RANK[b.mechanism])[0];
+    if (best.mechanism !== "reduction") return best;
+    const reductions = covering.filter((e) => e.mechanism === "reduction");
+    const specific = reductions.filter((e) => (e.condition?.schools?.length ?? 0) > 0);
+    const pool = specific.length ? specific : reductions;
+    const want = aoe ? "all" : "single";
+    return pool.find((e) => e.scope === want) ?? pool.find((e) => e.scope === "all") ?? pool[0];
+  }
+  function schoolCovers(schools, castSchool) {
+    if (!schools || schools.length === 0) return true;
+    const parts = castSchool.split(",").map((s) => s.trim());
+    const isMagic = parts.some((p) => p !== "Physical" && p !== "None");
+    return schools.some((sc) => sc === "Magic" ? isMagic : parts.includes(sc));
+  }
+  function analyzeTargetDrop(threats, group) {
+    const dropper_specs = group.filter((s) => s.rollups.has_target_drop).map(toResolvedSpec);
+    const out = [];
+    if (dropper_specs.length > 0) {
+      for (const t of threats) {
+        const singleTarget = !t.is_aoe && (t.party_targets === null || t.party_targets < 2);
+        if (!t.is_lethal || !singleTarget) continue;
+        const targeting_known = t.target_roles !== null && t.target_roles.length > 0;
+        const droppers = targeting_known ? dropper_specs.filter((s) => t.target_roles.includes(s.party_role)) : dropper_specs;
+        if (droppers.length === 0) continue;
+        out.push({ cast: t, droppers, targeting_known });
+      }
+    }
+    return { threats: out, dropper_specs };
+  }
+  function analyzeDpsSurvival(threats, group) {
+    const squishies = group.filter((s) => s.party_role !== "tank");
+    const cheatOf = (s) => s.externals.find((e) => e.passive && e.mechanism === "death_prevent") ?? null;
+    const personalsOf = (s) => s.externals.filter((e) => e.target === "self" && !e.passive && (e.mechanism === "reduction" || e.mechanism === "immunity"));
+    const answer = (s, e) => ({ spec: toResolvedSpec(s), ability: e.name, mechanism: e.mechanism, scope: e.scope });
+    const bestPersonal = (s, school) => {
+      const covering = personalsOf(s).filter((e) => schoolCovers(e.condition?.schools, school));
+      if (covering.length === 0) return null;
+      return [...covering].sort((a, b) => MECH_RANK[a.mechanism] - MECH_RANK[b.mechanism])[0];
+    };
+    const cheat_death_specs = squishies.flatMap((s) => {
+      const e = cheatOf(s);
+      return e ? [answer(s, e)] : [];
+    });
+    const personal_specs = squishies.flatMap((s) => personalsOf(s).map((e) => answer(s, e)));
+    const out = [];
+    for (const t of threats) {
+      const dodgeableAoe = t.is_aoe && !t.unavoidable && !(t.mechanic !== null && PARTY_CC_WORD[t.mechanic] !== void 0);
+      if (!t.is_lethal || t.tank_buster || t.positioning.length > 0 || t.dispel_detonates || dodgeableAoe) continue;
+      const measured = t.target_roles !== null && t.target_roles.length > 0;
+      const hitRoles = measured ? t.target_roles.filter((r) => r !== "tank") : null;
+      if (measured && hitRoles.length === 0) continue;
+      const affected = squishies.filter((s) => hitRoles === null || hitRoles.includes(s.party_role));
+      out.push({
+        cast: t,
+        affected: affected.map(toResolvedSpec),
+        personal_answers: affected.flatMap((s) => {
+          const e = bestPersonal(s, t.school);
+          return e ? [answer(s, e)] : [];
+        }),
+        cheat_death_specs: affected.flatMap((s) => {
+          const e = cheatOf(s);
+          return e ? [answer(s, e)] : [];
+        })
+      });
+    }
+    return { threats: out, personal_specs, cheat_death_specs };
+  }
+  function analyzePetChoice(group, dispels, stops) {
+    const out = [];
+    for (const s of group) {
+      if (s.default_pet === null || s.pet_options.length === 0) continue;
+      const gaps = [];
+      for (const o of s.pet_options) {
+        if (o.provides === "dispel" && o.dispel_type !== null) {
+          const applied = dispels.find((d) => d.dispel_type === o.dispel_type);
+          if (applied && !applied.covered) gaps.push({ option: o, gap: `${o.dispel_type} dispel` });
+        } else if (o.provides === "cc" && stops.cc_shortfall > 0) {
+          gaps.push({ option: o, gap: "CC stop" });
+        }
+      }
+      if (gaps.length > 0) out.push({ spec: toResolvedSpec(s), default_pet: s.default_pet, gaps });
+    }
+    return { warlocks: out };
+  }
+  var RAID_BUFF_ORDER = ["intellect", "stamina", "attack_power", "versatility", "mastery", "all_vuln", "magic_vuln", "physical_vuln"];
+  function analyzeComposition(group) {
+    const cov = (kind) => {
+      const providers = group.filter((s) => s.group_buffs.some((b) => b.kind === kind)).map(toResolvedSpec);
+      return { kind, covered: providers.length > 0, providers };
+    };
+    const rezProviders = group.filter((s) => s.battle_rez.length > 0).map(toResolvedSpec);
+    return {
+      lust: cov("lust"),
+      battle_rez: { covered: rezProviders.length > 0, providers: rezProviders },
+      raid_buffs: RAID_BUFF_ORDER.map(cov)
+    };
+  }
+  function analyzeTargeting(threats, group) {
+    const groupRoles = new Set(group.map((s) => s.party_role));
+    const out = [];
+    for (const t of threats) {
+      if (t.target_roles === null || t.target_roles.length === 0) continue;
+      const roles = [...t.target_roles].sort();
+      const affected = roles.filter((r) => groupRoles.has(r));
+      out.push({ cast: t, roles, affected, focus: classifyFocus(roles, affected, groupRoles) });
+    }
+    return out;
+  }
+  function classifyFocus(roles, affected, groupRoles) {
+    const hitsTank = roles.includes("tank");
+    if (groupRoles.has("tank") && !hitsTank && affected.length > 0) return "avoids_tank";
+    if (affected.length > 0 && [...groupRoles].every((r) => roles.includes(r))) return "party_wide";
+    if (affected.length === 1 && affected[0] === "tank") return "tank_only";
+    return "mixed";
+  }
+  function analyzeThroughput(stops, group) {
+    const rated = stops.must_kick.filter((t) => t.recast_cooldown_ms !== null);
+    let supply = 0;
+    let assumed_cd_kickers = 0;
+    for (const s of group) {
+      if (!s.rollups.has_interrupt) continue;
+      const k = fastestInterrupt(s);
+      if (!k) continue;
+      if (k.cooldown_ms === null) assumed_cd_kickers++;
+      supply += 6e4 / (k.cooldown_ms ?? DEFAULT_INTERRUPT_COOLDOWN_MS);
+    }
+    const group_lockout_ms = groupLockoutMs(group);
+    const demandBySchool = /* @__PURE__ */ new Map();
+    for (const t of rated) {
+      demandBySchool.set(t.school, (demandBySchool.get(t.school) ?? 0) + 6e4 / t.recast_cooldown_ms * t.count);
+    }
+    const lock_cap_per_min = group_lockout_ms ? 6e4 / group_lockout_ms : Infinity;
+    const by_school = [...demandBySchool].map(([school, demand2]) => ({
+      school,
+      demand_per_min: round1(demand2),
+      kicks_needed_per_min: round1(Math.min(demand2, lock_cap_per_min))
+    })).sort((a, b) => b.demand_per_min - a.demand_per_min);
+    const demand = [...demandBySchool.values()].reduce((n, d) => n + d, 0);
+    const kicks_needed = [...demandBySchool.values()].reduce((n, d) => n + Math.min(d, lock_cap_per_min), 0);
+    const coverage_frac = kicks_needed > 0 ? Math.min(1, supply / kicks_needed) : 1;
+    const cc_or_kick = analyzeCcThroughput(stops, group);
+    const sim = simulateMustKickBurst(stops, group);
+    const cc_sim = simulateCcBurst(stops, group);
+    return {
+      available: rated.length > 0 || cc_or_kick.available,
+      must_kick: {
+        demand_per_min: round1(demand),
+        kicks_needed_per_min: round1(kicks_needed),
+        supply_per_min: round1(supply),
+        coverage_pct: Math.round(coverage_frac * 100),
+        let_through_per_min: round1(demand * (1 - coverage_frac)),
+        rated_casts: rated.length,
+        unrated_casts: stops.must_kick.length - rated.length,
+        by_school
+      },
+      cc_or_kick,
+      sim,
+      cc_sim,
+      assumptions: [
+        assumed_cd_kickers > 0 ? `interrupt cooldowns from DB2 SpellCooldowns (${assumed_cd_kickers} interrupter(s) without a DB2 cooldown fell back to ${DEFAULT_INTERRUPT_COOLDOWN_MS / 1e3}s)` : "interrupt cooldowns from DB2 SpellCooldowns (per-spec real kick rates)",
+        group_lockout_ms ? `school lockout ${group_lockout_ms / 1e3}s (DB2; longest the group brings) \u2014 one kick suppresses all same-school casts in its window` : "no school-lockout data on the group's interrupts (per-cast counting)",
+        `CC supply is DR-aware: each DR category capped at ${DR_SUSTAINED_RATE_PER_MIN}/min (~3 applications per 18s immunity); distinct categories are independent lanes`,
+        `AoE CC credited with simultaneity (one cast stops up to ${MAX_SIMULTANEOUS_PRIORITY_CASTS} casters); priority-cast simultaneity capped at ${MAX_SIMULTANEOUS_PRIORITY_CASTS} (engine rule)`,
+        `L3 burst sim plays ${SIM_WINDOW_MS / 1e3}s of the must-kick stream (each mob copy on its cadence) \u2014 catches simultaneity the rate model can hide`,
+        `L3 cc burst sim plays the stoppable stream: a CC suppresses a mob's casting for its DB2 duration across ALL schools, with per-(mob,category) diminishing returns (${DR_LADDER.map((m) => `${m * 100}%`).join("\u2192")}\u2192immune, reset after ${DR_RESET_MS / 1e3}s)`
+      ]
+    };
+  }
+  function simulateMustKickBurst(stops, group) {
+    const events = [];
+    for (const t of stops.must_kick) {
+      if (t.recast_cooldown_ms === null || t.recast_cooldown_ms <= 0) continue;
+      const period = t.recast_cooldown_ms;
+      for (let copy = 0; copy < t.count; copy++) {
+        const mob = `${t.npc_id}#${copy}`;
+        for (let time = 0; time < SIM_WINDOW_MS; time += period) events.push({ time, mob, school: t.school });
+      }
+    }
+    if (events.length === 0) {
+      return { available: false, window_s: SIM_WINDOW_MS / 1e3, total_casts: 0, suppressed_by_lockout: 0, stopped: 0, leaked: 0, coverage_pct: 100, leaked_per_min: 0, peak_concurrent: 0 };
+    }
+    const kickers = group.map((s) => fastestInterrupt(s)).filter((k) => k !== null).map((k) => ({ cooldown: k.cooldown_ms ?? DEFAULT_INTERRUPT_COOLDOWN_MS, lockout: k.lockout_ms ?? 0, aoe: k.is_aoe, free_at: 0 }));
+    events.sort((a, b) => a.time - b.time || (a.mob < b.mob ? -1 : 1));
+    const lockUntil = /* @__PURE__ */ new Map();
+    let total = 0, suppressed = 0, stopped = 0, leaked = 0, peak = 0;
+    for (let i = 0; i < events.length; ) {
+      const t = events[i].time;
+      const group_casts = [];
+      while (i < events.length && events[i].time === t) group_casts.push(events[i++]);
+      total += group_casts.length;
+      peak = Math.max(peak, group_casts.length);
+      const needStop = group_casts.filter((c) => {
+        if ((lockUntil.get(`${c.mob}:${c.school}`) ?? 0) > t) {
+          suppressed++;
+          return false;
+        }
+        return true;
+      });
+      let remaining = needStop;
+      if (remaining.length >= 2) {
+        const aoe = kickers.find((k) => k.free_at <= t && k.aoe);
+        if (aoe) {
+          aoe.free_at = t + aoe.cooldown;
+          for (const c of remaining) {
+            lockUntil.set(`${c.mob}:${c.school}`, t + aoe.lockout);
+            stopped++;
+          }
+          remaining = [];
+        }
+      }
+      for (const k of kickers) {
+        if (remaining.length === 0) break;
+        if (k.free_at > t) continue;
+        k.free_at = t + k.cooldown;
+        const c = remaining.shift();
+        lockUntil.set(`${c.mob}:${c.school}`, t + k.lockout);
+        stopped++;
+      }
+      leaked += remaining.length;
+    }
+    const handled = suppressed + stopped;
+    return {
+      available: true,
+      window_s: SIM_WINDOW_MS / 1e3,
+      total_casts: total,
+      suppressed_by_lockout: suppressed,
+      stopped,
+      leaked,
+      coverage_pct: total > 0 ? Math.round(handled / total * 100) : 100,
+      leaked_per_min: round1(leaked / (SIM_WINDOW_MS / 6e4)),
+      peak_concurrent: peak
+    };
+  }
+  function simulateCcBurst(stops, group) {
+    const events = [];
+    for (const t of stops.cc_or_kick) {
+      if (t.recast_cooldown_ms === null || t.recast_cooldown_ms <= 0) continue;
+      const period = t.recast_cooldown_ms;
+      for (let copy = 0; copy < t.count; copy++) {
+        const mob = `${t.npc_id}#${copy}`;
+        for (let time = 0; time < SIM_WINDOW_MS; time += period) events.push({ time, mob, ct: t.creature_type });
+      }
+    }
+    if (events.length === 0) {
+      return { available: false, window_s: SIM_WINDOW_MS / 1e3, total_casts: 0, suppressed_by_cc: 0, stopped: 0, leaked: 0, coverage_pct: 100, leaked_per_min: 0, peak_concurrent: 0 };
+    }
+    const ccs = group.flatMap(
+      (s) => s.control.filter((c) => c.kind === "cc" && c.mechanic !== null && DR_CATEGORY[c.mechanic] !== void 0 && c.cooldown_ms !== null).map((c) => ({ cooldown: c.cooldown_ms, duration: c.duration_ms ?? 0, aoe: c.is_aoe, category: DR_CATEGORY[c.mechanic], allowed: c.condition?.creature_types ?? null, free_at: 0 }))
+    );
+    const ccHits = (cc, ct) => !cc.allowed || cc.allowed.length === 0 || cc.allowed.includes(ct);
+    events.sort((a, b) => a.time - b.time || (a.mob < b.mob ? -1 : 1));
+    const suppressUntil = /* @__PURE__ */ new Map();
+    const dr = /* @__PURE__ */ new Map();
+    const drMult = (mob, cat, t) => {
+      const st = dr.get(`${mob}:${cat}`);
+      if (!st || t - st.last > DR_RESET_MS) return DR_LADDER[0];
+      return DR_LADDER[st.count] ?? 0;
+    };
+    const applyDr = (mob, cat, t) => {
+      const key = `${mob}:${cat}`;
+      const st = dr.get(key);
+      dr.set(key, !st || t - st.last > DR_RESET_MS ? { count: 1, last: t } : { count: st.count + 1, last: t });
+    };
+    let total = 0, suppressed = 0, stopped = 0, leaked = 0, peak = 0;
+    for (let i = 0; i < events.length; ) {
+      const t = events[i].time;
+      const group_casts = [];
+      while (i < events.length && events[i].time === t) group_casts.push(events[i++]);
+      total += group_casts.length;
+      peak = Math.max(peak, group_casts.length);
+      let remaining = group_casts.filter((c) => {
+        if ((suppressUntil.get(c.mob) ?? 0) > t) {
+          suppressed++;
+          return false;
+        }
+        return true;
+      });
+      const land = (cc, c) => {
+        if (!ccHits(cc, c.ct)) return false;
+        const mult = drMult(c.mob, cc.category, t);
+        if (mult <= 0) return false;
+        applyDr(c.mob, cc.category, t);
+        suppressUntil.set(c.mob, t + cc.duration * mult);
+        stopped++;
+        return true;
+      };
+      if (remaining.length >= 2) {
+        const aoe = ccs.find((k) => k.free_at <= t && k.aoe && remaining.some((c) => ccHits(k, c.ct)));
+        if (aoe) {
+          aoe.free_at = t + aoe.cooldown;
+          remaining = remaining.filter((c) => !land(aoe, c));
+        }
+      }
+      for (const k of ccs) {
+        if (remaining.length === 0) break;
+        if (k.free_at > t) continue;
+        const idx = remaining.findIndex((c) => drMult(c.mob, k.category, t) > 0 && ccHits(k, c.ct));
+        if (idx < 0) continue;
+        k.free_at = t + k.cooldown;
+        land(k, remaining.splice(idx, 1)[0]);
+      }
+      leaked += remaining.length;
+    }
+    const handled = suppressed + stopped;
+    return {
+      available: true,
+      window_s: SIM_WINDOW_MS / 1e3,
+      total_casts: total,
+      suppressed_by_cc: suppressed,
+      stopped,
+      leaked,
+      coverage_pct: total > 0 ? Math.round(handled / total * 100) : 100,
+      leaked_per_min: round1(leaked / (SIM_WINDOW_MS / 6e4)),
+      peak_concurrent: peak
+    };
+  }
+  function analyzeCcThroughput(stops, group) {
+    const rated = stops.cc_or_kick.filter((t) => t.recast_cooldown_ms !== null);
+    const demand = rated.reduce((n, t) => n + 6e4 / t.recast_cooldown_ms * t.count, 0);
+    const cc_casters = stops.cc_or_kick.reduce((n, t) => n + t.count, 0);
+    const aoe_factor = Math.min(MAX_SIMULTANEOUS_PRIORITY_CASTS, Math.max(1, cc_casters));
+    const stoppableTypes = new Set(stops.cc_or_kick.map((t) => t.creature_type));
+    const byCat = /* @__PURE__ */ new Map();
+    for (const s of group) {
+      for (const c of s.control) {
+        if (c.kind !== "cc" || c.mechanic === null || c.cooldown_ms === null) continue;
+        const cat = DR_CATEGORY[c.mechanic];
+        if (!cat) continue;
+        if (![...stoppableTypes].some((ct) => creatureTypeAllowed(c.condition, ct))) continue;
+        const rate = 6e4 / c.cooldown_ms * (c.is_aoe ? aoe_factor : 1);
+        const e = byCat.get(cat) ?? { rate: 0, abilities: /* @__PURE__ */ new Set() };
+        e.rate += rate;
+        e.abilities.add(c.name);
+        byCat.set(cat, e);
+      }
+    }
+    let supply = 0;
+    const by_dr_category = [...byCat].map(([category, e]) => {
+      const capped = Math.min(e.rate, DR_SUSTAINED_RATE_PER_MIN);
+      supply += capped;
+      return { category, supply_per_min: round1(capped), abilities: [...e.abilities].sort() };
+    }).sort((a, b) => b.supply_per_min - a.supply_per_min);
+    const coverage_frac = demand > 0 ? Math.min(1, supply / demand) : 1;
+    return {
+      available: rated.length > 0,
+      demand_per_min: round1(demand),
+      supply_per_min: round1(supply),
+      coverage_pct: Math.round(coverage_frac * 100),
+      let_through_per_min: round1(demand * (1 - coverage_frac)),
+      rated_casts: rated.length,
+      unrated_casts: stops.cc_or_kick.length - rated.length,
+      by_dr_category,
+      aoe_factor
+    };
+  }
+  function fastestInterrupt(s) {
+    let best = null;
+    for (const c of s.control) {
+      if (c.kind !== "interrupt") continue;
+      if (best === null || (c.cooldown_ms ?? Infinity) < (best.cooldown_ms ?? Infinity)) best = c;
+    }
+    return best;
+  }
+  function groupLockoutMs(group) {
+    let v = null;
+    for (const s of group) {
+      if (!s.rollups.has_interrupt) continue;
+      const k = fastestInterrupt(s);
+      if (k?.lockout_ms != null) v = Math.max(v ?? 0, k.lockout_ms);
+    }
+    return v;
+  }
+  function analyzeKickTiming(threats, group) {
+    const hasInterrupt = group.some((s) => s.rollups.has_interrupt);
+    if (!hasInterrupt) return { available: false, threats: [] };
+    const lockout = groupLockoutMs(group);
+    const out = [];
+    for (const t of threats) {
+      const kp = t.observed_kick_point;
+      if (kp === null || !t.is_interruptible) continue;
+      if (t.is_stoppable || t.is_channeled) continue;
+      const long_kick_target_ms = kp.clean_cast_ms !== null ? Math.round(kp.clean_cast_ms * LONG_KICK_TARGET_PCT) : null;
+      const gain_ms = long_kick_target_ms !== null ? Math.max(0, long_kick_target_ms - kp.kick_point_ms) : 0;
+      const style = kp.pct === null ? "unknown" : kp.pct >= LONG_KICK_PCT ? "long" : kp.pct < REACT_KICK_PCT ? "react" : "mid";
+      out.push({
+        cast: t,
+        kick_point_ms: kp.kick_point_ms,
+        clean_cast_ms: kp.clean_cast_ms,
+        pct: kp.pct,
+        samples: kp.samples,
+        style,
+        long_kick_target_ms,
+        gain_ms,
+        lockout_ms: lockout,
+        effective_interval_now_ms: lockout !== null ? kp.kick_point_ms + lockout : null,
+        effective_interval_long_ms: lockout !== null && long_kick_target_ms !== null ? long_kick_target_ms + lockout : null
+      });
+    }
+    return { available: out.length > 0, threats: out };
+  }
+  function channelDealsDamage(t) {
+    return t.is_aoe || t.unavoidable || t.dot || t.party_targets !== null;
+  }
+  function analyzeChannelTiming(threats, stops) {
+    const hasKick = stops.interrupt_supply > 0;
+    const hasCc = stops.cc_stop_supply > 0;
+    const out = [];
+    for (const t of threats) {
+      const cs = t.observed_channel_stop;
+      if (cs === null || !t.is_channeled) continue;
+      if (!channelDealsDamage(t)) continue;
+      const ccStops = t.is_stoppable && hasCc;
+      if (!hasKick && !ccStops) continue;
+      out.push({
+        cast: t,
+        reaction_ms: cs.reaction_ms,
+        samples: cs.samples,
+        tool: ccStops ? "cc" : "kick",
+        // budget: CC a hard-stoppable channel (save the interrupt), else kick
+        fast: cs.reaction_ms <= CHANNEL_REACT_TARGET_MS
+      });
+    }
+    return { available: out.length > 0, threats: out };
+  }
+  function analyzeCompletionEffect(threats, stops) {
+    const hasKick = stops.interrupt_supply > 0;
+    const hasCc = stops.cc_stop_supply > 0;
+    const out = [];
+    for (const t of threats) {
+      if (!t.completion_effect) continue;
+      const tools = [];
+      if (t.is_stoppable && hasCc) tools.push("cc");
+      if (t.is_interruptible && hasKick) tools.push("kick");
+      out.push({ cast: t, effect: t.completion_effect, tools, deniable: tools.length > 0 });
+    }
+    return { threats: out };
+  }
+  function analyzeNotes(threats) {
+    const out = [];
+    for (const t of threats) {
+      const note = t.coaching_note?.trim();
+      if (note) out.push({ cast: t, note });
+    }
+    return { threats: out };
+  }
+  var ROLE_TAGS = ["tank", "healer", "dps"];
+  function coarseRole(role) {
+    return role === "tank" ? "tank" : role === "healer" ? "healer" : "dps";
+  }
+  function extAnswerer(a) {
+    return { role: coarseRole(a.spec.party_role), spec: a.spec, ability: a.ability };
+  }
+  function hitRolesOf(casts) {
+    const out = /* @__PURE__ */ new Set();
+    for (const t of casts) for (const role of t.target_roles ?? []) out.add(coarseRole(role));
+    return out;
+  }
+  function dispellersFor(dt, group) {
+    const out = [];
+    for (const s of group) {
+      const r = s.removals.find((rm) => rm.dispel_type === dt && rm.condition === null) ?? s.removals.find((rm) => rm.dispel_type === dt);
+      if (r) out.push({ role: coarseRole(s.party_role), spec: toResolvedSpec(s), ability: r.name });
+    }
+    return out;
+  }
+  function interruptersOf(group) {
+    const out = [];
+    for (const s of group) {
+      if (!s.rollups.has_interrupt) continue;
+      const k = s.control.find((c) => c.kind === "interrupt");
+      out.push({ role: coarseRole(s.party_role), spec: toResolvedSpec(s), ability: k?.name ?? "an interrupt" });
+    }
+    return out;
+  }
+  function ccStoppersOf(group, casts) {
+    const types = new Set(casts.map((t) => t.creature_type));
+    const out = [];
+    for (const s of group) {
+      const c = s.control.find((x) => x.kind === "cc" && x.mechanic !== null && STOPPING_MECHANICS.has(x.mechanic) && [...types].some((ct) => creatureTypeAllowed(x.condition, ct)));
+      if (c) out.push({ role: coarseRole(s.party_role), spec: toResolvedSpec(s), ability: c.name });
+    }
+    return out;
+  }
+  function freersFor(mechanic, group) {
+    const out = [];
+    for (const s of group) {
+      const f = s.movement_freedom.find((m) => m.mechanics.includes(mechanic));
+      if (f) out.push({ role: coarseRole(s.party_role), spec: toResolvedSpec(s), ability: f.name });
+    }
+    return out;
+  }
+  function joinAnd(parts) {
+    if (parts.length <= 1) return parts[0] ?? "";
+    if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+    return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
+  }
+  function answerersPhrase(answerers, lens) {
+    const mine = [...new Set(answerers.filter((a) => a.role === lens).map((a) => a.ability))];
+    const others = answerers.filter((a) => a.role !== lens);
+    const parts = [];
+    if (mine.length) parts.push(`you (${mine.join(" / ")})`);
+    for (const a of others) parts.push(`your ${a.spec.class} ${a.spec.spec_name} (${a.ability})`);
+    return joinAnd(parts);
+  }
+  function myAbilities(answerers, lens) {
+    return [...new Set(answerers.filter((a) => a.role === lens).map((a) => a.ability))].join(" / ");
+  }
+  var COARSE_LABEL = { tank: "Tank", healer: "Healer", dps: "DPS" };
+  var COARSE_ORDER = { tank: 0, healer: 1, dps: 2 };
+  function coarseRolePhrase(roles) {
+    return joinAnd([...roles].sort((a, b) => COARSE_ORDER[a] - COARSE_ORDER[b]).map((r) => COARSE_LABEL[r]));
+  }
+  function debuffTypeNoun(casts) {
+    const types = [...new Set(casts.map((t) => t.dispel_type))].filter((d) => d !== "None");
+    return types.length === 1 ? `${types[0]} debuff` : "debuff";
+  }
+  function impairVerb(mechanic) {
+    return mechanic === "rooted" ? "rooted" : "snared";
+  }
+  function mitigableAfterAdvice(casts, group) {
+    const answerers = [];
+    const seen = /* @__PURE__ */ new Set();
+    for (const t of casts) for (const a of dispellersFor(t.dispel_type, group)) {
+      if (!seen.has(a.spec.spec_id)) {
+        seen.add(a.spec.spec_id);
+        answerers.push(a);
+      }
+    }
+    const hit = hitRolesOf(casts);
+    const noun = debuffTypeNoun(casts);
+    const tick = casts.some((t) => t.dot) ? " to end the ticks" : "";
+    const healSentence = casts.some((t) => t.unavoidable || t.is_aoe) ? " Heal/mitigate through until then." : "";
+    const out = {};
+    for (const R of ROLE_TAGS) {
+      const phrase = answerersPhrase(answerers, R);
+      const amAnswerer = answerers.some((a) => a.role === R);
+      const amHit = hit.size === 0 ? null : hit.has(R);
+      if (amAnswerer) {
+        out[R] = `Can't be stopped \u2014 remove the ${noun} after it lands${tick}: ${phrase}.${healSentence}${amHit ? " (It can land on you too.)" : ""}`;
+      } else if (amHit === true) {
+        out[R] = `You'll take the ${noun} \u2014 it can't be stopped, so ${phrase} removes it after it lands${tick}; survive the ticks (personal / heal) until it's off.`;
+      } else if (amHit === null) {
+        out[R] = `Can't be stopped \u2014 ${phrase} removes the ${noun} after it lands${tick}.`;
+      } else {
+        out[R] = `Not your removal \u2014 ${phrase} clears the ${noun} after it lands${tick}; cover the team while it's up.`;
+      }
+    }
+    return out;
+  }
+  function dispelGapAdvice(dt, casts) {
+    const hit = hitRolesOf(casts);
+    const out = {};
+    for (const R of ROLE_TAGS) {
+      const amHit = hit.size === 0 ? null : hit.has(R);
+      if (amHit === true) {
+        out[R] = `You'll take a ${dt} debuff no one in the comp can remove \u2014 press a personal / heal through it; it runs its full duration.`;
+      } else if (amHit === null) {
+        out[R] = `No ${dt} removal in the comp \u2014 whoever it lands on rides it out (personal / heal-through).`;
+      } else {
+        out[R] = `No ${dt} removal in the comp \u2014 it lands on your ${coarseRolePhrase(hit)}; help them survive it (externals / spot-heals).`;
+      }
+    }
+    return out;
+  }
+  function immunityDispelAdvice(dt, removals) {
+    const answerers = removals.map((im) => ({ role: coarseRole(im.spec.party_role), spec: im.spec, ability: im.ability }));
+    const out = {};
+    for (const R of ROLE_TAGS) {
+      const amAnswerer = answerers.some((a) => a.role === R);
+      const phrase = answerersPhrase(answerers, R);
+      if (!amAnswerer) {
+        out[R] = `No standard ${dt} dispel \u2014 ${phrase} is the only removal, but it drops threat, so it won't be used on the tank. Plan to heal through it otherwise.`;
+      } else if (R === "tank") {
+        out[R] = `Your only ${dt} removal is ${phrase} \u2014 it clears it but DROPS ALL THREAT: never use it on yourself as the tank without a /cancelaura macro and a plan to regain aggro immediately.`;
+      } else {
+        out[R] = `Your only ${dt} removal is ${phrase} \u2014 it clears it but DROPS ALL THREAT on its target. EXTREME CAUTION: do not use it on your tank without coordination.`;
+      }
+    }
+    return out;
+  }
+  function conditionalDispelAdvice(dt, specs) {
+    const answerers = specs.map((s) => ({ role: coarseRole(s.party_role), spec: s, ability: `${dt} dispel` }));
+    const out = {};
+    for (const R of ROLE_TAGS) {
+      const amAnswerer = answerers.some((a) => a.role === R);
+      const who = joinAnd(specs.map((s) => `${s.class} ${s.spec_name}`));
+      out[R] = amAnswerer ? `You can remove the ${dt} only conditionally (e.g. with an active pet out) \u2014 keep the condition up so it's available.` : `${dt} is only removable conditionally by your ${who} (e.g. requires a pet) \u2014 don't count on it landing every time.`;
+    }
+    return out;
+  }
+  function kickAdvice(group, short, shortBy) {
+    const kickers = interruptersOf(group);
+    const out = {};
+    for (const R of ROLE_TAGS) {
+      const amKicker = kickers.some((a) => a.role === R);
+      if (kickers.length === 0) {
+        out[R] = "No interrupt in the comp \u2014 these recast through CC (a stun only delays). Position and survive what they cast.";
+      } else if (amKicker) {
+        out[R] = short ? `You're a kicker here (${myAbilities(kickers, R)}) and the comp is short ${shortBy} \u2014 prioritize the most dangerous casts; coordinate so one's always up.` : `You can kick these (${myAbilities(kickers, R)}) \u2014 keep one ready and call your target.`;
+      } else if (R === "healer") {
+        out[R] = `You bring no kick \u2014 ${answerersPhrase(kickers, R)} stop these; call the cast out if you spot it first.`;
+      } else {
+        out[R] = `Your interrupts (${answerersPhrase(kickers, R)}) cover these \u2014 track whose kick is up.`;
+      }
+    }
+    return out;
+  }
+  function ccStopAdvice(group, casts, spareInterrupts) {
+    const ccers = ccStoppersOf(group, casts);
+    const kickers = interruptersOf(group);
+    const spareTail = spareInterrupts > 0 ? ` (or spend one of your ${spareInterrupts} spare kick${spareInterrupts > 1 ? "s" : ""})` : "";
+    const out = {};
+    for (const R of ROLE_TAGS) {
+      const amCcer = ccers.some((a) => a.role === R);
+      const amKicker = kickers.some((a) => a.role === R);
+      if (amCcer) {
+        out[R] = `You bring a hard CC (${myAbilities(ccers, R)}) \u2014 use it to stop these and save interrupts for the must-kicks${spareTail}.`;
+      } else if (ccers.length > 0) {
+        out[R] = `Answer these with CC to save kicks \u2014 ${answerersPhrase(ccers, R)} can stop them${spareTail}.`;
+      } else if (amKicker) {
+        out[R] = `No hard CC in the comp \u2014 you'll have to spend a kick on these (${myAbilities(kickers, R)}); budget around the must-kicks.`;
+      } else {
+        out[R] = "No hard CC in the comp \u2014 these fall to the kickers; help track them.";
+      }
+    }
+    return out;
+  }
+  function movementAdvice(mt, group) {
+    const freers = freersFor(mt.mechanic, group);
+    const hit = hitRolesOf([mt.cast]);
+    const verb = impairVerb(mt.mechanic);
+    const selfOnly = mt.coverage === "self";
+    const lethalTail = mt.lethal_if_unfreed ? " \u2014 lethal if not freed, so be fast" : "";
+    const condTail = mt.coverage === "conditional" ? " (conditional/unreliable \u2014 position as a backup)" : "";
+    const out = {};
+    for (const R of ROLE_TAGS) {
+      const amFreer = freers.some((a) => a.role === R);
+      const amHit = hit.size === 0 ? null : hit.has(R);
+      if (freers.length === 0) {
+        out[R] = `No way to clear ${mt.mechanic} in the comp \u2014 position to avoid getting ${verb}${lethalTail}.`;
+      } else if (amFreer) {
+        out[R] = selfOnly ? `You can self-clear ${mt.mechanic} (${myAbilities(freers, R)}), but it won't free a teammate \u2014 they'll have to position${lethalTail}.` : `You can clear ${mt.mechanic} (${myAbilities(freers, R)}) \u2014 free whoever gets ${verb}${lethalTail}.`;
+      } else if (selfOnly) {
+        out[R] = `If you get ${verb} you're stuck \u2014 the comp's only freedom is self-cast (${answerersPhrase(freers, R)}); position to avoid it${lethalTail}.`;
+      } else if (amHit === false) {
+        out[R] = `${answerersPhrase(freers, R)} clears ${mt.mechanic} here.`;
+      } else {
+        out[R] = `If you get ${verb}, ${answerersPhrase(freers, R)} can free you (ally-castable)${lethalTail}.`;
+      }
+      if (condTail && out[R]) out[R] += condTail;
+    }
+    return out;
+  }
+  function tankBusterAdvice(tb) {
+    const allies = tb.ally_answers.map(extAnswerer);
+    const lethal = tb.cast.is_lethal;
+    const out = {};
+    if (!lethal) {
+      out.tank = `Aimed at you \u2014 your active mitigation covers it${allies.length ? `; call for an external (${answerersPhrase(allies, "tank")}) if it spikes` : ""}.`;
+    } else if (allies.length > 0) {
+      out.tank = `A LETHAL hit on you \u2014 pop your own major defensive AND get an external: ${answerersPhrase(allies, "tank")}.`;
+    } else if (tb.tank_self_answer) {
+      const a = tb.tank_self_answer;
+      const verb = a.mechanism === "immunity" ? "go immune with" : a.mechanism === "death_prevent" ? "survive it with" : "mitigate it with";
+      const scopeNote = tb.tank_self_scoped ? a.scope === "single" ? " (single-target \u2014 brand the lone dangerous creature)" : " (blanket mitigation \u2014 multiple dangerous creatures in the pull)" : "";
+      out.tank = `A LETHAL hit on you with no ally external \u2014 ${verb} your ${a.ability}${scopeNote}.`;
+    } else {
+      out.tank = "A LETHAL hit on you and the comp brings NO external \u2014 plan your biggest defensive; you have no backup for it.";
+    }
+    for (const R of ["healer", "dps"]) {
+      const mine = myAbilities(allies, R);
+      if (!mine && (R === "dps" || !lethal)) continue;
+      if (!lethal) {
+        out[R] = mine ? `Tank-buster \u2014 have ${mine} ready on the tank if it spikes.` : `Tank-buster on the tank \u2014 their actives cover it; ${R === "healer" ? "top them right after" : "keep DPSing"}.`;
+      } else if (mine) {
+        out[R] = `LETHAL tank-buster \u2014 pre-plan YOUR external on the tank (${mine}); don't let it land raw.`;
+      } else if (allies.length > 0) {
+        out[R] = `LETHAL tank-buster \u2014 ${answerersPhrase(allies, R)} must cover the tank; ${R === "healer" ? "pre-heal and back it up" : "keep DPSing \u2014 they have the tank covered"}.`;
+      } else if (tb.tank_self_answer) {
+        out[R] = `LETHAL tank-buster \u2014 no ally external, so the tank self-covers (${tb.tank_self_answer.ability}); ${R === "healer" ? "pre-heal hard around it" : "help where you can"}.`;
+      } else {
+        out[R] = `LETHAL tank-buster and NO external in the comp${R === "healer" ? " \u2014 pre-heal hard; flag this gap" : " \u2014 a real comp gap; flag it"}.`;
+      }
+    }
+    return out;
+  }
+  function dpsSurvivalAdvice(st) {
+    const personals = st.personal_answers.map(extAnswerer);
+    const affected = new Set(st.affected.map((s) => coarseRole(s.party_role)));
+    const out = {};
+    out.tank = "Not aimed at you \u2014 the targeted squishy presses their own personal and the healer covers them.";
+    for (const R of ["healer", "dps"]) {
+      const mine = myAbilities(personals, R);
+      if (mine) {
+        out[R] = `This can one-shot you \u2014 press your own ${mine} when targeted (school-matched).`;
+      } else if (affected.has(R)) {
+        out[R] = "This can one-shot you and you bring no school-matched personal \u2014 pre-position, bait it safely, and call for a heal / external.";
+      } else {
+        out[R] = "Lands on another squishy, not you \u2014 keep going.";
+      }
+    }
+    return out;
+  }
+  function vulnerabilityAdvice(vt, group) {
+    const sch = vt.school === "all" ? "" : `${vt.school} `;
+    const win = vt.duration_s ? ` for ~${vt.duration_s}s` : "";
+    const hit = new Set((vt.cast.target_roles ?? []).map(coarseRole));
+    if (vt.cast.tank_buster) hit.add("tank");
+    const partyWide = hit.size === 0;
+    const takesIt = (R) => partyWide || hit.has(R);
+    const tankAffected = partyWide || hit.has("tank");
+    const canDispel = (R) => vt.removal === "dispel" && group.some((s) => coarseRole(s.party_role) === R && s.removals.some((rm) => rm.dispel_type === vt.cast.dispel_type));
+    const hasAllyExternal = (R) => group.some((s) => coarseRole(s.party_role) === R && s.externals.some((e) => e.target === "ally" && !e.passive));
+    const out = {};
+    for (const R of ROLE_TAGS) {
+      const parts = [];
+      if (canDispel(R)) parts.push(`dispel it to clear the +${vt.pct}% amp`);
+      if (R === "tank") {
+        if (takesIt("tank")) parts.push(`your follow-up ${sch}hits are amplified +${vt.pct}%${win} \u2014 mitigate the window with a long damage-reduction cooldown`);
+      } else if (takesIt(R)) {
+        parts.push(`you take amplified ${sch}damage${win} \u2014 have a personal ready for the next hit`);
+      } else if (hasAllyExternal(R) && tankAffected) {
+        parts.push(`external the tank for the amplified hit`);
+      } else if (R === "healer" && tankAffected) {
+        parts.push(`heal the tank hard through the amplified window`);
+      }
+      if (parts.length) out[R] = parts.join("; ").replace(/^./, (c) => c.toUpperCase()) + ".";
+    }
+    return out;
+  }
+  function notesRoleAdvice(cast, note, group) {
+    const roles = new Set((cast.target_roles ?? []).map(coarseRole));
+    if (cast.tank_buster) roles.add("tank");
+    if (cast.dispel_type !== "None" && !cast.dispel_detonates) {
+      for (const s of group) if (s.removals.some((rm) => rm.dispel_type === cast.dispel_type)) roles.add(coarseRole(s.party_role));
+    }
+    if (cast.mechanic === "rooted" || cast.mechanic === "snared") {
+      for (const s of group) if (s.rollups.frees_movement) roles.add(coarseRole(s.party_role));
+    }
+    if (roles.size === 0 || roles.size >= ROLE_TAGS.length) return void 0;
+    const out = {};
+    for (const R of roles) out[R] = note;
+    return out;
+  }
+  var PARTY_CC_WORD = {
+    fleeing: "fear",
+    silenced: "silence",
+    disoriented: "disorient",
+    stunned: "stun",
+    incapacitated: "incapacitate",
+    charmed: "charm",
+    banished: "banish",
+    sleeping: "sleep"
+  };
+  function failGatesLethal(threats) {
+    const parentsOfLethal = /* @__PURE__ */ new Set();
+    for (const t of threats) if ((t.is_lethal || t.scales_to_lethal) && t.secondary_of != null) parentsOfLethal.add(t.secondary_of);
+    const out = /* @__PURE__ */ new Set();
+    for (const t of threats) if (parentsOfLethal.has(t.spell_id) && t.positioning.includes("soak")) out.add(t.spell_id);
+    return out;
+  }
+  function preventableUpstream(threats) {
+    const byId = new Map(threats.map((t) => [t.spell_id, t]));
+    const out = /* @__PURE__ */ new Map();
+    for (const t of threats) {
+      if (!(t.is_lethal || t.scales_to_lethal) || t.secondary_of == null) continue;
+      const parent = byId.get(t.secondary_of);
+      if (parent?.positioning.includes("soak")) out.set(t.spell_id, parent);
+    }
+    return out;
+  }
+  function intrinsicSeverity(cast, gatesLethal = false) {
+    const partyCC = cast.mechanic !== null && PARTY_CC_WORD[cast.mechanic] !== void 0;
+    const avoidable = cast.positioning.length > 0 || cast.is_aoe && !cast.unavoidable && !partyCC;
+    if (cast.is_lethal) return avoidable ? "warning" : "critical";
+    if (gatesLethal) return "warning";
+    if (cast.mechanic !== null && PARTY_CC_WORD[cast.mechanic] && (cast.is_aoe || (cast.party_targets ?? 0) >= 2)) return "warning";
+    return "info";
+  }
+  function describeType(cast) {
+    if (cast.tank_buster) return "tank-buster";
+    if (cast.mechanic !== null && PARTY_CC_WORD[cast.mechanic]) return `party ${PARTY_CC_WORD[cast.mechanic]}`;
+    if (cast.completion_effect) return `${cast.completion_effect.replace(/^an? /i, "")} cast`;
+    if (cast.mechanic === "rooted") return "root";
+    if (cast.mechanic === "snared") return "snare";
+    if (cast.is_interruptible) return "interruptible cast";
+    if (cast.unavoidable && cast.is_aoe) {
+      if (cast.dot) return cast.dispel_type !== "None" ? `unavoidable party-wide ${cast.dispel_type}` : "unavoidable party-wide damage-over-time";
+      return "unavoidable party-wide hit";
+    }
+    if (cast.positioning.includes("frontal")) return "frontal cone";
+    if (cast.positioning.includes("line_of_sight")) return "line-of-sight cast";
+    if (cast.is_aoe || cast.positioning.length > 0) return "avoidable ground effect";
+    if (cast.displacement.includes("knockback")) return "knockback";
+    if (cast.displacement.includes("pull")) return "pull";
+    if (cast.dispel_type !== "None") return cast.dot ? `${cast.dispel_type} damage-over-time` : `${cast.dispel_type} debuff`;
+    if (cast.dot) return "damage-over-time";
+    if (cast.is_lethal) return "single-target hit";
+    return "cast";
+  }
+  function describeRiders(cast, type) {
+    const out = [];
+    if (cast.vulnerability) {
+      const v = cast.vulnerability;
+      const sch = v.school === "all" ? "" : `${v.school} `;
+      const dur = cast.duration_ms != null ? ` for ~${Math.round(cast.duration_ms / 1e3)}s` : "";
+      out.push(`ramps your ${sch}damage taken +${v.pct}%${dur}`);
+    }
+    if (cast.displacement.includes("knockback") && type !== "knockback") out.push("knocks you back");
+    if (cast.displacement.includes("pull") && type !== "pull") out.push("pulls you in");
+    if (cast.dispel_type !== "None" && !type.includes(cast.dispel_type) && !type.includes("debuff")) out.push(`applies a ${cast.dispel_type} debuff`);
+    if (cast.dot && !type.includes("damage-over-time") && !type.includes(cast.dispel_type)) out.push("ticks damage over time");
+    if (cast.is_stoppable && cast.is_interruptible) out.push("won't recast if you CC it instead");
+    return out;
+  }
+  function composeDescription(cast, severity) {
+    const ADJ = { critical: "a critical", warning: "a dangerous", caution: "a", info: "a minor" };
+    const type = describeType(cast);
+    let adj = ADJ[severity];
+    if (adj === "a" && /^[aeiou]/i.test(type)) adj = "an";
+    const riders = describeRiders(cast, type);
+    const tail = riders.length ? ` that also ${joinAnd(riders)}` : "";
+    return `${cast.spell_name} is ${adj} ${type}${tail}.`;
+  }
+  function stripCastPrefix(message, cast) {
+    const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const label = new RegExp(`^${esc(cast.spell_name)}( \xD7\\d+)? \\(${esc(cast.npc_name)}\\)\\s*:?\\s*`);
+    let m = message.replace(label, "");
+    m = m.replace(/^is an? [^—]*— /, "");
+    return m.charAt(0).toUpperCase() + m.slice(1);
+  }
+  function damageLabel(cast) {
+    if (cast.is_lethal) return "heavy";
+    if (cast.tank_buster || cast.unavoidable) return "moderate";
+    return "mild";
+  }
+  function buildCastCard(cast, members, gatesLethal = false) {
+    const memberFloor = [intrinsicSeverity(cast, gatesLethal), ...members.map((m) => m.severity)];
+    const severity = memberFloor.sort((a, b) => SEVERITY_RANK[a] - SEVERITY_RANK[b])[0];
+    const perRole = { tank: [], healer: [], dps: [] };
+    const universal = [];
+    for (const m of members) {
+      const ra = m.role_advice;
+      if (ra && (ra.tank || ra.healer || ra.dps)) {
+        for (const R of ROLE_TAGS) {
+          const v = ra[R];
+          if (v) perRole[R].push(v);
+        }
+      } else if (m.message) {
+        universal.push(stripCastPrefix(m.message, cast));
+      }
+    }
+    const uniq = (a) => [...new Set(a)].join(" ");
+    const anyRole = perRole.tank.length > 0 || perRole.healer.length > 0 || perRole.dps.length > 0;
+    let role_advice;
+    let everyone;
+    if (anyRole) {
+      role_advice = {};
+      for (const R of ROLE_TAGS) if (perRole[R].length) role_advice[R] = uniq(perRole[R]);
+      if (universal.length) everyone = uniq(universal);
+    } else if (universal.length) {
+      everyone = uniq(universal);
+    }
+    const primary = [...members].sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity])[0];
+    const coaching = members.every((m) => m.coaching) && intrinsicSeverity(cast, gatesLethal) === "info";
+    const seen = /* @__PURE__ */ new Set();
+    const high_risk = [];
+    for (const hr of [...members.flatMap((m) => m.high_risk ?? []), ...cast.high_risk]) {
+      const k = `${hr.role}|${hr.text}`;
+      if (!seen.has(k)) {
+        seen.add(k);
+        high_risk.push(hr);
+      }
+    }
+    return {
+      severity,
+      category: primary.category,
+      consolidated: true,
+      coaching: coaching || void 0,
+      subjects: members[0].subjects,
+      message: composeDescription(cast, severity),
+      role_advice,
+      everyone,
+      high_risk: high_risk.length ? high_risk : void 0
+    };
+  }
+  function tankSurvivalCard(tb, vt) {
+    const cast = tb.cast;
+    const severity = intrinsicSeverity(cast);
+    const message = composeDescription(cast, severity);
+    const allies = tb.ally_answers.map(extAnswerer);
+    const winWord = vt.duration_s ? ` across the full ~${vt.duration_s}s window` : "";
+    const role_advice = {};
+    const tankExt = allies.length ? ` Back it with an external if needed: ${answerersPhrase(allies, "tank")}.` : "";
+    role_advice.tank = `To survive this, hold your strongest damage-reduction cooldown${winWord} \u2014 you can't dodge the amplified follow-up hits.${tankExt}`;
+    const healMine = myAbilities(allies, "healer");
+    role_advice.healer = `This tank-buster hits your tank for ${damageLabel(cast)} damage \u2014 ${healMine ? `have ${healMine} ready for them` : allies.length ? `back the tank with ${answerersPhrase(allies, "healer")}` : "pre-heal hard through the amplified window"}.`;
+    const note = cast.coaching_note?.trim();
+    if (note) role_advice.dps = note;
+    const high_risk = [...tb.high_risk, ...cast.high_risk];
+    return { severity, category: "tank_buster", consolidated: true, role_advice, message, high_risk: high_risk.length ? high_risk : void 0 };
+  }
+  function buildWarnings(r, group) {
+    const w = [];
+    const list = (ts) => ts.map((t) => labelCast(t)).join(", ");
+    const subj = (ts) => ts.map((t) => ({ spell_name: t.spell_name, npc_name: t.npc_name, count: t.count, is_boss: t.is_boss, is_boss_add: t.is_boss_add, summoned_by_name: t.summoned_by_name, secondary_of_name: t.secondary_of_name, target_roles: t.target_roles, cast_order: t.cast_order }));
+    const targetingByKey = new Map(r.targeting.map((tt) => [castKey(tt.cast), tt]));
+    const landsOn = (ts) => {
+      const roles = /* @__PURE__ */ new Set();
+      for (const t of ts) for (const role of targetingByKey.get(castKey(t))?.affected ?? []) roles.add(role);
+      return roles.size ? ` \u2014 lands on your ${rolePhrase(orderRoles(roles))}` : "";
+    };
+    const vulnByKey = new Map(r.vulnerability.threats.map((v) => [castKey(v.cast), v]));
+    const foldedKeys = /* @__PURE__ */ new Set();
+    for (const tb of r.tank_buster.threats) {
+      const vt = vulnByKey.get(castKey(tb.cast));
+      if (!vt) continue;
+      foldedKeys.add(castKey(tb.cast));
+      w.push({ ...tankSurvivalCard(tb, vt), subjects: subj([tb.cast]) });
+    }
+    const { stops } = r;
+    if (stops.must_kick_shortfall > 0) {
+      w.push({
+        severity: "critical",
+        category: "interrupt",
+        subjects: subj(stops.must_kick),
+        message: `${stops.must_kick_demand} must-kick cast(s) but only ${stops.interrupt_supply} interrupt(s) \u2014 short by ${stops.must_kick_shortfall}. These recast through CC; only a real interrupt stops them: ${list(stops.must_kick)}.`,
+        role_advice: kickAdvice(group, true, stops.must_kick_shortfall)
+      });
+    } else if (stops.must_kick_demand > 0) {
+      w.push({
+        severity: "info",
+        category: "interrupt",
+        coaching: true,
+        subjects: subj(stops.must_kick),
+        message: `${stops.must_kick_demand} must-kick cast(s) covered by ${stops.interrupt_supply} interrupt(s)${stops.spare_interrupts > 0 ? ` (${stops.spare_interrupts} spare)` : ""}.`,
+        role_advice: kickAdvice(group, false, 0)
+      });
+    }
+    if (stops.cc_shortfall > 0) {
+      w.push({
+        severity: "warning",
+        category: "cc",
+        subjects: subj(stops.cc_or_kick),
+        message: `${stops.cc_or_kick_demand} stoppable cast(s) exceed available CC (${stops.cc_stop_supply}) + spare interrupts (${stops.spare_interrupts}) \u2014 short by ${stops.cc_shortfall}: ${list(stops.cc_or_kick)}.`,
+        role_advice: ccStopAdvice(group, stops.cc_or_kick, stops.spare_interrupts)
+      });
+    } else if (stops.cc_or_kick.length > 0) {
+      w.push({
+        severity: "info",
+        category: "cc",
+        coaching: true,
+        subjects: subj(stops.cc_or_kick),
+        message: `${stops.cc_or_kick_demand} stoppable cast(s) \u2014 answer with CC to save interrupts (${stops.cc_stop_supply} CC + ${stops.spare_interrupts} spare interrupt available).`,
+        role_advice: ccStopAdvice(group, stops.cc_or_kick, stops.spare_interrupts)
+      });
+    }
+    if (r.throughput.must_kick.rated_casts > 0) {
+      const t = r.throughput.must_kick;
+      const lock = t.kicks_needed_per_min < t.demand_per_min ? ` (school-lockout: ${t.demand_per_min}/min casts \u2192 ${t.kicks_needed_per_min}/min kicks needed)` : "";
+      if (t.coverage_pct < 100) {
+        w.push({
+          severity: t.coverage_pct < 60 ? "critical" : "warning",
+          category: "throughput",
+          message: `Throughput (L2): must-kick coverage ~${t.coverage_pct}% \u2014 ${t.kicks_needed_per_min}/min kicks needed vs ${t.supply_per_min}/min supply, ~${t.let_through_per_min}/min leak${lock}.`
+        });
+      } else {
+        w.push({
+          severity: "info",
+          category: "throughput",
+          coaching: true,
+          message: `Throughput (L2): must-kick stream covered (${t.kicks_needed_per_min}/min kicks needed vs ${t.supply_per_min}/min supply)${lock}.`
+        });
+      }
+    }
+    const sim = r.throughput.sim;
+    if (sim.available && sim.leaked > 0) {
+      const worse = sim.coverage_pct < r.throughput.must_kick.coverage_pct;
+      w.push({
+        severity: sim.coverage_pct < 60 ? "critical" : "warning",
+        category: "throughput",
+        message: `Burst (L3): ~${sim.leaked_per_min}/min must-kick casts leak under simulation (${sim.coverage_pct}% covered, peak ${sim.peak_concurrent} concurrent)${worse ? " \u2014 worse than the steady-state rate: simultaneous casts overwhelm the kickers" : ""}.`
+      });
+    }
+    const csim = r.throughput.cc_sim;
+    if (csim.available && csim.leaked > 0) {
+      const worse = csim.coverage_pct < r.throughput.cc_or_kick.coverage_pct;
+      w.push({
+        severity: csim.coverage_pct < 60 ? "warning" : "caution",
+        category: "cc",
+        message: `Burst (L3): ~${csim.leaked_per_min}/min stoppable casts leak under simulation (${csim.coverage_pct}% covered, peak ${csim.peak_concurrent} concurrent)${worse ? " \u2014 worse than the steady-state rate: simultaneous casts + diminishing returns outrun the CC" : ""}.`
+      });
+    }
+    if (r.throughput.cc_or_kick.available) {
+      const c = r.throughput.cc_or_kick;
+      const lanes = c.by_dr_category.map((d) => d.category).join("/") || "none";
+      if (c.coverage_pct < 100) {
+        w.push({
+          severity: c.coverage_pct < 60 ? "warning" : "caution",
+          category: "cc",
+          message: `Throughput (L2): cc-or-kick coverage ~${c.coverage_pct}% \u2014 ${c.demand_per_min}/min stoppable casts vs ${c.supply_per_min}/min CC, ~${c.let_through_per_min}/min leak (DR lanes: ${lanes}).`
+        });
+      } else {
+        w.push({
+          severity: "info",
+          category: "cc",
+          coaching: true,
+          message: `Throughput (L2): cc-or-kick stream covered (${c.demand_per_min}/min vs ${c.supply_per_min}/min CC across DR lanes: ${lanes}).`
+        });
+      }
+      if (c.by_dr_category.length === 1 && c.demand_per_min > 0) {
+        w.push({
+          severity: "caution",
+          category: "cc",
+          coaching: true,
+          message: `All cc-or-kick stops share one DR category (${c.by_dr_category[0].category}) \u2014 diminishing returns make chaining unreliable; bring a second category.`
+        });
+      }
+    }
+    const secs = (ms) => (ms / 1e3).toFixed(1);
+    for (const kt of r.kick_timing.threats) {
+      const name = labelCast(kt.cast);
+      const ttc = kt.effective_interval_now_ms !== null && kt.effective_interval_long_ms !== null ? ` \u2014 pushing its next cast from ~${secs(kt.effective_interval_now_ms)}s to ~${secs(kt.effective_interval_long_ms)}s after it begins` : "";
+      if ((kt.style === "react" || kt.style === "mid") && kt.gain_ms >= MIN_KICK_GAIN_MS && kt.long_kick_target_ms !== null) {
+        const how = kt.style === "react" ? `react-kicking ${name} at ~${kt.pct}% of its cast (~${secs(kt.kick_point_ms)}s in)` : `kicking ${name} around mid-cast (~${kt.pct}%)`;
+        w.push({
+          severity: "caution",
+          category: "kick_timing",
+          coaching: true,
+          subjects: subj([kt.cast]),
+          message: `You're ${how}. Long-kicking to ~${Math.round(LONG_KICK_TARGET_PCT * 100)}% (~${secs(kt.long_kick_target_ms)}s) buys ~${secs(kt.gain_ms)}s more school-lockout coverage${ttc}.`
+        });
+      } else if (kt.style === "long") {
+        const lockTxt = kt.lockout_ms !== null ? ` (${secs(kt.lockout_ms)}s school lock)` : "";
+        w.push({
+          severity: "info",
+          category: "kick_timing",
+          coaching: true,
+          subjects: subj([kt.cast]),
+          message: `You're already long-kicking ${name} at ~${kt.pct}%${lockTxt} \u2014 maximizing the lockout. Keep it up.`
+        });
+      }
+    }
+    const chTargetTxt = secs(CHANNEL_REACT_TARGET_MS);
+    for (const ch of r.channel_timing.threats) {
+      const name = labelCast(ch.cast);
+      const at = secs(ch.reaction_ms);
+      const toolWord = ch.tool === "cc" ? "CC/AoE-stop" : "interrupt";
+      const budgetHint = ch.tool === "cc" ? " (CC hard-stops it \u2014 saves the interrupt)" : "";
+      const lethal = ch.cast.is_lethal;
+      if (ch.fast) {
+        w.push({
+          severity: "info",
+          category: "channel_timing",
+          coaching: true,
+          subjects: subj([ch.cast]),
+          message: `You're stopping ${name} at ~${at}s of its channel (n=${ch.samples}) \u2014 about the floor for a cast you can see coming.${lethal ? " It can one-shot, so stay on it." : ""}`
+        });
+      } else {
+        const gain = secs(ch.reaction_ms - CHANNEL_REACT_TARGET_MS);
+        w.push({
+          severity: lethal ? "warning" : "caution",
+          category: "channel_timing",
+          coaching: true,
+          subjects: subj([ch.cast]),
+          message: `You're letting ${name} channel ~${at}s before stopping it (n=${ch.samples}) \u2014 it ticks damage the whole time${lethal ? " and it can one-shot" : ""}. You can see the cast bar, so pre-commit your ${toolWord}${budgetHint} the instant it starts and cut this to ~${chTargetTxt}s (~${gain}s fewer ticks).`
+        });
+      }
+    }
+    for (const ce of r.completion_effect.threats) {
+      const name = labelCast(ce.cast);
+      const lethal = ce.cast.is_lethal;
+      if (!ce.deniable) {
+        w.push({
+          severity: lethal ? "warning" : "caution",
+          category: "completion_effect",
+          coaching: !lethal,
+          subjects: subj([ce.cast]),
+          message: `Nothing in the group can stop ${name} \u2014 it will complete and ${ce.effect}.`
+        });
+        continue;
+      }
+      const how = ce.tools.length === 2 ? "Crowd Control or interrupt" : ce.tools[0] === "cc" ? "Crowd Control" : "Interrupt";
+      w.push({
+        severity: lethal ? "warning" : "caution",
+        category: "completion_effect",
+        coaching: !lethal,
+        subjects: subj([ce.cast]),
+        message: `${how} ${name} before it completes to deny the ${ce.effect} \u2014 it fires only if the channel finishes, so any stop in time denies it.`
+      });
+    }
+    for (const mn of r.notes.threats) {
+      if (foldedKeys.has(castKey(mn.cast))) continue;
+      const lethal = mn.cast.is_lethal || mn.cast.scales_to_lethal;
+      w.push({
+        // normally coaching (the functional dimension owns the danger); but a dispel_detonates spread-bomb's note IS
+        // its only card (we suppressed the dispel/survive/reposition lines), so a lethal one is ESSENTIAL (expert sees it).
+        severity: lethal ? "caution" : "info",
+        category: "notes",
+        coaching: mn.cast.dispel_detonates && lethal ? void 0 : true,
+        subjects: subj([mn.cast]),
+        role_advice: notesRoleAdvice(mn.cast, mn.note, group),
+        message: `${labelCast(mn.cast)}: ${mn.note}`
+      });
+    }
+    for (const d of r.dispels) {
+      if (!d.covered) {
+        const uncovered = d.casts.filter((c) => !d.freedom_covered_casts.includes(c) && !d.immunity_covered_casts.includes(c));
+        if (uncovered.length > 0) {
+          const on = landsOn(uncovered);
+          const tail = on ? `${on}, and no group spec can dispel ${d.dispel_type}` : `, but no group spec can dispel ${d.dispel_type}`;
+          w.push({
+            severity: "warning",
+            category: "dispel",
+            subjects: subj(uncovered),
+            message: `Pull applies ${sumCount(uncovered)} ${d.dispel_type} debuff(s)${tail}: ${list(uncovered)}.`,
+            role_advice: dispelGapAdvice(d.dispel_type, uncovered)
+          });
+        }
+        if (d.immunity_covered_casts.length > 0 && d.immunity_removals.length > 0) {
+          const who = d.immunity_removals.map((im) => `${im.ability} (${im.spec.class} ${im.spec.spec_name})`).join(", ");
+          w.push({
+            severity: "caution",
+            category: "dispel",
+            subjects: subj(d.immunity_covered_casts),
+            message: `Applies a ${d.dispel_type} no standard dispel removes \u2014 your only removal is ${who}. The immunity clears the ${d.dispel_type}, but it DROPS ALL THREAT on its target for the duration: if you use it on the tank, have a /cancelaura macro ready and re-establish aggro immediately.`,
+            role_advice: immunityDispelAdvice(d.dispel_type, d.immunity_removals)
+          });
+        }
+      } else if (d.conditional) {
+        w.push({
+          severity: "caution",
+          category: "dispel",
+          subjects: subj(d.casts),
+          message: `${d.dispel_type} debuff(s) only removable conditionally (e.g. requires an active pet): ${d.covering_specs.map((s) => `${s.class} ${s.spec_name}`).join(", ")}.`,
+          role_advice: conditionalDispelAdvice(d.dispel_type, d.covering_specs)
+        });
+      }
+    }
+    if (r.soothe.enrages.length > 0 && !r.soothe.can_soothe) {
+      w.push({
+        severity: "warning",
+        category: "soothe",
+        subjects: subj(r.soothe.enrages),
+        message: `Enrage present (${list(r.soothe.enrages)}) but no group spec can soothe.`
+      });
+    }
+    const unpreventableLethal = r.awareness.unpreventable_lethal.filter((t) => t.positioning.length === 0 && !t.dispel_detonates && !t.tank_buster && !(t.is_aoe && !t.unavoidable && !(t.mechanic !== null && PARTY_CC_WORD[t.mechanic] !== void 0)));
+    if (unpreventableLethal.length > 0) {
+      w.push({
+        severity: "critical",
+        category: "survive",
+        subjects: subj(unpreventableLethal),
+        message: `Can't be prevented and hits lethally \u2014 plan a defensive/heal for it: ${list(unpreventableLethal)}${landsOn(unpreventableLethal)}.`
+      });
+    }
+    if (r.awareness.mitigable_after.length > 0) {
+      const ma = r.awareness.mitigable_after;
+      const hasDot = ma.some((t) => t.dot);
+      const hasUnavoid = ma.some((t) => t.unavoidable || t.is_aoe);
+      const nature = hasUnavoid && hasDot ? "an unavoidable party-wide DoT" : hasDot ? "a damage-over-time debuff" : hasUnavoid ? "an unavoidable party-wide hit" : "a debuff";
+      w.push({
+        severity: "info",
+        category: "survive",
+        coaching: true,
+        subjects: subj(ma),
+        message: `Cannot be stopped \u2014 ${nature}, but removable: dispel it after it lands${hasDot ? " to end the ticks" : ""}${hasUnavoid ? "; heal/mitigate through until then" : ""}${landsOn(ma)}: ${list(ma)}.`,
+        role_advice: mitigableAfterAdvice(ma, group)
+      });
+    }
+    const preventable = preventableUpstream(r.threats);
+    for (const sc of r.scaling) {
+      const name = labelCast(sc.cast);
+      const on = landsOn([sc.cast]);
+      const upstream = preventable.get(sc.cast.spell_id);
+      if (sc.answer === "survive" && upstream) {
+        w.push({
+          severity: "caution",
+          category: "scaling",
+          coaching: true,
+          subjects: subj([sc.cast]),
+          message: `${name} scales to lethal \u2014 prevent it by soaking ${upstream.spell_name} (an unsoaked point erupts into it)${on}. Forgiving now, but build the soak habit before it one-shots at higher keys.`
+        });
+      } else if (sc.answer === "survive") {
+        w.push({
+          severity: "caution",
+          category: "scaling",
+          coaching: true,
+          subjects: subj([sc.cast]),
+          message: `${name} scales to lethal \u2014 can't be prevented or dispelled${on}. Forgiving now, but build the defensive/positioning habit before it one-shots at higher keys.`
+        });
+      } else if (sc.covered) {
+        w.push({
+          severity: "caution",
+          category: "scaling",
+          coaching: true,
+          subjects: subj([sc.cast]),
+          message: `${name} scales to lethal \u2014 out-healable now, but becomes a must-${answerVerb(sc.answer)}${on}. Your party can ${answerVerb(sc.answer)} it; build the habit now so it's automatic when it's lethal.`
+        });
+      } else {
+        w.push({
+          severity: "critical",
+          category: "scaling",
+          subjects: subj([sc.cast]),
+          message: `${name} scales to lethal and your party has no ${answerNoun(sc.answer, sc.cast)} for it${on} \u2014 manageable now; becomes a kill at higher keys.`
+        });
+      }
+    }
+    const dispelGapKeys = /* @__PURE__ */ new Set();
+    for (const d of r.dispels) if (!d.covered) {
+      for (const c of d.casts) if (!d.freedom_covered_casts.includes(c)) dispelGapKeys.add(castKey(c));
+    }
+    for (const tt of r.targeting) {
+      if (tt.focus !== "avoids_tank" || dispelGapKeys.has(castKey(tt.cast))) continue;
+      const lethal = tt.cast.is_lethal;
+      w.push({
+        severity: lethal ? "warning" : "caution",
+        category: "targeting",
+        coaching: true,
+        subjects: subj([tt.cast]),
+        message: `${labelCast(tt.cast)} bypasses your tank \u2014 it lands on your ${rolePhrase(orderRoles(tt.affected))}, who can't soak it like the tank.${lethal ? " It is lethal: pre-plan personals/externals." : " Pre-plan personals/spot-heals."}`
+      });
+    }
+    for (const mt of r.movement.threats) {
+      const name = labelCast(mt.cast);
+      const on = landsOn([mt.cast]);
+      const verb = mt.mechanic === "rooted" ? "roots" : "snares";
+      const moveAdvice = movementAdvice(mt, group);
+      if (mt.coverage === "none") {
+        w.push(mt.lethal_if_unfreed ? { severity: "critical", category: "movement", subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on} and no one in the group can clear ${mt.mechanic} (shapeshift / Blessing of Freedom / Tiger's Lust \u2026) \u2014 lethal if not freed.` } : { severity: "caution", category: "movement", subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} your party${on} and no group spec can remove ${mt.mechanic} \u2014 position to avoid it (no movement freedom for it in the comp).` });
+      } else if (mt.coverage === "ally") {
+        w.push({ severity: "caution", category: "movement", coaching: true, subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target \u2014 clearable on anyone by ${freeList(mt.free_specs)} (ally-castable freedom).` });
+      } else if (mt.coverage === "self") {
+        w.push({ severity: "caution", category: "movement", coaching: true, subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on} \u2014 only self-clearable (${freeList(mt.free_specs)}); a ${mt.mechanic} player without their own freedom is stuck. Bring an ally-castable freedom or position.` });
+      } else {
+        w.push({ severity: "caution", category: "movement", coaching: true, subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on} \u2014 only a conditional freedom covers it (${freeList(mt.free_specs)}; e.g. Soulburn-timed Demonic Circle) \u2014 unreliable; treat as uncovered and position.` });
+      }
+    }
+    const canKick = r.stops.interrupt_supply > 0;
+    for (const ct of r.cc_on_party.threats) {
+      const name = labelCast(ct.cast);
+      const scope = ct.aoe ? "your whole party" : "a party member";
+      const on = ct.aoe ? "" : landsOn([ct.cast]);
+      const effect = ccConsequence(ct.category, ct.aoe);
+      if (ct.interruptible && canKick) {
+        const lead = ct.aoe ? `${name} ${ccVerb(ct.category)} ${scope} \u2014 prioritize this kick; if it lands, ${effect}` : `${name} ${ccVerb(ct.category)} ${scope}${on} \u2014 kick it to prevent (else ${effect})`;
+        w.push({ severity: "caution", category: "cc", coaching: true, subjects: subj([ct.cast]), message: `${lead}.` });
+      } else {
+        const why = ct.interruptible ? "no interrupt in the comp" : "cannot be interrupted";
+        const severity = ct.cast.is_lethal ? "critical" : ct.aoe || ct.category === "fear" || ct.category === "charm" ? "warning" : "caution";
+        w.push({ severity, category: "cc", subjects: subj([ct.cast]), message: `${name} ${ccVerb(ct.category)} ${scope}${on} and ${why} \u2014 it lands: ${effect}.` });
+      }
+    }
+    for (const dt of r.displacement.threats) {
+      const name = labelCast(dt.cast);
+      const tt = targetingByKey.get(castKey(dt.cast));
+      const backlineKnockback = dt.kinds.includes("knockback") && tt?.focus === "avoids_tank" && tt.affected.some((role) => CASTER_ROLES.has(role));
+      const on = tt?.focus === "party_wide" ? "" : landsOn([dt.cast]);
+      const lethal = dt.cast.is_lethal;
+      const severity = lethal ? "critical" : dt.kinds.includes("pull") || dt.kinds.includes("cast_pushback") || backlineKnockback ? "caution" : "info";
+      w.push({
+        severity,
+        category: "displacement",
+        coaching: lethal ? void 0 : true,
+        subjects: subj([dt.cast]),
+        message: `${name} ${displacementVerb(dt.kinds)} your party${on}${lethal ? " (lethal)" : ""} \u2014 ${displacementConsequence(dt.kinds, backlineKnockback)}.`
+      });
+    }
+    for (const vt of r.vulnerability.threats) {
+      if (foldedKeys.has(castKey(vt.cast))) continue;
+      const name = labelCast(vt.cast);
+      const schoolWord = vt.school === "all" ? "" : `${vt.school} `;
+      const forWindow = vt.duration_s ? ` for ${vt.duration_s}s` : "";
+      const amp = `ramps ${schoolWord}damage taken +${vt.pct}%${forWindow}${vt.stacks ? " (stacks)" : ""}`;
+      const combo = vt.amplified_casts.length ? ` \u2014 amplifies ${list(vt.amplified_casts)} (a +${vt.pct}% bigger hit${vt.removal_covered ? "" : " with no way to soften it"})` : "";
+      const removalText = vt.removal === "dispel" ? vt.removal_covered ? "dispel it to clear the amp" : `no ${vt.cast.dispel_type} dispel in the comp \u2014 the amp lingers` : vt.removal === "stop" ? vt.removal_covered ? "stop the cast (kick/CC) to deny the amp" : "no kick/CC to stop the cast \u2014 it lands" : "no removal \u2014 pre-plan an external/personal for the amplified hit";
+      const lethalCombo = vt.amplified_casts.length > 0;
+      const severity = lethalCombo && !vt.removal_covered ? "critical" : lethalCombo && vt.removal_covered || vt.stacks && !vt.removal_covered ? "warning" : "caution";
+      w.push({
+        severity,
+        category: "vulnerability",
+        coaching: severity === "caution" ? true : void 0,
+        subjects: subj([vt.cast]),
+        role_advice: vulnerabilityAdvice(vt, group),
+        message: `${name} ${amp}${combo} \u2014 ${removalText}.`
+      });
+    }
+    if (r.misplays.scatter_abilities.length > 0) {
+      w.push({
+        severity: "caution",
+        category: "misplay",
+        coaching: true,
+        message: `Group brings knock-away(s) that can unstack the pull (AoE/cleave DPS loss): ${r.misplays.scatter_abilities.map((a) => `${a.spell_name} (${a.spec.class} ${a.spec.spec_name})`).join(", ")}.`
+      });
+    }
+    if (r.misplays.fear_abilities.length > 0) {
+      w.push({
+        severity: "caution",
+        category: "misplay",
+        coaching: true,
+        message: `Group brings fear(s) \u2014 feared mobs may pull extra packs: ${r.misplays.fear_abilities.map((a) => `${a.spell_name} (${a.spec.class} ${a.spec.spec_name})`).join(", ")}.`
+      });
+    }
+    for (const tb of r.tank_buster.threats) {
+      if (foldedKeys.has(castKey(tb.cast))) continue;
+      const name = labelCast(tb.cast);
+      const tbAdvice = tankBusterAdvice(tb);
+      const hr = [...tb.high_risk, ...tb.cast.high_risk];
+      const high_risk = hr.length ? hr : void 0;
+      if (!tb.cast.is_lethal) {
+        const hint = tb.ally_answers.length ? `, with an external (${externalList(tb.ally_answers)}) if it spikes` : "";
+        w.push({ severity: "info", category: "tank_buster", coaching: true, subjects: subj([tb.cast]), role_advice: tbAdvice, high_risk, message: `${name} is a tank-buster \u2014 tank actives cover it${hint}.` });
+      } else if (tb.ally_answers.length > 0) {
+        w.push({
+          severity: "warning",
+          category: "tank_buster",
+          subjects: subj([tb.cast]),
+          role_advice: tbAdvice,
+          high_risk,
+          message: `${name} is a lethal tank-buster \u2014 pre-plan an external on the tank: ${externalList(tb.ally_answers)}.`
+        });
+      } else if (tb.tank_self_answer) {
+        const a = tb.tank_self_answer;
+        const verb = a.mechanism === "immunity" ? "immune" : a.mechanism === "death_prevent" ? "survive" : "mitigate";
+        const scopeNote = tb.tank_self_scoped ? a.scope === "single" ? " (single-target \u2014 brand the lone dangerous creature)" : " (blanket mitigation \u2014 multiple dangerous creatures in the pull)" : "";
+        w.push({
+          severity: "warning",
+          category: "tank_buster",
+          subjects: subj([tb.cast]),
+          role_advice: tbAdvice,
+          high_risk,
+          message: `${name} is a lethal tank-buster with no ally external \u2014 your ${a.spec.class} ${a.spec.spec_name} tank should ${verb} it with ${a.ability}${scopeNote}.`
+        });
+      } else {
+        w.push({
+          severity: "critical",
+          category: "tank_buster",
+          subjects: subj([tb.cast]),
+          role_advice: tbAdvice,
+          high_risk,
+          message: `${name} is a lethal tank-buster and the comp brings no external \u2014 the tank should plan a major defensive for it.`
+        });
+      }
+    }
+    const cheat = r.tank_buster.tank_cheat_death;
+    if (cheat && r.tank_buster.threats.some((tb) => tb.cast.is_lethal)) {
+      w.push({
+        severity: "info",
+        category: "tank_buster",
+        coaching: true,
+        message: `Heads-up: your ${cheat.spec.class} ${cheat.spec.spec_name} tank's ${cheat.ability} is a passive backstop here if a hit would otherwise be lethal \u2014 still plan a defensive, don't lean on it.`
+      });
+    }
+    for (const td of r.target_drop.threats) {
+      const name = labelCast(td.cast);
+      const who = freeList(td.droppers);
+      w.push({
+        severity: "info",
+        category: "target_drop",
+        coaching: true,
+        subjects: subj([td.cast]),
+        message: td.targeting_known ? `${name} is a single-target lethal cast \u2014 ${who} can drop it (Vanish / Feign Death / Ice Block / Invisibility) when targeted; a Night Elf can Shadowmeld it.` : `${name} is a single-target lethal cast \u2014 if it fixates ${who}, they can drop it (Vanish / Feign Death / Ice Block / Invisibility); a Night Elf can Shadowmeld it.`
+      });
+    }
+    for (const st of r.dps_survival.threats) {
+      if (st.personal_answers.length === 0) continue;
+      w.push({
+        severity: "info",
+        category: "dps_survival",
+        coaching: true,
+        subjects: subj([st.cast]),
+        message: `${labelCast(st.cast)} can one-shot a squishy${landsOn([st.cast])} \u2014 at-risk specs can answer with their own personal: ${externalList(st.personal_answers)}.`,
+        role_advice: dpsSurvivalAdvice(st)
+      });
+    }
+    const dpsCheatSeen = /* @__PURE__ */ new Set();
+    for (const st of r.dps_survival.threats) {
+      for (const cd of st.cheat_death_specs) {
+        if (dpsCheatSeen.has(cd.spec.spec_id)) continue;
+        dpsCheatSeen.add(cd.spec.spec_id);
+        w.push({
+          severity: "info",
+          category: "dps_survival",
+          coaching: true,
+          message: `Heads-up: your ${cd.spec.class} ${cd.spec.spec_name}'s ${cd.ability} is a passive backstop if a one-shot here would otherwise kill them \u2014 still use a personal, don't lean on it.`
+        });
+      }
+    }
+    for (const pc of r.pet_choice.warlocks) {
+      for (const g of pc.gaps) {
+        const o = g.option;
+        const provides = o.provides === "dispel" ? `a ${o.dispel_type} dispel` : o.provides === "cc" ? "a CC" : o.provides;
+        w.push({
+          severity: "caution",
+          category: "pet_choice",
+          coaching: true,
+          message: `${pc.spec.class} ${pc.spec.spec_name} could swap to ${petLabel(o.pet)} (${o.name} \u2014 ${provides}) to cover the ${g.gap} gap no one else answers \u2014 at the cost of ${defaultPetTool(pc.default_pet)}.`
+        });
+      }
+    }
+    const comp = r.composition;
+    if (!comp.lust.covered) {
+      w.push({ severity: "caution", category: "composition", coaching: true, message: "No lust in the comp (Bloodlust / Time Warp / Fury of the Aspects / Primal Rage) \u2014 no burst-haste window for big pulls and bosses." });
+    }
+    if (!comp.battle_rez.covered) {
+      w.push({ severity: "caution", category: "composition", coaching: true, message: "No battle rez (Rebirth / Raise Ally / Soulstone / Intercession) \u2014 a death can't be recovered mid-key." });
+    }
+    const broughtBuffs = comp.raid_buffs.filter((b) => b.covered).map((b) => BUFF_LABEL[b.kind]);
+    if (broughtBuffs.length > 0) {
+      w.push({ severity: "info", category: "composition", coaching: true, message: `Raid buffs covered: ${broughtBuffs.join(", ")}.` });
+    }
+    const FOLD_CATEGORIES = /* @__PURE__ */ new Set([
+      "targeting",
+      "movement",
+      "cc",
+      "displacement",
+      "vulnerability",
+      "tank_buster",
+      "target_drop",
+      "dps_survival",
+      "kick_timing",
+      "channel_timing",
+      "completion_effect",
+      "notes",
+      "scaling",
+      "dispel",
+      "survive",
+      "soothe"
+    ]);
+    const subjNameKey = (s) => `${s.npc_name}|${s.spell_name}`;
+    const isFoldable = (wn) => !wn.consolidated && (wn.subjects?.length ?? 0) === 1 && FOLD_CATEGORIES.has(wn.category);
+    const cardedNameKeys = /* @__PURE__ */ new Set();
+    for (const wn of w) {
+      if ((wn.consolidated || isFoldable(wn)) && (wn.subjects?.length ?? 0) === 1) cardedNameKeys.add(subjNameKey(wn.subjects[0]));
+    }
+    const notCarded = (t) => !cardedNameKeys.has(`${t.npc_name}|${t.spell_name}`);
+    const mitigableKeys = new Set(r.awareness.mitigable_after.map(castKey));
+    const unavoidableShown = r.awareness.unavoidable_casts.filter((t) => !mitigableKeys.has(castKey(t)) && notCarded(t));
+    if (unavoidableShown.length > 0) {
+      const lethal = unavoidableShown.some((t) => t.is_lethal);
+      w.push({
+        severity: lethal ? "warning" : "info",
+        category: "awareness",
+        coaching: lethal ? void 0 : true,
+        subjects: subj(unavoidableShown),
+        message: `${sumCount(unavoidableShown)} unavoidable party-wide cast(s) \u2014 heal/mitigate through${lethal ? " (lethal without a cooldown)" : ""}: ${list(unavoidableShown)}.`
+      });
+    }
+    const avoidable = r.awareness.avoidable_casts.filter((t) => !t.dispel_detonates && notCarded(t));
+    if (avoidable.length > 0) {
+      const lethal = avoidable.some((t) => t.is_lethal);
+      w.push({
+        severity: lethal ? "caution" : "info",
+        category: "awareness",
+        coaching: lethal ? void 0 : true,
+        subjects: subj(avoidable),
+        message: `${sumCount(avoidable)} avoidable cast(s) \u2014 reposition${lethal ? " (lethal if you stand in it)" : ""}: ${avoidable.map((t) => `${t.spell_name} [${avoidanceHint(t)}]`).join(", ")}.`
+      });
+    }
+    const dotShown = r.awareness.dot_casts.filter((t) => !mitigableKeys.has(castKey(t)) && notCarded(t));
+    if (dotShown.length > 0) {
+      const removable = dotShown.some((t) => FRIENDLY_DISPEL_TYPES.includes(t.dispel_type));
+      w.push({
+        severity: "info",
+        category: "awareness",
+        coaching: true,
+        subjects: subj(dotShown),
+        message: `${sumCount(dotShown)} damage-over-time cast(s) \u2014 sustained pressure${removable ? " (a removable one can be dispelled to end the ticks)" : ""}: ${list(dotShown)}.`
+      });
+    }
+    const threatByName = new Map(r.threats.map((t) => [`${t.npc_name}|${t.spell_name}`, t]));
+    const folded = [];
+    const groupAt = /* @__PURE__ */ new Map();
+    const groupMembers = /* @__PURE__ */ new Map();
+    for (const wn of w) {
+      if (!isFoldable(wn)) {
+        folded.push(wn);
+        continue;
+      }
+      const key = subjNameKey(wn.subjects[0]);
+      if (!groupMembers.has(key)) {
+        groupMembers.set(key, []);
+        groupAt.set(key, folded.length);
+        folded.push(wn);
+      }
+      groupMembers.get(key).push(wn);
+    }
+    const failGates = failGatesLethal(r.threats);
+    for (const [key, members] of groupMembers) {
+      const cast = threatByName.get(key);
+      if (cast) folded[groupAt.get(key)] = buildCastCard(cast, members, failGates.has(cast.spell_id));
+    }
+    return folded.map((x) => ({ ...x, ...classifyWarning(x) })).sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]);
+  }
+  var RESPONSIBLE = {
+    interrupt: ["dps"],
+    cc: ["dps"],
+    throughput: ["dps"],
+    kick_timing: ["dps"],
+    channel_timing: ["dps"],
+    completion_effect: ["dps"],
+    dispel: ["healer"],
+    soothe: ["dps"],
+    tank_buster: ["tank"],
+    survive: ["healer"]
+  };
+  function classifyWarning(w) {
+    const subs = w.subjects ?? [];
+    const source = subs.length === 0 ? "group" : subs.some((s) => s.is_boss || s.is_boss_add) ? "boss" : "trash";
+    const roles = /* @__PURE__ */ new Set();
+    for (const s of subs) for (const tr of s.target_roles ?? []) roles.add(tr === "tank" ? "tank" : tr === "healer" ? "healer" : "dps");
+    for (const r of RESPONSIBLE[w.category] ?? []) roles.add(r);
+    return { source, roles: [...roles] };
+  }
+  var BUFF_LABEL = {
+    lust: "Bloodlust",
+    intellect: "Arcane Intellect (Intellect)",
+    stamina: "Power Word: Fortitude (Stamina)",
+    attack_power: "Battle Shout (Attack Power)",
+    versatility: "Mark of the Wild (Versatility)",
+    mastery: "Skyfury (Mastery)",
+    all_vuln: "Hunter's Mark (+all damage)",
+    magic_vuln: "Chaos Brand (+magic damage)",
+    physical_vuln: "Mystic Touch (+physical damage)"
+  };
+  function answerVerb(a) {
+    return a === "kick" ? "interrupt" : a === "cc" ? "CC" : a === "dispel" ? "dispel" : a === "soothe" ? "soothe" : a === "free" ? "free" : "mitigate";
+  }
+  function answerNoun(a, t) {
+    return a === "kick" ? "interrupt" : a === "cc" ? "CC/stop" : a === "dispel" ? `${t.dispel_type} dispel` : a === "soothe" ? "soothe" : a === "free" ? "root/snare break (movement freedom)" : "answer";
+  }
+  function ccVerb(category) {
+    const v = {
+      fear: "fears",
+      silence: "silences",
+      disorient: "disorients",
+      stun: "stuns",
+      incapacitate: "incapacitates",
+      charm: "charms",
+      banish: "banishes"
+    };
+    return v[category] ?? "CCs";
+  }
+  function ccConsequence(category, aoe = false) {
+    if (aoe) {
+      const a = {
+        fear: "the whole party scatters at once and can chain-pull packs from several directions",
+        silence: "the whole party is silenced \u2014 no heals AND no one left to kick the follow-up",
+        disorient: "the whole party is out of action until hit \u2014 no one can react to the next mechanic",
+        stun: "the whole party is locked out \u2014 no one can dodge or kick what comes next",
+        incapacitate: "the whole party is out of action until hit \u2014 no one can react to the next mechanic",
+        charm: "the whole party turns on each other at once",
+        banish: "the whole party is removed from the fight"
+      };
+      return a[category] ?? "the whole party loses control at once";
+    }
+    const c = {
+      fear: "feared players flee and can pull extra packs",
+      silence: "silenced players can't cast \u2014 your healer can't heal and you can't kick",
+      disorient: "disoriented players are out of action until they take damage",
+      stun: "stunned players are fully locked out",
+      incapacitate: "incapacitated players are out of action until they take damage",
+      charm: "charmed players attack the party",
+      banish: "banished players are removed from the fight"
+    };
+    return c[category] ?? "the party loses control";
+  }
+  function displacementVerb(kinds) {
+    const v = { knockback: "knocks back", pull: "pulls in", cast_pushback: "pushes back the casts of" };
+    const parts = kinds.map((k) => v[k]);
+    if (parts.length <= 1) return parts[0] ?? "displaces";
+    return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
+  }
+  function displacementConsequence(kinds, backlineKnockback) {
+    const parts = [];
+    if (kinds.includes("knockback")) {
+      parts.push(backlineKnockback ? "it lands on your backline and avoids the tank \u2014 your healer/ranged are knocked out of position mid-cast, so pre-position them near terrain" : "pre-position back-to-terrain so no one is punted into the next pack or off a ledge (melee lose uptime)");
+    }
+    if (kinds.includes("pull")) parts.push("ranged/healer get yanked toward the caster into the pack \u2014 pre-position or break it");
+    if (kinds.includes("cast_pushback")) parts.push("your heals/casts land late \u2014 pre-cast or cast while moving");
+    return parts.join("; ");
+  }
+  var MECH_RANK = { immunity: 0, death_prevent: 1, reduction: 2 };
+  var MECH_LABEL = { immunity: "immunity", death_prevent: "death-prevent", reduction: "reduction" };
+  function externalList(answers) {
+    return [...answers].sort((a, b) => MECH_RANK[a.mechanism] - MECH_RANK[b.mechanism]).map((a) => `${a.ability} (${a.spec.class} ${a.spec.spec_name}, ${MECH_LABEL[a.mechanism]})`).join(", ");
+  }
+  function freeList(specs) {
+    return specs.map((s) => `${s.class} ${s.spec_name}`).join(", ") || "none";
+  }
+  var PET_LABEL = { felhunter: "a Felhunter", felguard: "a Felguard", imp: "an Imp", succubus: "a Succubus" };
+  function petLabel(p) {
+    return p === null ? "its pet" : PET_LABEL[p];
+  }
+  function defaultPetTool(p) {
+    return p === "felhunter" ? "its Spell Lock interrupt" : p === "felguard" ? "its Axe Toss interrupt" : "its standing pet utility";
+  }
+  function sumCount(ts) {
+    return ts.reduce((n, t) => n + t.count, 0);
+  }
+  function avoidanceHint(t) {
+    const LABEL = {
+      move_out: "move out",
+      frontal: "out of the cone",
+      line_of_sight: "LoS",
+      spread: "spread",
+      stack: "stack",
+      soak: "soak",
+      bait: "bait it"
+    };
+    const parts = t.positioning.map((p) => LABEL[p] ?? p);
+    return parts.length ? parts.join("/") : "sidestep/LoS";
+  }
+  function castKey(t) {
+    return `${t.npc_id}:${t.spell_id}`;
+  }
+  var ROLE_ORDER = { tank: 0, healer: 1, melee_dps: 2, ranged_dps: 3 };
+  var ROLE_LABEL = { tank: "tank", healer: "healer", melee_dps: "melee DPS", ranged_dps: "ranged DPS" };
+  function orderRoles(roles) {
+    return [...roles].sort((a, b) => ROLE_ORDER[a] - ROLE_ORDER[b]);
+  }
+  function rolePhrase(roles) {
+    const labels = roles.map((r) => ROLE_LABEL[r]);
+    if (labels.length <= 1) return labels[0] ?? "";
+    if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
+    return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
+  }
+  function round1(n) {
+    return Math.round(n * 10) / 10;
+  }
+  function labelCast(t) {
+    return t.count > 1 ? `${t.spell_name} \xD7${t.count} (${t.npc_name})` : `${t.spell_name} (${t.npc_name})`;
+  }
+
+  // node_modules/zod/v3/external.js
+  var external_exports = {};
+  __export(external_exports, {
+    BRAND: () => BRAND,
+    DIRTY: () => DIRTY,
+    EMPTY_PATH: () => EMPTY_PATH,
+    INVALID: () => INVALID,
+    NEVER: () => NEVER,
+    OK: () => OK,
+    ParseStatus: () => ParseStatus,
+    Schema: () => ZodType,
+    ZodAny: () => ZodAny,
+    ZodArray: () => ZodArray,
+    ZodBigInt: () => ZodBigInt,
+    ZodBoolean: () => ZodBoolean,
+    ZodBranded: () => ZodBranded,
+    ZodCatch: () => ZodCatch,
+    ZodDate: () => ZodDate,
+    ZodDefault: () => ZodDefault,
+    ZodDiscriminatedUnion: () => ZodDiscriminatedUnion,
+    ZodEffects: () => ZodEffects,
+    ZodEnum: () => ZodEnum,
+    ZodError: () => ZodError,
+    ZodFirstPartyTypeKind: () => ZodFirstPartyTypeKind,
+    ZodFunction: () => ZodFunction,
+    ZodIntersection: () => ZodIntersection,
+    ZodIssueCode: () => ZodIssueCode,
+    ZodLazy: () => ZodLazy,
+    ZodLiteral: () => ZodLiteral,
+    ZodMap: () => ZodMap,
+    ZodNaN: () => ZodNaN,
+    ZodNativeEnum: () => ZodNativeEnum,
+    ZodNever: () => ZodNever,
+    ZodNull: () => ZodNull,
+    ZodNullable: () => ZodNullable,
+    ZodNumber: () => ZodNumber,
+    ZodObject: () => ZodObject,
+    ZodOptional: () => ZodOptional,
+    ZodParsedType: () => ZodParsedType,
+    ZodPipeline: () => ZodPipeline,
+    ZodPromise: () => ZodPromise,
+    ZodReadonly: () => ZodReadonly,
+    ZodRecord: () => ZodRecord,
+    ZodSchema: () => ZodType,
+    ZodSet: () => ZodSet,
+    ZodString: () => ZodString,
+    ZodSymbol: () => ZodSymbol,
+    ZodTransformer: () => ZodEffects,
+    ZodTuple: () => ZodTuple,
+    ZodType: () => ZodType,
+    ZodUndefined: () => ZodUndefined,
+    ZodUnion: () => ZodUnion,
+    ZodUnknown: () => ZodUnknown,
+    ZodVoid: () => ZodVoid,
+    addIssueToContext: () => addIssueToContext,
+    any: () => anyType,
+    array: () => arrayType,
+    bigint: () => bigIntType,
+    boolean: () => booleanType,
+    coerce: () => coerce,
+    custom: () => custom,
+    date: () => dateType,
+    datetimeRegex: () => datetimeRegex,
+    defaultErrorMap: () => en_default,
+    discriminatedUnion: () => discriminatedUnionType,
+    effect: () => effectsType,
+    enum: () => enumType,
+    function: () => functionType,
+    getErrorMap: () => getErrorMap,
+    getParsedType: () => getParsedType,
+    instanceof: () => instanceOfType,
+    intersection: () => intersectionType,
+    isAborted: () => isAborted,
+    isAsync: () => isAsync,
+    isDirty: () => isDirty,
+    isValid: () => isValid,
+    late: () => late,
+    lazy: () => lazyType,
+    literal: () => literalType,
+    makeIssue: () => makeIssue,
+    map: () => mapType,
+    nan: () => nanType,
+    nativeEnum: () => nativeEnumType,
+    never: () => neverType,
+    null: () => nullType,
+    nullable: () => nullableType,
+    number: () => numberType,
+    object: () => objectType,
+    objectUtil: () => objectUtil,
+    oboolean: () => oboolean,
+    onumber: () => onumber,
+    optional: () => optionalType,
+    ostring: () => ostring,
+    pipeline: () => pipelineType,
+    preprocess: () => preprocessType,
+    promise: () => promiseType,
+    quotelessJson: () => quotelessJson,
+    record: () => recordType,
+    set: () => setType,
+    setErrorMap: () => setErrorMap,
+    strictObject: () => strictObjectType,
+    string: () => stringType,
+    symbol: () => symbolType,
+    transformer: () => effectsType,
+    tuple: () => tupleType,
+    undefined: () => undefinedType,
+    union: () => unionType,
+    unknown: () => unknownType,
+    util: () => util,
+    void: () => voidType
+  });
+
+  // node_modules/zod/v3/helpers/util.js
+  var util;
+  (function(util2) {
+    util2.assertEqual = (_) => {
+    };
+    function assertIs(_arg) {
+    }
+    util2.assertIs = assertIs;
+    function assertNever(_x) {
+      throw new Error();
+    }
+    util2.assertNever = assertNever;
+    util2.arrayToEnum = (items) => {
+      const obj = {};
+      for (const item of items) {
+        obj[item] = item;
+      }
+      return obj;
+    };
+    util2.getValidEnumValues = (obj) => {
+      const validKeys = util2.objectKeys(obj).filter((k) => typeof obj[obj[k]] !== "number");
+      const filtered = {};
+      for (const k of validKeys) {
+        filtered[k] = obj[k];
+      }
+      return util2.objectValues(filtered);
+    };
+    util2.objectValues = (obj) => {
+      return util2.objectKeys(obj).map(function(e) {
+        return obj[e];
+      });
+    };
+    util2.objectKeys = typeof Object.keys === "function" ? (obj) => Object.keys(obj) : (object) => {
+      const keys = [];
+      for (const key in object) {
+        if (Object.prototype.hasOwnProperty.call(object, key)) {
+          keys.push(key);
+        }
+      }
+      return keys;
+    };
+    util2.find = (arr, checker) => {
+      for (const item of arr) {
+        if (checker(item))
+          return item;
+      }
+      return void 0;
+    };
+    util2.isInteger = typeof Number.isInteger === "function" ? (val) => Number.isInteger(val) : (val) => typeof val === "number" && Number.isFinite(val) && Math.floor(val) === val;
+    function joinValues(array, separator = " | ") {
+      return array.map((val) => typeof val === "string" ? `'${val}'` : val).join(separator);
+    }
+    util2.joinValues = joinValues;
+    util2.jsonStringifyReplacer = (_, value) => {
+      if (typeof value === "bigint") {
+        return value.toString();
+      }
+      return value;
+    };
+  })(util || (util = {}));
+  var objectUtil;
+  (function(objectUtil2) {
+    objectUtil2.mergeShapes = (first, second) => {
+      return {
+        ...first,
+        ...second
+        // second overwrites first
+      };
+    };
+  })(objectUtil || (objectUtil = {}));
+  var ZodParsedType = util.arrayToEnum([
+    "string",
+    "nan",
+    "number",
+    "integer",
+    "float",
+    "boolean",
+    "date",
+    "bigint",
+    "symbol",
+    "function",
+    "undefined",
+    "null",
+    "array",
+    "object",
+    "unknown",
+    "promise",
+    "void",
+    "never",
+    "map",
+    "set"
+  ]);
+  var getParsedType = (data) => {
+    const t = typeof data;
+    switch (t) {
+      case "undefined":
+        return ZodParsedType.undefined;
+      case "string":
+        return ZodParsedType.string;
+      case "number":
+        return Number.isNaN(data) ? ZodParsedType.nan : ZodParsedType.number;
+      case "boolean":
+        return ZodParsedType.boolean;
+      case "function":
+        return ZodParsedType.function;
+      case "bigint":
+        return ZodParsedType.bigint;
+      case "symbol":
+        return ZodParsedType.symbol;
+      case "object":
+        if (Array.isArray(data)) {
+          return ZodParsedType.array;
+        }
+        if (data === null) {
+          return ZodParsedType.null;
+        }
+        if (data.then && typeof data.then === "function" && data.catch && typeof data.catch === "function") {
+          return ZodParsedType.promise;
+        }
+        if (typeof Map !== "undefined" && data instanceof Map) {
+          return ZodParsedType.map;
+        }
+        if (typeof Set !== "undefined" && data instanceof Set) {
+          return ZodParsedType.set;
+        }
+        if (typeof Date !== "undefined" && data instanceof Date) {
+          return ZodParsedType.date;
+        }
+        return ZodParsedType.object;
+      default:
+        return ZodParsedType.unknown;
+    }
+  };
+
+  // node_modules/zod/v3/ZodError.js
+  var ZodIssueCode = util.arrayToEnum([
+    "invalid_type",
+    "invalid_literal",
+    "custom",
+    "invalid_union",
+    "invalid_union_discriminator",
+    "invalid_enum_value",
+    "unrecognized_keys",
+    "invalid_arguments",
+    "invalid_return_type",
+    "invalid_date",
+    "invalid_string",
+    "too_small",
+    "too_big",
+    "invalid_intersection_types",
+    "not_multiple_of",
+    "not_finite"
+  ]);
+  var quotelessJson = (obj) => {
+    const json = JSON.stringify(obj, null, 2);
+    return json.replace(/"([^"]+)":/g, "$1:");
+  };
+  var ZodError = class _ZodError extends Error {
+    get errors() {
+      return this.issues;
+    }
+    constructor(issues) {
+      super();
+      this.issues = [];
+      this.addIssue = (sub) => {
+        this.issues = [...this.issues, sub];
+      };
+      this.addIssues = (subs = []) => {
+        this.issues = [...this.issues, ...subs];
+      };
+      const actualProto = new.target.prototype;
+      if (Object.setPrototypeOf) {
+        Object.setPrototypeOf(this, actualProto);
+      } else {
+        this.__proto__ = actualProto;
+      }
+      this.name = "ZodError";
+      this.issues = issues;
+    }
+    format(_mapper) {
+      const mapper = _mapper || function(issue) {
+        return issue.message;
+      };
+      const fieldErrors = { _errors: [] };
+      const processError = (error) => {
+        for (const issue of error.issues) {
+          if (issue.code === "invalid_union") {
+            issue.unionErrors.map(processError);
+          } else if (issue.code === "invalid_return_type") {
+            processError(issue.returnTypeError);
+          } else if (issue.code === "invalid_arguments") {
+            processError(issue.argumentsError);
+          } else if (issue.path.length === 0) {
+            fieldErrors._errors.push(mapper(issue));
+          } else {
+            let curr = fieldErrors;
+            let i = 0;
+            while (i < issue.path.length) {
+              const el = issue.path[i];
+              const terminal = i === issue.path.length - 1;
+              if (!terminal) {
+                curr[el] = curr[el] || { _errors: [] };
+              } else {
+                curr[el] = curr[el] || { _errors: [] };
+                curr[el]._errors.push(mapper(issue));
+              }
+              curr = curr[el];
+              i++;
+            }
+          }
+        }
+      };
+      processError(this);
+      return fieldErrors;
+    }
+    static assert(value) {
+      if (!(value instanceof _ZodError)) {
+        throw new Error(`Not a ZodError: ${value}`);
+      }
+    }
+    toString() {
+      return this.message;
+    }
+    get message() {
+      return JSON.stringify(this.issues, util.jsonStringifyReplacer, 2);
+    }
+    get isEmpty() {
+      return this.issues.length === 0;
+    }
+    flatten(mapper = (issue) => issue.message) {
+      const fieldErrors = {};
+      const formErrors = [];
+      for (const sub of this.issues) {
+        if (sub.path.length > 0) {
+          const firstEl = sub.path[0];
+          fieldErrors[firstEl] = fieldErrors[firstEl] || [];
+          fieldErrors[firstEl].push(mapper(sub));
+        } else {
+          formErrors.push(mapper(sub));
+        }
+      }
+      return { formErrors, fieldErrors };
+    }
+    get formErrors() {
+      return this.flatten();
+    }
+  };
+  ZodError.create = (issues) => {
+    const error = new ZodError(issues);
+    return error;
+  };
+
+  // node_modules/zod/v3/locales/en.js
+  var errorMap = (issue, _ctx) => {
+    let message;
+    switch (issue.code) {
+      case ZodIssueCode.invalid_type:
+        if (issue.received === ZodParsedType.undefined) {
+          message = "Required";
+        } else {
+          message = `Expected ${issue.expected}, received ${issue.received}`;
+        }
+        break;
+      case ZodIssueCode.invalid_literal:
+        message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util.jsonStringifyReplacer)}`;
+        break;
+      case ZodIssueCode.unrecognized_keys:
+        message = `Unrecognized key(s) in object: ${util.joinValues(issue.keys, ", ")}`;
+        break;
+      case ZodIssueCode.invalid_union:
+        message = `Invalid input`;
+        break;
+      case ZodIssueCode.invalid_union_discriminator:
+        message = `Invalid discriminator value. Expected ${util.joinValues(issue.options)}`;
+        break;
+      case ZodIssueCode.invalid_enum_value:
+        message = `Invalid enum value. Expected ${util.joinValues(issue.options)}, received '${issue.received}'`;
+        break;
+      case ZodIssueCode.invalid_arguments:
+        message = `Invalid function arguments`;
+        break;
+      case ZodIssueCode.invalid_return_type:
+        message = `Invalid function return type`;
+        break;
+      case ZodIssueCode.invalid_date:
+        message = `Invalid date`;
+        break;
+      case ZodIssueCode.invalid_string:
+        if (typeof issue.validation === "object") {
+          if ("includes" in issue.validation) {
+            message = `Invalid input: must include "${issue.validation.includes}"`;
+            if (typeof issue.validation.position === "number") {
+              message = `${message} at one or more positions greater than or equal to ${issue.validation.position}`;
+            }
+          } else if ("startsWith" in issue.validation) {
+            message = `Invalid input: must start with "${issue.validation.startsWith}"`;
+          } else if ("endsWith" in issue.validation) {
+            message = `Invalid input: must end with "${issue.validation.endsWith}"`;
+          } else {
+            util.assertNever(issue.validation);
+          }
+        } else if (issue.validation !== "regex") {
+          message = `Invalid ${issue.validation}`;
+        } else {
+          message = "Invalid";
+        }
+        break;
+      case ZodIssueCode.too_small:
+        if (issue.type === "array")
+          message = `Array must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `more than`} ${issue.minimum} element(s)`;
+        else if (issue.type === "string")
+          message = `String must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `over`} ${issue.minimum} character(s)`;
+        else if (issue.type === "number")
+          message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
+        else if (issue.type === "bigint")
+          message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
+        else if (issue.type === "date")
+          message = `Date must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${new Date(Number(issue.minimum))}`;
+        else
+          message = "Invalid input";
+        break;
+      case ZodIssueCode.too_big:
+        if (issue.type === "array")
+          message = `Array must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `less than`} ${issue.maximum} element(s)`;
+        else if (issue.type === "string")
+          message = `String must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `under`} ${issue.maximum} character(s)`;
+        else if (issue.type === "number")
+          message = `Number must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
+        else if (issue.type === "bigint")
+          message = `BigInt must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
+        else if (issue.type === "date")
+          message = `Date must be ${issue.exact ? `exactly` : issue.inclusive ? `smaller than or equal to` : `smaller than`} ${new Date(Number(issue.maximum))}`;
+        else
+          message = "Invalid input";
+        break;
+      case ZodIssueCode.custom:
+        message = `Invalid input`;
+        break;
+      case ZodIssueCode.invalid_intersection_types:
+        message = `Intersection results could not be merged`;
+        break;
+      case ZodIssueCode.not_multiple_of:
+        message = `Number must be a multiple of ${issue.multipleOf}`;
+        break;
+      case ZodIssueCode.not_finite:
+        message = "Number must be finite";
+        break;
+      default:
+        message = _ctx.defaultError;
+        util.assertNever(issue);
+    }
+    return { message };
+  };
+  var en_default = errorMap;
+
+  // node_modules/zod/v3/errors.js
+  var overrideErrorMap = en_default;
+  function setErrorMap(map) {
+    overrideErrorMap = map;
+  }
+  function getErrorMap() {
+    return overrideErrorMap;
+  }
+
+  // node_modules/zod/v3/helpers/parseUtil.js
+  var makeIssue = (params) => {
+    const { data, path, errorMaps, issueData } = params;
+    const fullPath = [...path, ...issueData.path || []];
+    const fullIssue = {
+      ...issueData,
+      path: fullPath
+    };
+    if (issueData.message !== void 0) {
+      return {
+        ...issueData,
+        path: fullPath,
+        message: issueData.message
+      };
+    }
+    let errorMessage = "";
+    const maps = errorMaps.filter((m) => !!m).slice().reverse();
+    for (const map of maps) {
+      errorMessage = map(fullIssue, { data, defaultError: errorMessage }).message;
+    }
+    return {
+      ...issueData,
+      path: fullPath,
+      message: errorMessage
+    };
+  };
+  var EMPTY_PATH = [];
+  function addIssueToContext(ctx, issueData) {
+    const overrideMap = getErrorMap();
+    const issue = makeIssue({
+      issueData,
+      data: ctx.data,
+      path: ctx.path,
+      errorMaps: [
+        ctx.common.contextualErrorMap,
+        // contextual error map is first priority
+        ctx.schemaErrorMap,
+        // then schema-bound map if available
+        overrideMap,
+        // then global override map
+        overrideMap === en_default ? void 0 : en_default
+        // then global default map
+      ].filter((x) => !!x)
+    });
+    ctx.common.issues.push(issue);
+  }
+  var ParseStatus = class _ParseStatus {
+    constructor() {
+      this.value = "valid";
+    }
+    dirty() {
+      if (this.value === "valid")
+        this.value = "dirty";
+    }
+    abort() {
+      if (this.value !== "aborted")
+        this.value = "aborted";
+    }
+    static mergeArray(status, results) {
+      const arrayValue = [];
+      for (const s of results) {
+        if (s.status === "aborted")
+          return INVALID;
+        if (s.status === "dirty")
+          status.dirty();
+        arrayValue.push(s.value);
+      }
+      return { status: status.value, value: arrayValue };
+    }
+    static async mergeObjectAsync(status, pairs) {
+      const syncPairs = [];
+      for (const pair of pairs) {
+        const key = await pair.key;
+        const value = await pair.value;
+        syncPairs.push({
+          key,
+          value
+        });
+      }
+      return _ParseStatus.mergeObjectSync(status, syncPairs);
+    }
+    static mergeObjectSync(status, pairs) {
+      const finalObject = {};
+      for (const pair of pairs) {
+        const { key, value } = pair;
+        if (key.status === "aborted")
+          return INVALID;
+        if (value.status === "aborted")
+          return INVALID;
+        if (key.status === "dirty")
+          status.dirty();
+        if (value.status === "dirty")
+          status.dirty();
+        if (key.value !== "__proto__" && (typeof value.value !== "undefined" || pair.alwaysSet)) {
+          finalObject[key.value] = value.value;
+        }
+      }
+      return { status: status.value, value: finalObject };
+    }
+  };
+  var INVALID = Object.freeze({
+    status: "aborted"
+  });
+  var DIRTY = (value) => ({ status: "dirty", value });
+  var OK = (value) => ({ status: "valid", value });
+  var isAborted = (x) => x.status === "aborted";
+  var isDirty = (x) => x.status === "dirty";
+  var isValid = (x) => x.status === "valid";
+  var isAsync = (x) => typeof Promise !== "undefined" && x instanceof Promise;
+
+  // node_modules/zod/v3/helpers/errorUtil.js
+  var errorUtil;
+  (function(errorUtil2) {
+    errorUtil2.errToObj = (message) => typeof message === "string" ? { message } : message || {};
+    errorUtil2.toString = (message) => typeof message === "string" ? message : message?.message;
+  })(errorUtil || (errorUtil = {}));
+
+  // node_modules/zod/v3/types.js
+  var ParseInputLazyPath = class {
+    constructor(parent, value, path, key) {
+      this._cachedPath = [];
+      this.parent = parent;
+      this.data = value;
+      this._path = path;
+      this._key = key;
+    }
+    get path() {
+      if (!this._cachedPath.length) {
+        if (Array.isArray(this._key)) {
+          this._cachedPath.push(...this._path, ...this._key);
+        } else {
+          this._cachedPath.push(...this._path, this._key);
+        }
+      }
+      return this._cachedPath;
+    }
+  };
+  var handleResult = (ctx, result) => {
+    if (isValid(result)) {
+      return { success: true, data: result.value };
+    } else {
+      if (!ctx.common.issues.length) {
+        throw new Error("Validation failed but no issues detected.");
+      }
+      return {
+        success: false,
+        get error() {
+          if (this._error)
+            return this._error;
+          const error = new ZodError(ctx.common.issues);
+          this._error = error;
+          return this._error;
+        }
+      };
+    }
+  };
+  function processCreateParams(params) {
+    if (!params)
+      return {};
+    const { errorMap: errorMap2, invalid_type_error, required_error, description } = params;
+    if (errorMap2 && (invalid_type_error || required_error)) {
+      throw new Error(`Can't use "invalid_type_error" or "required_error" in conjunction with custom error map.`);
+    }
+    if (errorMap2)
+      return { errorMap: errorMap2, description };
+    const customMap = (iss, ctx) => {
+      const { message } = params;
+      if (iss.code === "invalid_enum_value") {
+        return { message: message ?? ctx.defaultError };
+      }
+      if (typeof ctx.data === "undefined") {
+        return { message: message ?? required_error ?? ctx.defaultError };
+      }
+      if (iss.code !== "invalid_type")
+        return { message: ctx.defaultError };
+      return { message: message ?? invalid_type_error ?? ctx.defaultError };
+    };
+    return { errorMap: customMap, description };
+  }
+  var ZodType = class {
+    get description() {
+      return this._def.description;
+    }
+    _getType(input) {
+      return getParsedType(input.data);
+    }
+    _getOrReturnCtx(input, ctx) {
+      return ctx || {
+        common: input.parent.common,
+        data: input.data,
+        parsedType: getParsedType(input.data),
+        schemaErrorMap: this._def.errorMap,
+        path: input.path,
+        parent: input.parent
+      };
+    }
+    _processInputParams(input) {
+      return {
+        status: new ParseStatus(),
+        ctx: {
+          common: input.parent.common,
+          data: input.data,
+          parsedType: getParsedType(input.data),
+          schemaErrorMap: this._def.errorMap,
+          path: input.path,
+          parent: input.parent
+        }
+      };
+    }
+    _parseSync(input) {
+      const result = this._parse(input);
+      if (isAsync(result)) {
+        throw new Error("Synchronous parse encountered promise.");
+      }
+      return result;
+    }
+    _parseAsync(input) {
+      const result = this._parse(input);
+      return Promise.resolve(result);
+    }
+    parse(data, params) {
+      const result = this.safeParse(data, params);
+      if (result.success)
+        return result.data;
+      throw result.error;
+    }
+    safeParse(data, params) {
+      const ctx = {
+        common: {
+          issues: [],
+          async: params?.async ?? false,
+          contextualErrorMap: params?.errorMap
+        },
+        path: params?.path || [],
+        schemaErrorMap: this._def.errorMap,
+        parent: null,
+        data,
+        parsedType: getParsedType(data)
+      };
+      const result = this._parseSync({ data, path: ctx.path, parent: ctx });
+      return handleResult(ctx, result);
+    }
+    "~validate"(data) {
+      const ctx = {
+        common: {
+          issues: [],
+          async: !!this["~standard"].async
+        },
+        path: [],
+        schemaErrorMap: this._def.errorMap,
+        parent: null,
+        data,
+        parsedType: getParsedType(data)
+      };
+      if (!this["~standard"].async) {
+        try {
+          const result = this._parseSync({ data, path: [], parent: ctx });
+          return isValid(result) ? {
+            value: result.value
+          } : {
+            issues: ctx.common.issues
+          };
+        } catch (err) {
+          if (err?.message?.toLowerCase()?.includes("encountered")) {
+            this["~standard"].async = true;
+          }
+          ctx.common = {
+            issues: [],
+            async: true
+          };
+        }
+      }
+      return this._parseAsync({ data, path: [], parent: ctx }).then((result) => isValid(result) ? {
+        value: result.value
+      } : {
+        issues: ctx.common.issues
+      });
+    }
+    async parseAsync(data, params) {
+      const result = await this.safeParseAsync(data, params);
+      if (result.success)
+        return result.data;
+      throw result.error;
+    }
+    async safeParseAsync(data, params) {
+      const ctx = {
+        common: {
+          issues: [],
+          contextualErrorMap: params?.errorMap,
+          async: true
+        },
+        path: params?.path || [],
+        schemaErrorMap: this._def.errorMap,
+        parent: null,
+        data,
+        parsedType: getParsedType(data)
+      };
+      const maybeAsyncResult = this._parse({ data, path: ctx.path, parent: ctx });
+      const result = await (isAsync(maybeAsyncResult) ? maybeAsyncResult : Promise.resolve(maybeAsyncResult));
+      return handleResult(ctx, result);
+    }
+    refine(check, message) {
+      const getIssueProperties = (val) => {
+        if (typeof message === "string" || typeof message === "undefined") {
+          return { message };
+        } else if (typeof message === "function") {
+          return message(val);
+        } else {
+          return message;
+        }
+      };
+      return this._refinement((val, ctx) => {
+        const result = check(val);
+        const setError = () => ctx.addIssue({
+          code: ZodIssueCode.custom,
+          ...getIssueProperties(val)
+        });
+        if (typeof Promise !== "undefined" && result instanceof Promise) {
+          return result.then((data) => {
+            if (!data) {
+              setError();
+              return false;
+            } else {
+              return true;
+            }
+          });
+        }
+        if (!result) {
+          setError();
+          return false;
+        } else {
+          return true;
+        }
+      });
+    }
+    refinement(check, refinementData) {
+      return this._refinement((val, ctx) => {
+        if (!check(val)) {
+          ctx.addIssue(typeof refinementData === "function" ? refinementData(val, ctx) : refinementData);
+          return false;
+        } else {
+          return true;
+        }
+      });
+    }
+    _refinement(refinement) {
+      return new ZodEffects({
+        schema: this,
+        typeName: ZodFirstPartyTypeKind.ZodEffects,
+        effect: { type: "refinement", refinement }
+      });
+    }
+    superRefine(refinement) {
+      return this._refinement(refinement);
+    }
+    constructor(def) {
+      this.spa = this.safeParseAsync;
+      this._def = def;
+      this.parse = this.parse.bind(this);
+      this.safeParse = this.safeParse.bind(this);
+      this.parseAsync = this.parseAsync.bind(this);
+      this.safeParseAsync = this.safeParseAsync.bind(this);
+      this.spa = this.spa.bind(this);
+      this.refine = this.refine.bind(this);
+      this.refinement = this.refinement.bind(this);
+      this.superRefine = this.superRefine.bind(this);
+      this.optional = this.optional.bind(this);
+      this.nullable = this.nullable.bind(this);
+      this.nullish = this.nullish.bind(this);
+      this.array = this.array.bind(this);
+      this.promise = this.promise.bind(this);
+      this.or = this.or.bind(this);
+      this.and = this.and.bind(this);
+      this.transform = this.transform.bind(this);
+      this.brand = this.brand.bind(this);
+      this.default = this.default.bind(this);
+      this.catch = this.catch.bind(this);
+      this.describe = this.describe.bind(this);
+      this.pipe = this.pipe.bind(this);
+      this.readonly = this.readonly.bind(this);
+      this.isNullable = this.isNullable.bind(this);
+      this.isOptional = this.isOptional.bind(this);
+      this["~standard"] = {
+        version: 1,
+        vendor: "zod",
+        validate: (data) => this["~validate"](data)
+      };
+    }
+    optional() {
+      return ZodOptional.create(this, this._def);
+    }
+    nullable() {
+      return ZodNullable.create(this, this._def);
+    }
+    nullish() {
+      return this.nullable().optional();
+    }
+    array() {
+      return ZodArray.create(this);
+    }
+    promise() {
+      return ZodPromise.create(this, this._def);
+    }
+    or(option) {
+      return ZodUnion.create([this, option], this._def);
+    }
+    and(incoming) {
+      return ZodIntersection.create(this, incoming, this._def);
+    }
+    transform(transform) {
+      return new ZodEffects({
+        ...processCreateParams(this._def),
+        schema: this,
+        typeName: ZodFirstPartyTypeKind.ZodEffects,
+        effect: { type: "transform", transform }
+      });
+    }
+    default(def) {
+      const defaultValueFunc = typeof def === "function" ? def : () => def;
+      return new ZodDefault({
+        ...processCreateParams(this._def),
+        innerType: this,
+        defaultValue: defaultValueFunc,
+        typeName: ZodFirstPartyTypeKind.ZodDefault
+      });
+    }
+    brand() {
+      return new ZodBranded({
+        typeName: ZodFirstPartyTypeKind.ZodBranded,
+        type: this,
+        ...processCreateParams(this._def)
+      });
+    }
+    catch(def) {
+      const catchValueFunc = typeof def === "function" ? def : () => def;
+      return new ZodCatch({
+        ...processCreateParams(this._def),
+        innerType: this,
+        catchValue: catchValueFunc,
+        typeName: ZodFirstPartyTypeKind.ZodCatch
+      });
+    }
+    describe(description) {
+      const This = this.constructor;
+      return new This({
+        ...this._def,
+        description
+      });
+    }
+    pipe(target) {
+      return ZodPipeline.create(this, target);
+    }
+    readonly() {
+      return ZodReadonly.create(this);
+    }
+    isOptional() {
+      return this.safeParse(void 0).success;
+    }
+    isNullable() {
+      return this.safeParse(null).success;
+    }
+  };
+  var cuidRegex = /^c[^\s-]{8,}$/i;
+  var cuid2Regex = /^[0-9a-z]+$/;
+  var ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/i;
+  var uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/i;
+  var nanoidRegex = /^[a-z0-9_-]{21}$/i;
+  var jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;
+  var durationRegex = /^[-+]?P(?!$)(?:(?:[-+]?\d+Y)|(?:[-+]?\d+[.,]\d+Y$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:(?:[-+]?\d+W)|(?:[-+]?\d+[.,]\d+W$))?(?:(?:[-+]?\d+D)|(?:[-+]?\d+[.,]\d+D$))?(?:T(?=[\d+-])(?:(?:[-+]?\d+H)|(?:[-+]?\d+[.,]\d+H$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:[-+]?\d+(?:[.,]\d+)?S)?)??$/;
+  var emailRegex = /^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-\.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i;
+  var _emojiRegex = `^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$`;
+  var emojiRegex;
+  var ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/;
+  var ipv4CidrRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/(3[0-2]|[12]?[0-9])$/;
+  var ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
+  var ipv6CidrRegex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/;
+  var base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+  var base64urlRegex = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/;
+  var dateRegexSource = `((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))`;
+  var dateRegex = new RegExp(`^${dateRegexSource}$`);
+  function timeRegexSource(args) {
+    let secondsRegexSource = `[0-5]\\d`;
+    if (args.precision) {
+      secondsRegexSource = `${secondsRegexSource}\\.\\d{${args.precision}}`;
+    } else if (args.precision == null) {
+      secondsRegexSource = `${secondsRegexSource}(\\.\\d+)?`;
+    }
+    const secondsQuantifier = args.precision ? "+" : "?";
+    return `([01]\\d|2[0-3]):[0-5]\\d(:${secondsRegexSource})${secondsQuantifier}`;
+  }
+  function timeRegex(args) {
+    return new RegExp(`^${timeRegexSource(args)}$`);
+  }
+  function datetimeRegex(args) {
+    let regex = `${dateRegexSource}T${timeRegexSource(args)}`;
+    const opts = [];
+    opts.push(args.local ? `Z?` : `Z`);
+    if (args.offset)
+      opts.push(`([+-]\\d{2}:?\\d{2})`);
+    regex = `${regex}(${opts.join("|")})`;
+    return new RegExp(`^${regex}$`);
+  }
+  function isValidIP(ip, version) {
+    if ((version === "v4" || !version) && ipv4Regex.test(ip)) {
+      return true;
+    }
+    if ((version === "v6" || !version) && ipv6Regex.test(ip)) {
+      return true;
+    }
+    return false;
+  }
+  function isValidJWT(jwt, alg) {
+    if (!jwtRegex.test(jwt))
+      return false;
+    try {
+      const [header] = jwt.split(".");
+      if (!header)
+        return false;
+      const base64 = header.replace(/-/g, "+").replace(/_/g, "/").padEnd(header.length + (4 - header.length % 4) % 4, "=");
+      const decoded = JSON.parse(atob(base64));
+      if (typeof decoded !== "object" || decoded === null)
+        return false;
+      if ("typ" in decoded && decoded?.typ !== "JWT")
+        return false;
+      if (!decoded.alg)
+        return false;
+      if (alg && decoded.alg !== alg)
+        return false;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  function isValidCidr(ip, version) {
+    if ((version === "v4" || !version) && ipv4CidrRegex.test(ip)) {
+      return true;
+    }
+    if ((version === "v6" || !version) && ipv6CidrRegex.test(ip)) {
+      return true;
+    }
+    return false;
+  }
+  var ZodString = class _ZodString extends ZodType {
+    _parse(input) {
+      if (this._def.coerce) {
+        input.data = String(input.data);
+      }
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.string) {
+        const ctx2 = this._getOrReturnCtx(input);
+        addIssueToContext(ctx2, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.string,
+          received: ctx2.parsedType
+        });
+        return INVALID;
+      }
+      const status = new ParseStatus();
+      let ctx = void 0;
+      for (const check of this._def.checks) {
+        if (check.kind === "min") {
+          if (input.data.length < check.value) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_small,
+              minimum: check.value,
+              type: "string",
+              inclusive: true,
+              exact: false,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "max") {
+          if (input.data.length > check.value) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_big,
+              maximum: check.value,
+              type: "string",
+              inclusive: true,
+              exact: false,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "length") {
+          const tooBig = input.data.length > check.value;
+          const tooSmall = input.data.length < check.value;
+          if (tooBig || tooSmall) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            if (tooBig) {
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.too_big,
+                maximum: check.value,
+                type: "string",
+                inclusive: true,
+                exact: true,
+                message: check.message
+              });
+            } else if (tooSmall) {
+              addIssueToContext(ctx, {
+                code: ZodIssueCode.too_small,
+                minimum: check.value,
+                type: "string",
+                inclusive: true,
+                exact: true,
+                message: check.message
+              });
+            }
+            status.dirty();
+          }
+        } else if (check.kind === "email") {
+          if (!emailRegex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "email",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "emoji") {
+          if (!emojiRegex) {
+            emojiRegex = new RegExp(_emojiRegex, "u");
+          }
+          if (!emojiRegex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "emoji",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "uuid") {
+          if (!uuidRegex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "uuid",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "nanoid") {
+          if (!nanoidRegex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "nanoid",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "cuid") {
+          if (!cuidRegex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "cuid",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "cuid2") {
+          if (!cuid2Regex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "cuid2",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "ulid") {
+          if (!ulidRegex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "ulid",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "url") {
+          try {
+            new URL(input.data);
+          } catch {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "url",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "regex") {
+          check.regex.lastIndex = 0;
+          const testResult = check.regex.test(input.data);
+          if (!testResult) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "regex",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "trim") {
+          input.data = input.data.trim();
+        } else if (check.kind === "includes") {
+          if (!input.data.includes(check.value, check.position)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.invalid_string,
+              validation: { includes: check.value, position: check.position },
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "toLowerCase") {
+          input.data = input.data.toLowerCase();
+        } else if (check.kind === "toUpperCase") {
+          input.data = input.data.toUpperCase();
+        } else if (check.kind === "startsWith") {
+          if (!input.data.startsWith(check.value)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.invalid_string,
+              validation: { startsWith: check.value },
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "endsWith") {
+          if (!input.data.endsWith(check.value)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.invalid_string,
+              validation: { endsWith: check.value },
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "datetime") {
+          const regex = datetimeRegex(check);
+          if (!regex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.invalid_string,
+              validation: "datetime",
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "date") {
+          const regex = dateRegex;
+          if (!regex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.invalid_string,
+              validation: "date",
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "time") {
+          const regex = timeRegex(check);
+          if (!regex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.invalid_string,
+              validation: "time",
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "duration") {
+          if (!durationRegex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "duration",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "ip") {
+          if (!isValidIP(input.data, check.version)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "ip",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "jwt") {
+          if (!isValidJWT(input.data, check.alg)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "jwt",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "cidr") {
+          if (!isValidCidr(input.data, check.version)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "cidr",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "base64") {
+          if (!base64Regex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "base64",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "base64url") {
+          if (!base64urlRegex.test(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              validation: "base64url",
+              code: ZodIssueCode.invalid_string,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else {
+          util.assertNever(check);
+        }
+      }
+      return { status: status.value, value: input.data };
+    }
+    _regex(regex, validation, message) {
+      return this.refinement((data) => regex.test(data), {
+        validation,
+        code: ZodIssueCode.invalid_string,
+        ...errorUtil.errToObj(message)
+      });
+    }
+    _addCheck(check) {
+      return new _ZodString({
+        ...this._def,
+        checks: [...this._def.checks, check]
+      });
+    }
+    email(message) {
+      return this._addCheck({ kind: "email", ...errorUtil.errToObj(message) });
+    }
+    url(message) {
+      return this._addCheck({ kind: "url", ...errorUtil.errToObj(message) });
+    }
+    emoji(message) {
+      return this._addCheck({ kind: "emoji", ...errorUtil.errToObj(message) });
+    }
+    uuid(message) {
+      return this._addCheck({ kind: "uuid", ...errorUtil.errToObj(message) });
+    }
+    nanoid(message) {
+      return this._addCheck({ kind: "nanoid", ...errorUtil.errToObj(message) });
+    }
+    cuid(message) {
+      return this._addCheck({ kind: "cuid", ...errorUtil.errToObj(message) });
+    }
+    cuid2(message) {
+      return this._addCheck({ kind: "cuid2", ...errorUtil.errToObj(message) });
+    }
+    ulid(message) {
+      return this._addCheck({ kind: "ulid", ...errorUtil.errToObj(message) });
+    }
+    base64(message) {
+      return this._addCheck({ kind: "base64", ...errorUtil.errToObj(message) });
+    }
+    base64url(message) {
+      return this._addCheck({
+        kind: "base64url",
+        ...errorUtil.errToObj(message)
+      });
+    }
+    jwt(options) {
+      return this._addCheck({ kind: "jwt", ...errorUtil.errToObj(options) });
+    }
+    ip(options) {
+      return this._addCheck({ kind: "ip", ...errorUtil.errToObj(options) });
+    }
+    cidr(options) {
+      return this._addCheck({ kind: "cidr", ...errorUtil.errToObj(options) });
+    }
+    datetime(options) {
+      if (typeof options === "string") {
+        return this._addCheck({
+          kind: "datetime",
+          precision: null,
+          offset: false,
+          local: false,
+          message: options
+        });
+      }
+      return this._addCheck({
+        kind: "datetime",
+        precision: typeof options?.precision === "undefined" ? null : options?.precision,
+        offset: options?.offset ?? false,
+        local: options?.local ?? false,
+        ...errorUtil.errToObj(options?.message)
+      });
+    }
+    date(message) {
+      return this._addCheck({ kind: "date", message });
+    }
+    time(options) {
+      if (typeof options === "string") {
+        return this._addCheck({
+          kind: "time",
+          precision: null,
+          message: options
+        });
+      }
+      return this._addCheck({
+        kind: "time",
+        precision: typeof options?.precision === "undefined" ? null : options?.precision,
+        ...errorUtil.errToObj(options?.message)
+      });
+    }
+    duration(message) {
+      return this._addCheck({ kind: "duration", ...errorUtil.errToObj(message) });
+    }
+    regex(regex, message) {
+      return this._addCheck({
+        kind: "regex",
+        regex,
+        ...errorUtil.errToObj(message)
+      });
+    }
+    includes(value, options) {
+      return this._addCheck({
+        kind: "includes",
+        value,
+        position: options?.position,
+        ...errorUtil.errToObj(options?.message)
+      });
+    }
+    startsWith(value, message) {
+      return this._addCheck({
+        kind: "startsWith",
+        value,
+        ...errorUtil.errToObj(message)
+      });
+    }
+    endsWith(value, message) {
+      return this._addCheck({
+        kind: "endsWith",
+        value,
+        ...errorUtil.errToObj(message)
+      });
+    }
+    min(minLength, message) {
+      return this._addCheck({
+        kind: "min",
+        value: minLength,
+        ...errorUtil.errToObj(message)
+      });
+    }
+    max(maxLength, message) {
+      return this._addCheck({
+        kind: "max",
+        value: maxLength,
+        ...errorUtil.errToObj(message)
+      });
+    }
+    length(len, message) {
+      return this._addCheck({
+        kind: "length",
+        value: len,
+        ...errorUtil.errToObj(message)
+      });
+    }
+    /**
+     * Equivalent to `.min(1)`
+     */
+    nonempty(message) {
+      return this.min(1, errorUtil.errToObj(message));
+    }
+    trim() {
+      return new _ZodString({
+        ...this._def,
+        checks: [...this._def.checks, { kind: "trim" }]
+      });
+    }
+    toLowerCase() {
+      return new _ZodString({
+        ...this._def,
+        checks: [...this._def.checks, { kind: "toLowerCase" }]
+      });
+    }
+    toUpperCase() {
+      return new _ZodString({
+        ...this._def,
+        checks: [...this._def.checks, { kind: "toUpperCase" }]
+      });
+    }
+    get isDatetime() {
+      return !!this._def.checks.find((ch) => ch.kind === "datetime");
+    }
+    get isDate() {
+      return !!this._def.checks.find((ch) => ch.kind === "date");
+    }
+    get isTime() {
+      return !!this._def.checks.find((ch) => ch.kind === "time");
+    }
+    get isDuration() {
+      return !!this._def.checks.find((ch) => ch.kind === "duration");
+    }
+    get isEmail() {
+      return !!this._def.checks.find((ch) => ch.kind === "email");
+    }
+    get isURL() {
+      return !!this._def.checks.find((ch) => ch.kind === "url");
+    }
+    get isEmoji() {
+      return !!this._def.checks.find((ch) => ch.kind === "emoji");
+    }
+    get isUUID() {
+      return !!this._def.checks.find((ch) => ch.kind === "uuid");
+    }
+    get isNANOID() {
+      return !!this._def.checks.find((ch) => ch.kind === "nanoid");
+    }
+    get isCUID() {
+      return !!this._def.checks.find((ch) => ch.kind === "cuid");
+    }
+    get isCUID2() {
+      return !!this._def.checks.find((ch) => ch.kind === "cuid2");
+    }
+    get isULID() {
+      return !!this._def.checks.find((ch) => ch.kind === "ulid");
+    }
+    get isIP() {
+      return !!this._def.checks.find((ch) => ch.kind === "ip");
+    }
+    get isCIDR() {
+      return !!this._def.checks.find((ch) => ch.kind === "cidr");
+    }
+    get isBase64() {
+      return !!this._def.checks.find((ch) => ch.kind === "base64");
+    }
+    get isBase64url() {
+      return !!this._def.checks.find((ch) => ch.kind === "base64url");
+    }
+    get minLength() {
+      let min = null;
+      for (const ch of this._def.checks) {
+        if (ch.kind === "min") {
+          if (min === null || ch.value > min)
+            min = ch.value;
+        }
+      }
+      return min;
+    }
+    get maxLength() {
+      let max = null;
+      for (const ch of this._def.checks) {
+        if (ch.kind === "max") {
+          if (max === null || ch.value < max)
+            max = ch.value;
+        }
+      }
+      return max;
+    }
+  };
+  ZodString.create = (params) => {
+    return new ZodString({
+      checks: [],
+      typeName: ZodFirstPartyTypeKind.ZodString,
+      coerce: params?.coerce ?? false,
+      ...processCreateParams(params)
+    });
+  };
+  function floatSafeRemainder(val, step) {
+    const valDecCount = (val.toString().split(".")[1] || "").length;
+    const stepDecCount = (step.toString().split(".")[1] || "").length;
+    const decCount = valDecCount > stepDecCount ? valDecCount : stepDecCount;
+    const valInt = Number.parseInt(val.toFixed(decCount).replace(".", ""));
+    const stepInt = Number.parseInt(step.toFixed(decCount).replace(".", ""));
+    return valInt % stepInt / 10 ** decCount;
+  }
+  var ZodNumber = class _ZodNumber extends ZodType {
+    constructor() {
+      super(...arguments);
+      this.min = this.gte;
+      this.max = this.lte;
+      this.step = this.multipleOf;
+    }
+    _parse(input) {
+      if (this._def.coerce) {
+        input.data = Number(input.data);
+      }
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.number) {
+        const ctx2 = this._getOrReturnCtx(input);
+        addIssueToContext(ctx2, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.number,
+          received: ctx2.parsedType
+        });
+        return INVALID;
+      }
+      let ctx = void 0;
+      const status = new ParseStatus();
+      for (const check of this._def.checks) {
+        if (check.kind === "int") {
+          if (!util.isInteger(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.invalid_type,
+              expected: "integer",
+              received: "float",
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "min") {
+          const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
+          if (tooSmall) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_small,
+              minimum: check.value,
+              type: "number",
+              inclusive: check.inclusive,
+              exact: false,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "max") {
+          const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
+          if (tooBig) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_big,
+              maximum: check.value,
+              type: "number",
+              inclusive: check.inclusive,
+              exact: false,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "multipleOf") {
+          if (floatSafeRemainder(input.data, check.value) !== 0) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.not_multiple_of,
+              multipleOf: check.value,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "finite") {
+          if (!Number.isFinite(input.data)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.not_finite,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else {
+          util.assertNever(check);
+        }
+      }
+      return { status: status.value, value: input.data };
+    }
+    gte(value, message) {
+      return this.setLimit("min", value, true, errorUtil.toString(message));
+    }
+    gt(value, message) {
+      return this.setLimit("min", value, false, errorUtil.toString(message));
+    }
+    lte(value, message) {
+      return this.setLimit("max", value, true, errorUtil.toString(message));
+    }
+    lt(value, message) {
+      return this.setLimit("max", value, false, errorUtil.toString(message));
+    }
+    setLimit(kind, value, inclusive, message) {
+      return new _ZodNumber({
+        ...this._def,
+        checks: [
+          ...this._def.checks,
+          {
+            kind,
+            value,
+            inclusive,
+            message: errorUtil.toString(message)
+          }
+        ]
+      });
+    }
+    _addCheck(check) {
+      return new _ZodNumber({
+        ...this._def,
+        checks: [...this._def.checks, check]
+      });
+    }
+    int(message) {
+      return this._addCheck({
+        kind: "int",
+        message: errorUtil.toString(message)
+      });
+    }
+    positive(message) {
+      return this._addCheck({
+        kind: "min",
+        value: 0,
+        inclusive: false,
+        message: errorUtil.toString(message)
+      });
+    }
+    negative(message) {
+      return this._addCheck({
+        kind: "max",
+        value: 0,
+        inclusive: false,
+        message: errorUtil.toString(message)
+      });
+    }
+    nonpositive(message) {
+      return this._addCheck({
+        kind: "max",
+        value: 0,
+        inclusive: true,
+        message: errorUtil.toString(message)
+      });
+    }
+    nonnegative(message) {
+      return this._addCheck({
+        kind: "min",
+        value: 0,
+        inclusive: true,
+        message: errorUtil.toString(message)
+      });
+    }
+    multipleOf(value, message) {
+      return this._addCheck({
+        kind: "multipleOf",
+        value,
+        message: errorUtil.toString(message)
+      });
+    }
+    finite(message) {
+      return this._addCheck({
+        kind: "finite",
+        message: errorUtil.toString(message)
+      });
+    }
+    safe(message) {
+      return this._addCheck({
+        kind: "min",
+        inclusive: true,
+        value: Number.MIN_SAFE_INTEGER,
+        message: errorUtil.toString(message)
+      })._addCheck({
+        kind: "max",
+        inclusive: true,
+        value: Number.MAX_SAFE_INTEGER,
+        message: errorUtil.toString(message)
+      });
+    }
+    get minValue() {
+      let min = null;
+      for (const ch of this._def.checks) {
+        if (ch.kind === "min") {
+          if (min === null || ch.value > min)
+            min = ch.value;
+        }
+      }
+      return min;
+    }
+    get maxValue() {
+      let max = null;
+      for (const ch of this._def.checks) {
+        if (ch.kind === "max") {
+          if (max === null || ch.value < max)
+            max = ch.value;
+        }
+      }
+      return max;
+    }
+    get isInt() {
+      return !!this._def.checks.find((ch) => ch.kind === "int" || ch.kind === "multipleOf" && util.isInteger(ch.value));
+    }
+    get isFinite() {
+      let max = null;
+      let min = null;
+      for (const ch of this._def.checks) {
+        if (ch.kind === "finite" || ch.kind === "int" || ch.kind === "multipleOf") {
+          return true;
+        } else if (ch.kind === "min") {
+          if (min === null || ch.value > min)
+            min = ch.value;
+        } else if (ch.kind === "max") {
+          if (max === null || ch.value < max)
+            max = ch.value;
+        }
+      }
+      return Number.isFinite(min) && Number.isFinite(max);
+    }
+  };
+  ZodNumber.create = (params) => {
+    return new ZodNumber({
+      checks: [],
+      typeName: ZodFirstPartyTypeKind.ZodNumber,
+      coerce: params?.coerce || false,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodBigInt = class _ZodBigInt extends ZodType {
+    constructor() {
+      super(...arguments);
+      this.min = this.gte;
+      this.max = this.lte;
+    }
+    _parse(input) {
+      if (this._def.coerce) {
+        try {
+          input.data = BigInt(input.data);
+        } catch {
+          return this._getInvalidInput(input);
+        }
+      }
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.bigint) {
+        return this._getInvalidInput(input);
+      }
+      let ctx = void 0;
+      const status = new ParseStatus();
+      for (const check of this._def.checks) {
+        if (check.kind === "min") {
+          const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
+          if (tooSmall) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_small,
+              type: "bigint",
+              minimum: check.value,
+              inclusive: check.inclusive,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "max") {
+          const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
+          if (tooBig) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_big,
+              type: "bigint",
+              maximum: check.value,
+              inclusive: check.inclusive,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "multipleOf") {
+          if (input.data % check.value !== BigInt(0)) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.not_multiple_of,
+              multipleOf: check.value,
+              message: check.message
+            });
+            status.dirty();
+          }
+        } else {
+          util.assertNever(check);
+        }
+      }
+      return { status: status.value, value: input.data };
+    }
+    _getInvalidInput(input) {
+      const ctx = this._getOrReturnCtx(input);
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.bigint,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    gte(value, message) {
+      return this.setLimit("min", value, true, errorUtil.toString(message));
+    }
+    gt(value, message) {
+      return this.setLimit("min", value, false, errorUtil.toString(message));
+    }
+    lte(value, message) {
+      return this.setLimit("max", value, true, errorUtil.toString(message));
+    }
+    lt(value, message) {
+      return this.setLimit("max", value, false, errorUtil.toString(message));
+    }
+    setLimit(kind, value, inclusive, message) {
+      return new _ZodBigInt({
+        ...this._def,
+        checks: [
+          ...this._def.checks,
+          {
+            kind,
+            value,
+            inclusive,
+            message: errorUtil.toString(message)
+          }
+        ]
+      });
+    }
+    _addCheck(check) {
+      return new _ZodBigInt({
+        ...this._def,
+        checks: [...this._def.checks, check]
+      });
+    }
+    positive(message) {
+      return this._addCheck({
+        kind: "min",
+        value: BigInt(0),
+        inclusive: false,
+        message: errorUtil.toString(message)
+      });
+    }
+    negative(message) {
+      return this._addCheck({
+        kind: "max",
+        value: BigInt(0),
+        inclusive: false,
+        message: errorUtil.toString(message)
+      });
+    }
+    nonpositive(message) {
+      return this._addCheck({
+        kind: "max",
+        value: BigInt(0),
+        inclusive: true,
+        message: errorUtil.toString(message)
+      });
+    }
+    nonnegative(message) {
+      return this._addCheck({
+        kind: "min",
+        value: BigInt(0),
+        inclusive: true,
+        message: errorUtil.toString(message)
+      });
+    }
+    multipleOf(value, message) {
+      return this._addCheck({
+        kind: "multipleOf",
+        value,
+        message: errorUtil.toString(message)
+      });
+    }
+    get minValue() {
+      let min = null;
+      for (const ch of this._def.checks) {
+        if (ch.kind === "min") {
+          if (min === null || ch.value > min)
+            min = ch.value;
+        }
+      }
+      return min;
+    }
+    get maxValue() {
+      let max = null;
+      for (const ch of this._def.checks) {
+        if (ch.kind === "max") {
+          if (max === null || ch.value < max)
+            max = ch.value;
+        }
+      }
+      return max;
+    }
+  };
+  ZodBigInt.create = (params) => {
+    return new ZodBigInt({
+      checks: [],
+      typeName: ZodFirstPartyTypeKind.ZodBigInt,
+      coerce: params?.coerce ?? false,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodBoolean = class extends ZodType {
+    _parse(input) {
+      if (this._def.coerce) {
+        input.data = Boolean(input.data);
+      }
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.boolean) {
+        const ctx = this._getOrReturnCtx(input);
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.boolean,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      return OK(input.data);
+    }
+  };
+  ZodBoolean.create = (params) => {
+    return new ZodBoolean({
+      typeName: ZodFirstPartyTypeKind.ZodBoolean,
+      coerce: params?.coerce || false,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodDate = class _ZodDate extends ZodType {
+    _parse(input) {
+      if (this._def.coerce) {
+        input.data = new Date(input.data);
+      }
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.date) {
+        const ctx2 = this._getOrReturnCtx(input);
+        addIssueToContext(ctx2, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.date,
+          received: ctx2.parsedType
+        });
+        return INVALID;
+      }
+      if (Number.isNaN(input.data.getTime())) {
+        const ctx2 = this._getOrReturnCtx(input);
+        addIssueToContext(ctx2, {
+          code: ZodIssueCode.invalid_date
+        });
+        return INVALID;
+      }
+      const status = new ParseStatus();
+      let ctx = void 0;
+      for (const check of this._def.checks) {
+        if (check.kind === "min") {
+          if (input.data.getTime() < check.value) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_small,
+              message: check.message,
+              inclusive: true,
+              exact: false,
+              minimum: check.value,
+              type: "date"
+            });
+            status.dirty();
+          }
+        } else if (check.kind === "max") {
+          if (input.data.getTime() > check.value) {
+            ctx = this._getOrReturnCtx(input, ctx);
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_big,
+              message: check.message,
+              inclusive: true,
+              exact: false,
+              maximum: check.value,
+              type: "date"
+            });
+            status.dirty();
+          }
+        } else {
+          util.assertNever(check);
+        }
+      }
+      return {
+        status: status.value,
+        value: new Date(input.data.getTime())
+      };
+    }
+    _addCheck(check) {
+      return new _ZodDate({
+        ...this._def,
+        checks: [...this._def.checks, check]
+      });
+    }
+    min(minDate, message) {
+      return this._addCheck({
+        kind: "min",
+        value: minDate.getTime(),
+        message: errorUtil.toString(message)
+      });
+    }
+    max(maxDate, message) {
+      return this._addCheck({
+        kind: "max",
+        value: maxDate.getTime(),
+        message: errorUtil.toString(message)
+      });
+    }
+    get minDate() {
+      let min = null;
+      for (const ch of this._def.checks) {
+        if (ch.kind === "min") {
+          if (min === null || ch.value > min)
+            min = ch.value;
+        }
+      }
+      return min != null ? new Date(min) : null;
+    }
+    get maxDate() {
+      let max = null;
+      for (const ch of this._def.checks) {
+        if (ch.kind === "max") {
+          if (max === null || ch.value < max)
+            max = ch.value;
+        }
+      }
+      return max != null ? new Date(max) : null;
+    }
+  };
+  ZodDate.create = (params) => {
+    return new ZodDate({
+      checks: [],
+      coerce: params?.coerce || false,
+      typeName: ZodFirstPartyTypeKind.ZodDate,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodSymbol = class extends ZodType {
+    _parse(input) {
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.symbol) {
+        const ctx = this._getOrReturnCtx(input);
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.symbol,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      return OK(input.data);
+    }
+  };
+  ZodSymbol.create = (params) => {
+    return new ZodSymbol({
+      typeName: ZodFirstPartyTypeKind.ZodSymbol,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodUndefined = class extends ZodType {
+    _parse(input) {
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.undefined) {
+        const ctx = this._getOrReturnCtx(input);
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.undefined,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      return OK(input.data);
+    }
+  };
+  ZodUndefined.create = (params) => {
+    return new ZodUndefined({
+      typeName: ZodFirstPartyTypeKind.ZodUndefined,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodNull = class extends ZodType {
+    _parse(input) {
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.null) {
+        const ctx = this._getOrReturnCtx(input);
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.null,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      return OK(input.data);
+    }
+  };
+  ZodNull.create = (params) => {
+    return new ZodNull({
+      typeName: ZodFirstPartyTypeKind.ZodNull,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodAny = class extends ZodType {
+    constructor() {
+      super(...arguments);
+      this._any = true;
+    }
+    _parse(input) {
+      return OK(input.data);
+    }
+  };
+  ZodAny.create = (params) => {
+    return new ZodAny({
+      typeName: ZodFirstPartyTypeKind.ZodAny,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodUnknown = class extends ZodType {
+    constructor() {
+      super(...arguments);
+      this._unknown = true;
+    }
+    _parse(input) {
+      return OK(input.data);
+    }
+  };
+  ZodUnknown.create = (params) => {
+    return new ZodUnknown({
+      typeName: ZodFirstPartyTypeKind.ZodUnknown,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodNever = class extends ZodType {
+    _parse(input) {
+      const ctx = this._getOrReturnCtx(input);
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.never,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+  };
+  ZodNever.create = (params) => {
+    return new ZodNever({
+      typeName: ZodFirstPartyTypeKind.ZodNever,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodVoid = class extends ZodType {
+    _parse(input) {
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.undefined) {
+        const ctx = this._getOrReturnCtx(input);
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.void,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      return OK(input.data);
+    }
+  };
+  ZodVoid.create = (params) => {
+    return new ZodVoid({
+      typeName: ZodFirstPartyTypeKind.ZodVoid,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodArray = class _ZodArray extends ZodType {
+    _parse(input) {
+      const { ctx, status } = this._processInputParams(input);
+      const def = this._def;
+      if (ctx.parsedType !== ZodParsedType.array) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.array,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      if (def.exactLength !== null) {
+        const tooBig = ctx.data.length > def.exactLength.value;
+        const tooSmall = ctx.data.length < def.exactLength.value;
+        if (tooBig || tooSmall) {
+          addIssueToContext(ctx, {
+            code: tooBig ? ZodIssueCode.too_big : ZodIssueCode.too_small,
+            minimum: tooSmall ? def.exactLength.value : void 0,
+            maximum: tooBig ? def.exactLength.value : void 0,
+            type: "array",
+            inclusive: true,
+            exact: true,
+            message: def.exactLength.message
+          });
+          status.dirty();
+        }
+      }
+      if (def.minLength !== null) {
+        if (ctx.data.length < def.minLength.value) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_small,
+            minimum: def.minLength.value,
+            type: "array",
+            inclusive: true,
+            exact: false,
+            message: def.minLength.message
+          });
+          status.dirty();
+        }
+      }
+      if (def.maxLength !== null) {
+        if (ctx.data.length > def.maxLength.value) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_big,
+            maximum: def.maxLength.value,
+            type: "array",
+            inclusive: true,
+            exact: false,
+            message: def.maxLength.message
+          });
+          status.dirty();
+        }
+      }
+      if (ctx.common.async) {
+        return Promise.all([...ctx.data].map((item, i) => {
+          return def.type._parseAsync(new ParseInputLazyPath(ctx, item, ctx.path, i));
+        })).then((result2) => {
+          return ParseStatus.mergeArray(status, result2);
+        });
+      }
+      const result = [...ctx.data].map((item, i) => {
+        return def.type._parseSync(new ParseInputLazyPath(ctx, item, ctx.path, i));
+      });
+      return ParseStatus.mergeArray(status, result);
+    }
+    get element() {
+      return this._def.type;
+    }
+    min(minLength, message) {
+      return new _ZodArray({
+        ...this._def,
+        minLength: { value: minLength, message: errorUtil.toString(message) }
+      });
+    }
+    max(maxLength, message) {
+      return new _ZodArray({
+        ...this._def,
+        maxLength: { value: maxLength, message: errorUtil.toString(message) }
+      });
+    }
+    length(len, message) {
+      return new _ZodArray({
+        ...this._def,
+        exactLength: { value: len, message: errorUtil.toString(message) }
+      });
+    }
+    nonempty(message) {
+      return this.min(1, message);
+    }
+  };
+  ZodArray.create = (schema, params) => {
+    return new ZodArray({
+      type: schema,
+      minLength: null,
+      maxLength: null,
+      exactLength: null,
+      typeName: ZodFirstPartyTypeKind.ZodArray,
+      ...processCreateParams(params)
+    });
+  };
+  function deepPartialify(schema) {
+    if (schema instanceof ZodObject) {
+      const newShape = {};
+      for (const key in schema.shape) {
+        const fieldSchema = schema.shape[key];
+        newShape[key] = ZodOptional.create(deepPartialify(fieldSchema));
+      }
+      return new ZodObject({
+        ...schema._def,
+        shape: () => newShape
+      });
+    } else if (schema instanceof ZodArray) {
+      return new ZodArray({
+        ...schema._def,
+        type: deepPartialify(schema.element)
+      });
+    } else if (schema instanceof ZodOptional) {
+      return ZodOptional.create(deepPartialify(schema.unwrap()));
+    } else if (schema instanceof ZodNullable) {
+      return ZodNullable.create(deepPartialify(schema.unwrap()));
+    } else if (schema instanceof ZodTuple) {
+      return ZodTuple.create(schema.items.map((item) => deepPartialify(item)));
+    } else {
+      return schema;
+    }
+  }
+  var ZodObject = class _ZodObject extends ZodType {
+    constructor() {
+      super(...arguments);
+      this._cached = null;
+      this.nonstrict = this.passthrough;
+      this.augment = this.extend;
+    }
+    _getCached() {
+      if (this._cached !== null)
+        return this._cached;
+      const shape = this._def.shape();
+      const keys = util.objectKeys(shape);
+      this._cached = { shape, keys };
+      return this._cached;
+    }
+    _parse(input) {
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.object) {
+        const ctx2 = this._getOrReturnCtx(input);
+        addIssueToContext(ctx2, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.object,
+          received: ctx2.parsedType
+        });
+        return INVALID;
+      }
+      const { status, ctx } = this._processInputParams(input);
+      const { shape, keys: shapeKeys } = this._getCached();
+      const extraKeys = [];
+      if (!(this._def.catchall instanceof ZodNever && this._def.unknownKeys === "strip")) {
+        for (const key in ctx.data) {
+          if (!shapeKeys.includes(key)) {
+            extraKeys.push(key);
+          }
+        }
+      }
+      const pairs = [];
+      for (const key of shapeKeys) {
+        const keyValidator = shape[key];
+        const value = ctx.data[key];
+        pairs.push({
+          key: { status: "valid", value: key },
+          value: keyValidator._parse(new ParseInputLazyPath(ctx, value, ctx.path, key)),
+          alwaysSet: key in ctx.data
+        });
+      }
+      if (this._def.catchall instanceof ZodNever) {
+        const unknownKeys = this._def.unknownKeys;
+        if (unknownKeys === "passthrough") {
+          for (const key of extraKeys) {
+            pairs.push({
+              key: { status: "valid", value: key },
+              value: { status: "valid", value: ctx.data[key] }
+            });
+          }
+        } else if (unknownKeys === "strict") {
+          if (extraKeys.length > 0) {
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.unrecognized_keys,
+              keys: extraKeys
+            });
+            status.dirty();
+          }
+        } else if (unknownKeys === "strip") {
+        } else {
+          throw new Error(`Internal ZodObject error: invalid unknownKeys value.`);
+        }
+      } else {
+        const catchall = this._def.catchall;
+        for (const key of extraKeys) {
+          const value = ctx.data[key];
+          pairs.push({
+            key: { status: "valid", value: key },
+            value: catchall._parse(
+              new ParseInputLazyPath(ctx, value, ctx.path, key)
+              //, ctx.child(key), value, getParsedType(value)
+            ),
+            alwaysSet: key in ctx.data
+          });
+        }
+      }
+      if (ctx.common.async) {
+        return Promise.resolve().then(async () => {
+          const syncPairs = [];
+          for (const pair of pairs) {
+            const key = await pair.key;
+            const value = await pair.value;
+            syncPairs.push({
+              key,
+              value,
+              alwaysSet: pair.alwaysSet
+            });
+          }
+          return syncPairs;
+        }).then((syncPairs) => {
+          return ParseStatus.mergeObjectSync(status, syncPairs);
+        });
+      } else {
+        return ParseStatus.mergeObjectSync(status, pairs);
+      }
+    }
+    get shape() {
+      return this._def.shape();
+    }
+    strict(message) {
+      errorUtil.errToObj;
+      return new _ZodObject({
+        ...this._def,
+        unknownKeys: "strict",
+        ...message !== void 0 ? {
+          errorMap: (issue, ctx) => {
+            const defaultError = this._def.errorMap?.(issue, ctx).message ?? ctx.defaultError;
+            if (issue.code === "unrecognized_keys")
+              return {
+                message: errorUtil.errToObj(message).message ?? defaultError
+              };
+            return {
+              message: defaultError
+            };
+          }
+        } : {}
+      });
+    }
+    strip() {
+      return new _ZodObject({
+        ...this._def,
+        unknownKeys: "strip"
+      });
+    }
+    passthrough() {
+      return new _ZodObject({
+        ...this._def,
+        unknownKeys: "passthrough"
+      });
+    }
+    // const AugmentFactory =
+    //   <Def extends ZodObjectDef>(def: Def) =>
+    //   <Augmentation extends ZodRawShape>(
+    //     augmentation: Augmentation
+    //   ): ZodObject<
+    //     extendShape<ReturnType<Def["shape"]>, Augmentation>,
+    //     Def["unknownKeys"],
+    //     Def["catchall"]
+    //   > => {
+    //     return new ZodObject({
+    //       ...def,
+    //       shape: () => ({
+    //         ...def.shape(),
+    //         ...augmentation,
+    //       }),
+    //     }) as any;
+    //   };
+    extend(augmentation) {
+      return new _ZodObject({
+        ...this._def,
+        shape: () => ({
+          ...this._def.shape(),
+          ...augmentation
+        })
+      });
+    }
+    /**
+     * Prior to zod@1.0.12 there was a bug in the
+     * inferred type of merged objects. Please
+     * upgrade if you are experiencing issues.
+     */
+    merge(merging) {
+      const merged = new _ZodObject({
+        unknownKeys: merging._def.unknownKeys,
+        catchall: merging._def.catchall,
+        shape: () => ({
+          ...this._def.shape(),
+          ...merging._def.shape()
+        }),
+        typeName: ZodFirstPartyTypeKind.ZodObject
+      });
+      return merged;
+    }
+    // merge<
+    //   Incoming extends AnyZodObject,
+    //   Augmentation extends Incoming["shape"],
+    //   NewOutput extends {
+    //     [k in keyof Augmentation | keyof Output]: k extends keyof Augmentation
+    //       ? Augmentation[k]["_output"]
+    //       : k extends keyof Output
+    //       ? Output[k]
+    //       : never;
+    //   },
+    //   NewInput extends {
+    //     [k in keyof Augmentation | keyof Input]: k extends keyof Augmentation
+    //       ? Augmentation[k]["_input"]
+    //       : k extends keyof Input
+    //       ? Input[k]
+    //       : never;
+    //   }
+    // >(
+    //   merging: Incoming
+    // ): ZodObject<
+    //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
+    //   Incoming["_def"]["unknownKeys"],
+    //   Incoming["_def"]["catchall"],
+    //   NewOutput,
+    //   NewInput
+    // > {
+    //   const merged: any = new ZodObject({
+    //     unknownKeys: merging._def.unknownKeys,
+    //     catchall: merging._def.catchall,
+    //     shape: () =>
+    //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
+    //     typeName: ZodFirstPartyTypeKind.ZodObject,
+    //   }) as any;
+    //   return merged;
+    // }
+    setKey(key, schema) {
+      return this.augment({ [key]: schema });
+    }
+    // merge<Incoming extends AnyZodObject>(
+    //   merging: Incoming
+    // ): //ZodObject<T & Incoming["_shape"], UnknownKeys, Catchall> = (merging) => {
+    // ZodObject<
+    //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
+    //   Incoming["_def"]["unknownKeys"],
+    //   Incoming["_def"]["catchall"]
+    // > {
+    //   // const mergedShape = objectUtil.mergeShapes(
+    //   //   this._def.shape(),
+    //   //   merging._def.shape()
+    //   // );
+    //   const merged: any = new ZodObject({
+    //     unknownKeys: merging._def.unknownKeys,
+    //     catchall: merging._def.catchall,
+    //     shape: () =>
+    //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
+    //     typeName: ZodFirstPartyTypeKind.ZodObject,
+    //   }) as any;
+    //   return merged;
+    // }
+    catchall(index) {
+      return new _ZodObject({
+        ...this._def,
+        catchall: index
+      });
+    }
+    pick(mask) {
+      const shape = {};
+      for (const key of util.objectKeys(mask)) {
+        if (mask[key] && this.shape[key]) {
+          shape[key] = this.shape[key];
+        }
+      }
+      return new _ZodObject({
+        ...this._def,
+        shape: () => shape
+      });
+    }
+    omit(mask) {
+      const shape = {};
+      for (const key of util.objectKeys(this.shape)) {
+        if (!mask[key]) {
+          shape[key] = this.shape[key];
+        }
+      }
+      return new _ZodObject({
+        ...this._def,
+        shape: () => shape
+      });
+    }
+    /**
+     * @deprecated
+     */
+    deepPartial() {
+      return deepPartialify(this);
+    }
+    partial(mask) {
+      const newShape = {};
+      for (const key of util.objectKeys(this.shape)) {
+        const fieldSchema = this.shape[key];
+        if (mask && !mask[key]) {
+          newShape[key] = fieldSchema;
+        } else {
+          newShape[key] = fieldSchema.optional();
+        }
+      }
+      return new _ZodObject({
+        ...this._def,
+        shape: () => newShape
+      });
+    }
+    required(mask) {
+      const newShape = {};
+      for (const key of util.objectKeys(this.shape)) {
+        if (mask && !mask[key]) {
+          newShape[key] = this.shape[key];
+        } else {
+          const fieldSchema = this.shape[key];
+          let newField = fieldSchema;
+          while (newField instanceof ZodOptional) {
+            newField = newField._def.innerType;
+          }
+          newShape[key] = newField;
+        }
+      }
+      return new _ZodObject({
+        ...this._def,
+        shape: () => newShape
+      });
+    }
+    keyof() {
+      return createZodEnum(util.objectKeys(this.shape));
+    }
+  };
+  ZodObject.create = (shape, params) => {
+    return new ZodObject({
+      shape: () => shape,
+      unknownKeys: "strip",
+      catchall: ZodNever.create(),
+      typeName: ZodFirstPartyTypeKind.ZodObject,
+      ...processCreateParams(params)
+    });
+  };
+  ZodObject.strictCreate = (shape, params) => {
+    return new ZodObject({
+      shape: () => shape,
+      unknownKeys: "strict",
+      catchall: ZodNever.create(),
+      typeName: ZodFirstPartyTypeKind.ZodObject,
+      ...processCreateParams(params)
+    });
+  };
+  ZodObject.lazycreate = (shape, params) => {
+    return new ZodObject({
+      shape,
+      unknownKeys: "strip",
+      catchall: ZodNever.create(),
+      typeName: ZodFirstPartyTypeKind.ZodObject,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodUnion = class extends ZodType {
+    _parse(input) {
+      const { ctx } = this._processInputParams(input);
+      const options = this._def.options;
+      function handleResults(results) {
+        for (const result of results) {
+          if (result.result.status === "valid") {
+            return result.result;
+          }
+        }
+        for (const result of results) {
+          if (result.result.status === "dirty") {
+            ctx.common.issues.push(...result.ctx.common.issues);
+            return result.result;
+          }
+        }
+        const unionErrors = results.map((result) => new ZodError(result.ctx.common.issues));
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_union,
+          unionErrors
+        });
+        return INVALID;
+      }
+      if (ctx.common.async) {
+        return Promise.all(options.map(async (option) => {
+          const childCtx = {
+            ...ctx,
+            common: {
+              ...ctx.common,
+              issues: []
+            },
+            parent: null
+          };
+          return {
+            result: await option._parseAsync({
+              data: ctx.data,
+              path: ctx.path,
+              parent: childCtx
+            }),
+            ctx: childCtx
+          };
+        })).then(handleResults);
+      } else {
+        let dirty = void 0;
+        const issues = [];
+        for (const option of options) {
+          const childCtx = {
+            ...ctx,
+            common: {
+              ...ctx.common,
+              issues: []
+            },
+            parent: null
+          };
+          const result = option._parseSync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: childCtx
+          });
+          if (result.status === "valid") {
+            return result;
+          } else if (result.status === "dirty" && !dirty) {
+            dirty = { result, ctx: childCtx };
+          }
+          if (childCtx.common.issues.length) {
+            issues.push(childCtx.common.issues);
+          }
+        }
+        if (dirty) {
+          ctx.common.issues.push(...dirty.ctx.common.issues);
+          return dirty.result;
+        }
+        const unionErrors = issues.map((issues2) => new ZodError(issues2));
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_union,
+          unionErrors
+        });
+        return INVALID;
+      }
+    }
+    get options() {
+      return this._def.options;
+    }
+  };
+  ZodUnion.create = (types, params) => {
+    return new ZodUnion({
+      options: types,
+      typeName: ZodFirstPartyTypeKind.ZodUnion,
+      ...processCreateParams(params)
+    });
+  };
+  var getDiscriminator = (type) => {
+    if (type instanceof ZodLazy) {
+      return getDiscriminator(type.schema);
+    } else if (type instanceof ZodEffects) {
+      return getDiscriminator(type.innerType());
+    } else if (type instanceof ZodLiteral) {
+      return [type.value];
+    } else if (type instanceof ZodEnum) {
+      return type.options;
+    } else if (type instanceof ZodNativeEnum) {
+      return util.objectValues(type.enum);
+    } else if (type instanceof ZodDefault) {
+      return getDiscriminator(type._def.innerType);
+    } else if (type instanceof ZodUndefined) {
+      return [void 0];
+    } else if (type instanceof ZodNull) {
+      return [null];
+    } else if (type instanceof ZodOptional) {
+      return [void 0, ...getDiscriminator(type.unwrap())];
+    } else if (type instanceof ZodNullable) {
+      return [null, ...getDiscriminator(type.unwrap())];
+    } else if (type instanceof ZodBranded) {
+      return getDiscriminator(type.unwrap());
+    } else if (type instanceof ZodReadonly) {
+      return getDiscriminator(type.unwrap());
+    } else if (type instanceof ZodCatch) {
+      return getDiscriminator(type._def.innerType);
+    } else {
+      return [];
+    }
+  };
+  var ZodDiscriminatedUnion = class _ZodDiscriminatedUnion extends ZodType {
+    _parse(input) {
+      const { ctx } = this._processInputParams(input);
+      if (ctx.parsedType !== ZodParsedType.object) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.object,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      const discriminator = this.discriminator;
+      const discriminatorValue = ctx.data[discriminator];
+      const option = this.optionsMap.get(discriminatorValue);
+      if (!option) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_union_discriminator,
+          options: Array.from(this.optionsMap.keys()),
+          path: [discriminator]
+        });
+        return INVALID;
+      }
+      if (ctx.common.async) {
+        return option._parseAsync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: ctx
+        });
+      } else {
+        return option._parseSync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: ctx
+        });
+      }
+    }
+    get discriminator() {
+      return this._def.discriminator;
+    }
+    get options() {
+      return this._def.options;
+    }
+    get optionsMap() {
+      return this._def.optionsMap;
+    }
+    /**
+     * The constructor of the discriminated union schema. Its behaviour is very similar to that of the normal z.union() constructor.
+     * However, it only allows a union of objects, all of which need to share a discriminator property. This property must
+     * have a different value for each object in the union.
+     * @param discriminator the name of the discriminator property
+     * @param types an array of object schemas
+     * @param params
+     */
+    static create(discriminator, options, params) {
+      const optionsMap = /* @__PURE__ */ new Map();
+      for (const type of options) {
+        const discriminatorValues = getDiscriminator(type.shape[discriminator]);
+        if (!discriminatorValues.length) {
+          throw new Error(`A discriminator value for key \`${discriminator}\` could not be extracted from all schema options`);
+        }
+        for (const value of discriminatorValues) {
+          if (optionsMap.has(value)) {
+            throw new Error(`Discriminator property ${String(discriminator)} has duplicate value ${String(value)}`);
+          }
+          optionsMap.set(value, type);
+        }
+      }
+      return new _ZodDiscriminatedUnion({
+        typeName: ZodFirstPartyTypeKind.ZodDiscriminatedUnion,
+        discriminator,
+        options,
+        optionsMap,
+        ...processCreateParams(params)
+      });
+    }
+  };
+  function mergeValues(a, b) {
+    const aType = getParsedType(a);
+    const bType = getParsedType(b);
+    if (a === b) {
+      return { valid: true, data: a };
+    } else if (aType === ZodParsedType.object && bType === ZodParsedType.object) {
+      const bKeys = util.objectKeys(b);
+      const sharedKeys = util.objectKeys(a).filter((key) => bKeys.indexOf(key) !== -1);
+      const newObj = { ...a, ...b };
+      for (const key of sharedKeys) {
+        const sharedValue = mergeValues(a[key], b[key]);
+        if (!sharedValue.valid) {
+          return { valid: false };
+        }
+        newObj[key] = sharedValue.data;
+      }
+      return { valid: true, data: newObj };
+    } else if (aType === ZodParsedType.array && bType === ZodParsedType.array) {
+      if (a.length !== b.length) {
+        return { valid: false };
+      }
+      const newArray = [];
+      for (let index = 0; index < a.length; index++) {
+        const itemA = a[index];
+        const itemB = b[index];
+        const sharedValue = mergeValues(itemA, itemB);
+        if (!sharedValue.valid) {
+          return { valid: false };
+        }
+        newArray.push(sharedValue.data);
+      }
+      return { valid: true, data: newArray };
+    } else if (aType === ZodParsedType.date && bType === ZodParsedType.date && +a === +b) {
+      return { valid: true, data: a };
+    } else {
+      return { valid: false };
+    }
+  }
+  var ZodIntersection = class extends ZodType {
+    _parse(input) {
+      const { status, ctx } = this._processInputParams(input);
+      const handleParsed = (parsedLeft, parsedRight) => {
+        if (isAborted(parsedLeft) || isAborted(parsedRight)) {
+          return INVALID;
+        }
+        const merged = mergeValues(parsedLeft.value, parsedRight.value);
+        if (!merged.valid) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_intersection_types
+          });
+          return INVALID;
+        }
+        if (isDirty(parsedLeft) || isDirty(parsedRight)) {
+          status.dirty();
+        }
+        return { status: status.value, value: merged.data };
+      };
+      if (ctx.common.async) {
+        return Promise.all([
+          this._def.left._parseAsync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: ctx
+          }),
+          this._def.right._parseAsync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: ctx
+          })
+        ]).then(([left, right]) => handleParsed(left, right));
+      } else {
+        return handleParsed(this._def.left._parseSync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: ctx
+        }), this._def.right._parseSync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: ctx
+        }));
+      }
+    }
+  };
+  ZodIntersection.create = (left, right, params) => {
+    return new ZodIntersection({
+      left,
+      right,
+      typeName: ZodFirstPartyTypeKind.ZodIntersection,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodTuple = class _ZodTuple extends ZodType {
+    _parse(input) {
+      const { status, ctx } = this._processInputParams(input);
+      if (ctx.parsedType !== ZodParsedType.array) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.array,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      if (ctx.data.length < this._def.items.length) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.too_small,
+          minimum: this._def.items.length,
+          inclusive: true,
+          exact: false,
+          type: "array"
+        });
+        return INVALID;
+      }
+      const rest = this._def.rest;
+      if (!rest && ctx.data.length > this._def.items.length) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.too_big,
+          maximum: this._def.items.length,
+          inclusive: true,
+          exact: false,
+          type: "array"
+        });
+        status.dirty();
+      }
+      const items = [...ctx.data].map((item, itemIndex) => {
+        const schema = this._def.items[itemIndex] || this._def.rest;
+        if (!schema)
+          return null;
+        return schema._parse(new ParseInputLazyPath(ctx, item, ctx.path, itemIndex));
+      }).filter((x) => !!x);
+      if (ctx.common.async) {
+        return Promise.all(items).then((results) => {
+          return ParseStatus.mergeArray(status, results);
+        });
+      } else {
+        return ParseStatus.mergeArray(status, items);
+      }
+    }
+    get items() {
+      return this._def.items;
+    }
+    rest(rest) {
+      return new _ZodTuple({
+        ...this._def,
+        rest
+      });
+    }
+  };
+  ZodTuple.create = (schemas, params) => {
+    if (!Array.isArray(schemas)) {
+      throw new Error("You must pass an array of schemas to z.tuple([ ... ])");
+    }
+    return new ZodTuple({
+      items: schemas,
+      typeName: ZodFirstPartyTypeKind.ZodTuple,
+      rest: null,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodRecord = class _ZodRecord extends ZodType {
+    get keySchema() {
+      return this._def.keyType;
+    }
+    get valueSchema() {
+      return this._def.valueType;
+    }
+    _parse(input) {
+      const { status, ctx } = this._processInputParams(input);
+      if (ctx.parsedType !== ZodParsedType.object) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.object,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      const pairs = [];
+      const keyType = this._def.keyType;
+      const valueType = this._def.valueType;
+      for (const key in ctx.data) {
+        pairs.push({
+          key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, key)),
+          value: valueType._parse(new ParseInputLazyPath(ctx, ctx.data[key], ctx.path, key)),
+          alwaysSet: key in ctx.data
+        });
+      }
+      if (ctx.common.async) {
+        return ParseStatus.mergeObjectAsync(status, pairs);
+      } else {
+        return ParseStatus.mergeObjectSync(status, pairs);
+      }
+    }
+    get element() {
+      return this._def.valueType;
+    }
+    static create(first, second, third) {
+      if (second instanceof ZodType) {
+        return new _ZodRecord({
+          keyType: first,
+          valueType: second,
+          typeName: ZodFirstPartyTypeKind.ZodRecord,
+          ...processCreateParams(third)
+        });
+      }
+      return new _ZodRecord({
+        keyType: ZodString.create(),
+        valueType: first,
+        typeName: ZodFirstPartyTypeKind.ZodRecord,
+        ...processCreateParams(second)
+      });
+    }
+  };
+  var ZodMap = class extends ZodType {
+    get keySchema() {
+      return this._def.keyType;
+    }
+    get valueSchema() {
+      return this._def.valueType;
+    }
+    _parse(input) {
+      const { status, ctx } = this._processInputParams(input);
+      if (ctx.parsedType !== ZodParsedType.map) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.map,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      const keyType = this._def.keyType;
+      const valueType = this._def.valueType;
+      const pairs = [...ctx.data.entries()].map(([key, value], index) => {
+        return {
+          key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, [index, "key"])),
+          value: valueType._parse(new ParseInputLazyPath(ctx, value, ctx.path, [index, "value"]))
+        };
+      });
+      if (ctx.common.async) {
+        const finalMap = /* @__PURE__ */ new Map();
+        return Promise.resolve().then(async () => {
+          for (const pair of pairs) {
+            const key = await pair.key;
+            const value = await pair.value;
+            if (key.status === "aborted" || value.status === "aborted") {
+              return INVALID;
+            }
+            if (key.status === "dirty" || value.status === "dirty") {
+              status.dirty();
+            }
+            finalMap.set(key.value, value.value);
+          }
+          return { status: status.value, value: finalMap };
+        });
+      } else {
+        const finalMap = /* @__PURE__ */ new Map();
+        for (const pair of pairs) {
+          const key = pair.key;
+          const value = pair.value;
+          if (key.status === "aborted" || value.status === "aborted") {
+            return INVALID;
+          }
+          if (key.status === "dirty" || value.status === "dirty") {
+            status.dirty();
+          }
+          finalMap.set(key.value, value.value);
+        }
+        return { status: status.value, value: finalMap };
+      }
+    }
+  };
+  ZodMap.create = (keyType, valueType, params) => {
+    return new ZodMap({
+      valueType,
+      keyType,
+      typeName: ZodFirstPartyTypeKind.ZodMap,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodSet = class _ZodSet extends ZodType {
+    _parse(input) {
+      const { status, ctx } = this._processInputParams(input);
+      if (ctx.parsedType !== ZodParsedType.set) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.set,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      const def = this._def;
+      if (def.minSize !== null) {
+        if (ctx.data.size < def.minSize.value) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_small,
+            minimum: def.minSize.value,
+            type: "set",
+            inclusive: true,
+            exact: false,
+            message: def.minSize.message
+          });
+          status.dirty();
+        }
+      }
+      if (def.maxSize !== null) {
+        if (ctx.data.size > def.maxSize.value) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_big,
+            maximum: def.maxSize.value,
+            type: "set",
+            inclusive: true,
+            exact: false,
+            message: def.maxSize.message
+          });
+          status.dirty();
+        }
+      }
+      const valueType = this._def.valueType;
+      function finalizeSet(elements2) {
+        const parsedSet = /* @__PURE__ */ new Set();
+        for (const element of elements2) {
+          if (element.status === "aborted")
+            return INVALID;
+          if (element.status === "dirty")
+            status.dirty();
+          parsedSet.add(element.value);
+        }
+        return { status: status.value, value: parsedSet };
+      }
+      const elements = [...ctx.data.values()].map((item, i) => valueType._parse(new ParseInputLazyPath(ctx, item, ctx.path, i)));
+      if (ctx.common.async) {
+        return Promise.all(elements).then((elements2) => finalizeSet(elements2));
+      } else {
+        return finalizeSet(elements);
+      }
+    }
+    min(minSize, message) {
+      return new _ZodSet({
+        ...this._def,
+        minSize: { value: minSize, message: errorUtil.toString(message) }
+      });
+    }
+    max(maxSize, message) {
+      return new _ZodSet({
+        ...this._def,
+        maxSize: { value: maxSize, message: errorUtil.toString(message) }
+      });
+    }
+    size(size, message) {
+      return this.min(size, message).max(size, message);
+    }
+    nonempty(message) {
+      return this.min(1, message);
+    }
+  };
+  ZodSet.create = (valueType, params) => {
+    return new ZodSet({
+      valueType,
+      minSize: null,
+      maxSize: null,
+      typeName: ZodFirstPartyTypeKind.ZodSet,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodFunction = class _ZodFunction extends ZodType {
+    constructor() {
+      super(...arguments);
+      this.validate = this.implement;
+    }
+    _parse(input) {
+      const { ctx } = this._processInputParams(input);
+      if (ctx.parsedType !== ZodParsedType.function) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.function,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      function makeArgsIssue(args, error) {
+        return makeIssue({
+          data: args,
+          path: ctx.path,
+          errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, getErrorMap(), en_default].filter((x) => !!x),
+          issueData: {
+            code: ZodIssueCode.invalid_arguments,
+            argumentsError: error
+          }
+        });
+      }
+      function makeReturnsIssue(returns, error) {
+        return makeIssue({
+          data: returns,
+          path: ctx.path,
+          errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, getErrorMap(), en_default].filter((x) => !!x),
+          issueData: {
+            code: ZodIssueCode.invalid_return_type,
+            returnTypeError: error
+          }
+        });
+      }
+      const params = { errorMap: ctx.common.contextualErrorMap };
+      const fn = ctx.data;
+      if (this._def.returns instanceof ZodPromise) {
+        const me = this;
+        return OK(async function(...args) {
+          const error = new ZodError([]);
+          const parsedArgs = await me._def.args.parseAsync(args, params).catch((e) => {
+            error.addIssue(makeArgsIssue(args, e));
+            throw error;
+          });
+          const result = await Reflect.apply(fn, this, parsedArgs);
+          const parsedReturns = await me._def.returns._def.type.parseAsync(result, params).catch((e) => {
+            error.addIssue(makeReturnsIssue(result, e));
+            throw error;
+          });
+          return parsedReturns;
+        });
+      } else {
+        const me = this;
+        return OK(function(...args) {
+          const parsedArgs = me._def.args.safeParse(args, params);
+          if (!parsedArgs.success) {
+            throw new ZodError([makeArgsIssue(args, parsedArgs.error)]);
+          }
+          const result = Reflect.apply(fn, this, parsedArgs.data);
+          const parsedReturns = me._def.returns.safeParse(result, params);
+          if (!parsedReturns.success) {
+            throw new ZodError([makeReturnsIssue(result, parsedReturns.error)]);
+          }
+          return parsedReturns.data;
+        });
+      }
+    }
+    parameters() {
+      return this._def.args;
+    }
+    returnType() {
+      return this._def.returns;
+    }
+    args(...items) {
+      return new _ZodFunction({
+        ...this._def,
+        args: ZodTuple.create(items).rest(ZodUnknown.create())
+      });
+    }
+    returns(returnType) {
+      return new _ZodFunction({
+        ...this._def,
+        returns: returnType
+      });
+    }
+    implement(func) {
+      const validatedFunc = this.parse(func);
+      return validatedFunc;
+    }
+    strictImplement(func) {
+      const validatedFunc = this.parse(func);
+      return validatedFunc;
+    }
+    static create(args, returns, params) {
+      return new _ZodFunction({
+        args: args ? args : ZodTuple.create([]).rest(ZodUnknown.create()),
+        returns: returns || ZodUnknown.create(),
+        typeName: ZodFirstPartyTypeKind.ZodFunction,
+        ...processCreateParams(params)
+      });
+    }
+  };
+  var ZodLazy = class extends ZodType {
+    get schema() {
+      return this._def.getter();
+    }
+    _parse(input) {
+      const { ctx } = this._processInputParams(input);
+      const lazySchema = this._def.getter();
+      return lazySchema._parse({ data: ctx.data, path: ctx.path, parent: ctx });
+    }
+  };
+  ZodLazy.create = (getter, params) => {
+    return new ZodLazy({
+      getter,
+      typeName: ZodFirstPartyTypeKind.ZodLazy,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodLiteral = class extends ZodType {
+    _parse(input) {
+      if (input.data !== this._def.value) {
+        const ctx = this._getOrReturnCtx(input);
+        addIssueToContext(ctx, {
+          received: ctx.data,
+          code: ZodIssueCode.invalid_literal,
+          expected: this._def.value
+        });
+        return INVALID;
+      }
+      return { status: "valid", value: input.data };
+    }
+    get value() {
+      return this._def.value;
+    }
+  };
+  ZodLiteral.create = (value, params) => {
+    return new ZodLiteral({
+      value,
+      typeName: ZodFirstPartyTypeKind.ZodLiteral,
+      ...processCreateParams(params)
+    });
+  };
+  function createZodEnum(values, params) {
+    return new ZodEnum({
+      values,
+      typeName: ZodFirstPartyTypeKind.ZodEnum,
+      ...processCreateParams(params)
+    });
+  }
+  var ZodEnum = class _ZodEnum extends ZodType {
+    _parse(input) {
+      if (typeof input.data !== "string") {
+        const ctx = this._getOrReturnCtx(input);
+        const expectedValues = this._def.values;
+        addIssueToContext(ctx, {
+          expected: util.joinValues(expectedValues),
+          received: ctx.parsedType,
+          code: ZodIssueCode.invalid_type
+        });
+        return INVALID;
+      }
+      if (!this._cache) {
+        this._cache = new Set(this._def.values);
+      }
+      if (!this._cache.has(input.data)) {
+        const ctx = this._getOrReturnCtx(input);
+        const expectedValues = this._def.values;
+        addIssueToContext(ctx, {
+          received: ctx.data,
+          code: ZodIssueCode.invalid_enum_value,
+          options: expectedValues
+        });
+        return INVALID;
+      }
+      return OK(input.data);
+    }
+    get options() {
+      return this._def.values;
+    }
+    get enum() {
+      const enumValues = {};
+      for (const val of this._def.values) {
+        enumValues[val] = val;
+      }
+      return enumValues;
+    }
+    get Values() {
+      const enumValues = {};
+      for (const val of this._def.values) {
+        enumValues[val] = val;
+      }
+      return enumValues;
+    }
+    get Enum() {
+      const enumValues = {};
+      for (const val of this._def.values) {
+        enumValues[val] = val;
+      }
+      return enumValues;
+    }
+    extract(values, newDef = this._def) {
+      return _ZodEnum.create(values, {
+        ...this._def,
+        ...newDef
+      });
+    }
+    exclude(values, newDef = this._def) {
+      return _ZodEnum.create(this.options.filter((opt) => !values.includes(opt)), {
+        ...this._def,
+        ...newDef
+      });
+    }
+  };
+  ZodEnum.create = createZodEnum;
+  var ZodNativeEnum = class extends ZodType {
+    _parse(input) {
+      const nativeEnumValues = util.getValidEnumValues(this._def.values);
+      const ctx = this._getOrReturnCtx(input);
+      if (ctx.parsedType !== ZodParsedType.string && ctx.parsedType !== ZodParsedType.number) {
+        const expectedValues = util.objectValues(nativeEnumValues);
+        addIssueToContext(ctx, {
+          expected: util.joinValues(expectedValues),
+          received: ctx.parsedType,
+          code: ZodIssueCode.invalid_type
+        });
+        return INVALID;
+      }
+      if (!this._cache) {
+        this._cache = new Set(util.getValidEnumValues(this._def.values));
+      }
+      if (!this._cache.has(input.data)) {
+        const expectedValues = util.objectValues(nativeEnumValues);
+        addIssueToContext(ctx, {
+          received: ctx.data,
+          code: ZodIssueCode.invalid_enum_value,
+          options: expectedValues
+        });
+        return INVALID;
+      }
+      return OK(input.data);
+    }
+    get enum() {
+      return this._def.values;
+    }
+  };
+  ZodNativeEnum.create = (values, params) => {
+    return new ZodNativeEnum({
+      values,
+      typeName: ZodFirstPartyTypeKind.ZodNativeEnum,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodPromise = class extends ZodType {
+    unwrap() {
+      return this._def.type;
+    }
+    _parse(input) {
+      const { ctx } = this._processInputParams(input);
+      if (ctx.parsedType !== ZodParsedType.promise && ctx.common.async === false) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.promise,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      const promisified = ctx.parsedType === ZodParsedType.promise ? ctx.data : Promise.resolve(ctx.data);
+      return OK(promisified.then((data) => {
+        return this._def.type.parseAsync(data, {
+          path: ctx.path,
+          errorMap: ctx.common.contextualErrorMap
+        });
+      }));
+    }
+  };
+  ZodPromise.create = (schema, params) => {
+    return new ZodPromise({
+      type: schema,
+      typeName: ZodFirstPartyTypeKind.ZodPromise,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodEffects = class extends ZodType {
+    innerType() {
+      return this._def.schema;
+    }
+    sourceType() {
+      return this._def.schema._def.typeName === ZodFirstPartyTypeKind.ZodEffects ? this._def.schema.sourceType() : this._def.schema;
+    }
+    _parse(input) {
+      const { status, ctx } = this._processInputParams(input);
+      const effect = this._def.effect || null;
+      const checkCtx = {
+        addIssue: (arg) => {
+          addIssueToContext(ctx, arg);
+          if (arg.fatal) {
+            status.abort();
+          } else {
+            status.dirty();
+          }
+        },
+        get path() {
+          return ctx.path;
+        }
+      };
+      checkCtx.addIssue = checkCtx.addIssue.bind(checkCtx);
+      if (effect.type === "preprocess") {
+        const processed = effect.transform(ctx.data, checkCtx);
+        if (ctx.common.async) {
+          return Promise.resolve(processed).then(async (processed2) => {
+            if (status.value === "aborted")
+              return INVALID;
+            const result = await this._def.schema._parseAsync({
+              data: processed2,
+              path: ctx.path,
+              parent: ctx
+            });
+            if (result.status === "aborted")
+              return INVALID;
+            if (result.status === "dirty")
+              return DIRTY(result.value);
+            if (status.value === "dirty")
+              return DIRTY(result.value);
+            return result;
+          });
+        } else {
+          if (status.value === "aborted")
+            return INVALID;
+          const result = this._def.schema._parseSync({
+            data: processed,
+            path: ctx.path,
+            parent: ctx
+          });
+          if (result.status === "aborted")
+            return INVALID;
+          if (result.status === "dirty")
+            return DIRTY(result.value);
+          if (status.value === "dirty")
+            return DIRTY(result.value);
+          return result;
+        }
+      }
+      if (effect.type === "refinement") {
+        const executeRefinement = (acc) => {
+          const result = effect.refinement(acc, checkCtx);
+          if (ctx.common.async) {
+            return Promise.resolve(result);
+          }
+          if (result instanceof Promise) {
+            throw new Error("Async refinement encountered during synchronous parse operation. Use .parseAsync instead.");
+          }
+          return acc;
+        };
+        if (ctx.common.async === false) {
+          const inner = this._def.schema._parseSync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: ctx
+          });
+          if (inner.status === "aborted")
+            return INVALID;
+          if (inner.status === "dirty")
+            status.dirty();
+          executeRefinement(inner.value);
+          return { status: status.value, value: inner.value };
+        } else {
+          return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((inner) => {
+            if (inner.status === "aborted")
+              return INVALID;
+            if (inner.status === "dirty")
+              status.dirty();
+            return executeRefinement(inner.value).then(() => {
+              return { status: status.value, value: inner.value };
+            });
+          });
+        }
+      }
+      if (effect.type === "transform") {
+        if (ctx.common.async === false) {
+          const base = this._def.schema._parseSync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: ctx
+          });
+          if (!isValid(base))
+            return INVALID;
+          const result = effect.transform(base.value, checkCtx);
+          if (result instanceof Promise) {
+            throw new Error(`Asynchronous transform encountered during synchronous parse operation. Use .parseAsync instead.`);
+          }
+          return { status: status.value, value: result };
+        } else {
+          return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((base) => {
+            if (!isValid(base))
+              return INVALID;
+            return Promise.resolve(effect.transform(base.value, checkCtx)).then((result) => ({
+              status: status.value,
+              value: result
+            }));
+          });
+        }
+      }
+      util.assertNever(effect);
+    }
+  };
+  ZodEffects.create = (schema, effect, params) => {
+    return new ZodEffects({
+      schema,
+      typeName: ZodFirstPartyTypeKind.ZodEffects,
+      effect,
+      ...processCreateParams(params)
+    });
+  };
+  ZodEffects.createWithPreprocess = (preprocess, schema, params) => {
+    return new ZodEffects({
+      schema,
+      effect: { type: "preprocess", transform: preprocess },
+      typeName: ZodFirstPartyTypeKind.ZodEffects,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodOptional = class extends ZodType {
+    _parse(input) {
+      const parsedType = this._getType(input);
+      if (parsedType === ZodParsedType.undefined) {
+        return OK(void 0);
+      }
+      return this._def.innerType._parse(input);
+    }
+    unwrap() {
+      return this._def.innerType;
+    }
+  };
+  ZodOptional.create = (type, params) => {
+    return new ZodOptional({
+      innerType: type,
+      typeName: ZodFirstPartyTypeKind.ZodOptional,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodNullable = class extends ZodType {
+    _parse(input) {
+      const parsedType = this._getType(input);
+      if (parsedType === ZodParsedType.null) {
+        return OK(null);
+      }
+      return this._def.innerType._parse(input);
+    }
+    unwrap() {
+      return this._def.innerType;
+    }
+  };
+  ZodNullable.create = (type, params) => {
+    return new ZodNullable({
+      innerType: type,
+      typeName: ZodFirstPartyTypeKind.ZodNullable,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodDefault = class extends ZodType {
+    _parse(input) {
+      const { ctx } = this._processInputParams(input);
+      let data = ctx.data;
+      if (ctx.parsedType === ZodParsedType.undefined) {
+        data = this._def.defaultValue();
+      }
+      return this._def.innerType._parse({
+        data,
+        path: ctx.path,
+        parent: ctx
+      });
+    }
+    removeDefault() {
+      return this._def.innerType;
+    }
+  };
+  ZodDefault.create = (type, params) => {
+    return new ZodDefault({
+      innerType: type,
+      typeName: ZodFirstPartyTypeKind.ZodDefault,
+      defaultValue: typeof params.default === "function" ? params.default : () => params.default,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodCatch = class extends ZodType {
+    _parse(input) {
+      const { ctx } = this._processInputParams(input);
+      const newCtx = {
+        ...ctx,
+        common: {
+          ...ctx.common,
+          issues: []
+        }
+      };
+      const result = this._def.innerType._parse({
+        data: newCtx.data,
+        path: newCtx.path,
+        parent: {
+          ...newCtx
+        }
+      });
+      if (isAsync(result)) {
+        return result.then((result2) => {
+          return {
+            status: "valid",
+            value: result2.status === "valid" ? result2.value : this._def.catchValue({
+              get error() {
+                return new ZodError(newCtx.common.issues);
+              },
+              input: newCtx.data
+            })
+          };
+        });
+      } else {
+        return {
+          status: "valid",
+          value: result.status === "valid" ? result.value : this._def.catchValue({
+            get error() {
+              return new ZodError(newCtx.common.issues);
+            },
+            input: newCtx.data
+          })
+        };
+      }
+    }
+    removeCatch() {
+      return this._def.innerType;
+    }
+  };
+  ZodCatch.create = (type, params) => {
+    return new ZodCatch({
+      innerType: type,
+      typeName: ZodFirstPartyTypeKind.ZodCatch,
+      catchValue: typeof params.catch === "function" ? params.catch : () => params.catch,
+      ...processCreateParams(params)
+    });
+  };
+  var ZodNaN = class extends ZodType {
+    _parse(input) {
+      const parsedType = this._getType(input);
+      if (parsedType !== ZodParsedType.nan) {
+        const ctx = this._getOrReturnCtx(input);
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_type,
+          expected: ZodParsedType.nan,
+          received: ctx.parsedType
+        });
+        return INVALID;
+      }
+      return { status: "valid", value: input.data };
+    }
+  };
+  ZodNaN.create = (params) => {
+    return new ZodNaN({
+      typeName: ZodFirstPartyTypeKind.ZodNaN,
+      ...processCreateParams(params)
+    });
+  };
+  var BRAND = /* @__PURE__ */ Symbol("zod_brand");
+  var ZodBranded = class extends ZodType {
+    _parse(input) {
+      const { ctx } = this._processInputParams(input);
+      const data = ctx.data;
+      return this._def.type._parse({
+        data,
+        path: ctx.path,
+        parent: ctx
+      });
+    }
+    unwrap() {
+      return this._def.type;
+    }
+  };
+  var ZodPipeline = class _ZodPipeline extends ZodType {
+    _parse(input) {
+      const { status, ctx } = this._processInputParams(input);
+      if (ctx.common.async) {
+        const handleAsync = async () => {
+          const inResult = await this._def.in._parseAsync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: ctx
+          });
+          if (inResult.status === "aborted")
+            return INVALID;
+          if (inResult.status === "dirty") {
+            status.dirty();
+            return DIRTY(inResult.value);
+          } else {
+            return this._def.out._parseAsync({
+              data: inResult.value,
+              path: ctx.path,
+              parent: ctx
+            });
+          }
+        };
+        return handleAsync();
+      } else {
+        const inResult = this._def.in._parseSync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: ctx
+        });
+        if (inResult.status === "aborted")
+          return INVALID;
+        if (inResult.status === "dirty") {
+          status.dirty();
+          return {
+            status: "dirty",
+            value: inResult.value
+          };
+        } else {
+          return this._def.out._parseSync({
+            data: inResult.value,
+            path: ctx.path,
+            parent: ctx
+          });
+        }
+      }
+    }
+    static create(a, b) {
+      return new _ZodPipeline({
+        in: a,
+        out: b,
+        typeName: ZodFirstPartyTypeKind.ZodPipeline
+      });
+    }
+  };
+  var ZodReadonly = class extends ZodType {
+    _parse(input) {
+      const result = this._def.innerType._parse(input);
+      const freeze = (data) => {
+        if (isValid(data)) {
+          data.value = Object.freeze(data.value);
+        }
+        return data;
+      };
+      return isAsync(result) ? result.then((data) => freeze(data)) : freeze(result);
+    }
+    unwrap() {
+      return this._def.innerType;
+    }
+  };
+  ZodReadonly.create = (type, params) => {
+    return new ZodReadonly({
+      innerType: type,
+      typeName: ZodFirstPartyTypeKind.ZodReadonly,
+      ...processCreateParams(params)
+    });
+  };
+  function cleanParams(params, data) {
+    const p = typeof params === "function" ? params(data) : typeof params === "string" ? { message: params } : params;
+    const p2 = typeof p === "string" ? { message: p } : p;
+    return p2;
+  }
+  function custom(check, _params = {}, fatal) {
+    if (check)
+      return ZodAny.create().superRefine((data, ctx) => {
+        const r = check(data);
+        if (r instanceof Promise) {
+          return r.then((r2) => {
+            if (!r2) {
+              const params = cleanParams(_params, data);
+              const _fatal = params.fatal ?? fatal ?? true;
+              ctx.addIssue({ code: "custom", ...params, fatal: _fatal });
+            }
+          });
+        }
+        if (!r) {
+          const params = cleanParams(_params, data);
+          const _fatal = params.fatal ?? fatal ?? true;
+          ctx.addIssue({ code: "custom", ...params, fatal: _fatal });
+        }
+        return;
+      });
+    return ZodAny.create();
+  }
+  var late = {
+    object: ZodObject.lazycreate
+  };
+  var ZodFirstPartyTypeKind;
+  (function(ZodFirstPartyTypeKind2) {
+    ZodFirstPartyTypeKind2["ZodString"] = "ZodString";
+    ZodFirstPartyTypeKind2["ZodNumber"] = "ZodNumber";
+    ZodFirstPartyTypeKind2["ZodNaN"] = "ZodNaN";
+    ZodFirstPartyTypeKind2["ZodBigInt"] = "ZodBigInt";
+    ZodFirstPartyTypeKind2["ZodBoolean"] = "ZodBoolean";
+    ZodFirstPartyTypeKind2["ZodDate"] = "ZodDate";
+    ZodFirstPartyTypeKind2["ZodSymbol"] = "ZodSymbol";
+    ZodFirstPartyTypeKind2["ZodUndefined"] = "ZodUndefined";
+    ZodFirstPartyTypeKind2["ZodNull"] = "ZodNull";
+    ZodFirstPartyTypeKind2["ZodAny"] = "ZodAny";
+    ZodFirstPartyTypeKind2["ZodUnknown"] = "ZodUnknown";
+    ZodFirstPartyTypeKind2["ZodNever"] = "ZodNever";
+    ZodFirstPartyTypeKind2["ZodVoid"] = "ZodVoid";
+    ZodFirstPartyTypeKind2["ZodArray"] = "ZodArray";
+    ZodFirstPartyTypeKind2["ZodObject"] = "ZodObject";
+    ZodFirstPartyTypeKind2["ZodUnion"] = "ZodUnion";
+    ZodFirstPartyTypeKind2["ZodDiscriminatedUnion"] = "ZodDiscriminatedUnion";
+    ZodFirstPartyTypeKind2["ZodIntersection"] = "ZodIntersection";
+    ZodFirstPartyTypeKind2["ZodTuple"] = "ZodTuple";
+    ZodFirstPartyTypeKind2["ZodRecord"] = "ZodRecord";
+    ZodFirstPartyTypeKind2["ZodMap"] = "ZodMap";
+    ZodFirstPartyTypeKind2["ZodSet"] = "ZodSet";
+    ZodFirstPartyTypeKind2["ZodFunction"] = "ZodFunction";
+    ZodFirstPartyTypeKind2["ZodLazy"] = "ZodLazy";
+    ZodFirstPartyTypeKind2["ZodLiteral"] = "ZodLiteral";
+    ZodFirstPartyTypeKind2["ZodEnum"] = "ZodEnum";
+    ZodFirstPartyTypeKind2["ZodEffects"] = "ZodEffects";
+    ZodFirstPartyTypeKind2["ZodNativeEnum"] = "ZodNativeEnum";
+    ZodFirstPartyTypeKind2["ZodOptional"] = "ZodOptional";
+    ZodFirstPartyTypeKind2["ZodNullable"] = "ZodNullable";
+    ZodFirstPartyTypeKind2["ZodDefault"] = "ZodDefault";
+    ZodFirstPartyTypeKind2["ZodCatch"] = "ZodCatch";
+    ZodFirstPartyTypeKind2["ZodPromise"] = "ZodPromise";
+    ZodFirstPartyTypeKind2["ZodBranded"] = "ZodBranded";
+    ZodFirstPartyTypeKind2["ZodPipeline"] = "ZodPipeline";
+    ZodFirstPartyTypeKind2["ZodReadonly"] = "ZodReadonly";
+  })(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
+  var instanceOfType = (cls, params = {
+    message: `Input not instance of ${cls.name}`
+  }) => custom((data) => data instanceof cls, params);
+  var stringType = ZodString.create;
+  var numberType = ZodNumber.create;
+  var nanType = ZodNaN.create;
+  var bigIntType = ZodBigInt.create;
+  var booleanType = ZodBoolean.create;
+  var dateType = ZodDate.create;
+  var symbolType = ZodSymbol.create;
+  var undefinedType = ZodUndefined.create;
+  var nullType = ZodNull.create;
+  var anyType = ZodAny.create;
+  var unknownType = ZodUnknown.create;
+  var neverType = ZodNever.create;
+  var voidType = ZodVoid.create;
+  var arrayType = ZodArray.create;
+  var objectType = ZodObject.create;
+  var strictObjectType = ZodObject.strictCreate;
+  var unionType = ZodUnion.create;
+  var discriminatedUnionType = ZodDiscriminatedUnion.create;
+  var intersectionType = ZodIntersection.create;
+  var tupleType = ZodTuple.create;
+  var recordType = ZodRecord.create;
+  var mapType = ZodMap.create;
+  var setType = ZodSet.create;
+  var functionType = ZodFunction.create;
+  var lazyType = ZodLazy.create;
+  var literalType = ZodLiteral.create;
+  var enumType = ZodEnum.create;
+  var nativeEnumType = ZodNativeEnum.create;
+  var promiseType = ZodPromise.create;
+  var effectsType = ZodEffects.create;
+  var optionalType = ZodOptional.create;
+  var nullableType = ZodNullable.create;
+  var preprocessType = ZodEffects.createWithPreprocess;
+  var pipelineType = ZodPipeline.create;
+  var ostring = () => stringType().optional();
+  var onumber = () => numberType().optional();
+  var oboolean = () => booleanType().optional();
+  var coerce = {
+    string: ((arg) => ZodString.create({ ...arg, coerce: true })),
+    number: ((arg) => ZodNumber.create({ ...arg, coerce: true })),
+    boolean: ((arg) => ZodBoolean.create({
+      ...arg,
+      coerce: true
+    })),
+    bigint: ((arg) => ZodBigInt.create({ ...arg, coerce: true })),
+    date: ((arg) => ZodDate.create({ ...arg, coerce: true }))
+  };
+  var NEVER = INVALID;
+
+  // src/schema.ts
+  var DispelType = external_exports.enum([
+    "None",
+    "Magic",
+    "Curse",
+    "Disease",
+    "Poison",
+    "Enrage",
+    "Bleed"
+  ]);
+  var Role = external_exports.enum(["Tank", "Healer", "DPS"]);
+  var PartyRole = external_exports.enum(["tank", "healer", "melee_dps", "ranged_dps"]);
+  var Priority = external_exports.enum(["trivial", "priority", "reference"]);
+  var CreatureTypeName = external_exports.enum([
+    "Beast",
+    "Dragonkin",
+    "Demon",
+    "Elemental",
+    "Giant",
+    "Undead",
+    "Humanoid",
+    "Critter",
+    "Mechanical",
+    "Not specified",
+    "Totem",
+    "Non-combat Pet",
+    "Gas Cloud",
+    "Wild Pet",
+    "Aberration"
+  ]);
+  var MechanicName = external_exports.string().min(1);
+  var SchoolName = external_exports.string().min(1);
+  var DispelTypeLookup = external_exports.object({
+    id: external_exports.number().int(),
+    name: external_exports.string()
+    // SpellDispelType.Name_lang
+  });
+  var MechanicLookup = external_exports.object({
+    id: external_exports.number().int(),
+    name: external_exports.string()
+    // SpellMechanic.StateName_lang
+  });
+  var CreatureTypeLookup = external_exports.object({
+    id: external_exports.number().int(),
+    name: external_exports.string()
+    // CreatureType.Name_lang
+  });
+  var Dungeon = external_exports.object({
+    dungeon_id: external_exports.number().int(),
+    // DB2  JournalInstance.ID
+    map_id: external_exports.number().int(),
+    // DB2  primary UiMap.ID (decision B)
+    name: external_exports.string(),
+    // DB2  JournalInstance.Name_lang
+    expansion: external_exports.string(),
+    // EDITORIAL
+    season: external_exports.string(),
+    // EDITORIAL
+    // Extensions for the future map UI (decision B). Not part of the warning
+    // model; recorded so a multi-floor dungeon isn't lost.
+    floor_map_ids: external_exports.array(external_exports.number().int()),
+    // DB2  all UiMap floors
+    parent_map_id: external_exports.number().int().nullable(),
+    // DB2  UiMap.ParentUiMapID
+    instance_map_id: external_exports.number().int()
+    // DB2  Map.ID
+  });
+  var Creature = external_exports.object({
+    npc_id: external_exports.number().int(),
+    // DB2/WOWHEAD  universal join key
+    name: external_exports.string(),
+    // WOWHEAD scrape (client DB2 Creature only covers cosmetic NPCs)
+    display_id: external_exports.number().int().nullable(),
+    // model id, for icons later; not identity
+    creature_type: CreatureTypeName,
+    // WOWHEAD scrape type -> CreatureType vocabulary
+    base_health: external_exports.number().int().nullable(),
+    // base/unscaled; null until in-game testing
+    is_boss: external_exports.boolean(),
+    // WOWHEAD encounter section / editorial
+    // Editorial: this creature is an ADD summoned during a boss encounter (e.g. Ancient Branch, thrown by the
+    // Overgrown Ancient) — NOT a boss itself, but its mechanics belong with the boss, not in the trash bucket.
+    is_boss_add: external_exports.boolean().default(false),
+    summoned_by: external_exports.number().int().nullable().default(null),
+    // the boss npc_id that summons this add (for labeling); null = n/a
+    // Editorial: an UNAVOIDABLE add (default) appears every pull — its mechanics are part of the encounter, so
+    // the engine auto-includes it when its summoner is pulled. `avoidable:true` = the spawn can be reliably
+    // prevented (kick the summon), so it's NOT auto-included. Only meaningful when is_boss_add.
+    avoidable: external_exports.boolean().default(false),
+    level: external_exports.number().int().nullable(),
+    // Tiering signal from Wowhead (Normal/Elite/Rare Elite/Rare). Flexible string,
+    // not a closed enum, so a new value never breaks the build. Does NOT separate
+    // dungeon bosses from elite trash — use is_boss for that.
+    classification: external_exports.string().nullable()
+  });
+  var Spell = external_exports.object({
+    spell_id: external_exports.number().int(),
+    // DB2  SpellName.ID
+    name: external_exports.string(),
+    // DB2  SpellName.Name_lang
+    dispel_type: DispelType,
+    // DB2  SpellCategories.DispelType -> SpellDispelType
+    mechanic: MechanicName.nullable(),
+    // DB2  SpellCategories.Mechanic -> SpellMechanic (null = none)
+    cast_time_ms: external_exports.number().int(),
+    // DB2  SpellMisc.CastingTimeIndex -> SpellCastTimes.Base
+    // DB2  SpellMisc.DurationIndex -> SpellDuration.Duration (ms); null = no finite duration (-1 infinite / no row).
+    // The aura/effect duration — feeds the vulnerability window ("ramps … for Ns"). Defaulted null for back-compat.
+    duration_ms: external_exports.number().int().nullable().default(null),
+    is_channeled: external_exports.boolean(),
+    // LOCKED  SpellMisc.Attributes_1 & 0x4
+    is_interruptible: external_exports.boolean(),
+    // LOCKED  (cast>0||channeled) && SpellInterrupts.InterruptFlags & 0x4
+    is_stoppable: external_exports.boolean(),
+    // EDITORIAL  CC stops w/o recast; depends on creature AI; default false
+    school: SchoolName,
+    // DB2  SpellMisc.SchoolMask decoded
+    // DB2  Spell.Description_lang (the tooltip text), with `$@spelldescNNNN` REDIRECTS resolved (a cast's
+    // tooltip often points at its impact spell's text — Runic Mark 1224801 -> $@spelldesc1225792). Keeps the
+    // raw $-tokens ($s1/$t2/yards); the structural signatures (DoT "every N sec", AoE "within N yards", bounce)
+    // survive for the tooltip scanner (`audit-tooltips`). null = no description. Defaulted for back-compat.
+    description: external_exports.string().nullable().default(null)
+  });
+  var DungeonCreature = external_exports.object({
+    dungeon_id: external_exports.number().int(),
+    // WOWHEAD membership
+    npc_id: external_exports.number().int(),
+    // WOWHEAD membership
+    forces: external_exports.number().int().nullable()
+    // EDITORIAL enemy-forces count; nullable for now
+  });
+  var CadenceConfidence = external_exports.enum(["measured", "editorial"]);
+  var ObservedKickPoint = external_exports.object({
+    kick_point_ms: external_exports.number().int(),
+    // median absolute time into the cast bar a kick lands
+    clean_cast_ms: external_exports.number().int().nullable(),
+    // median uninterrupted cast duration (the baseline); null = never completed cleanly
+    pct: external_exports.number().int().nullable(),
+    // kick_point / clean_cast as % (null when the cast is too instant for a meaningful ratio)
+    samples: external_exports.number().int()
+    // interrupts matched to a begincast (the basis of the medians)
+  }).strict();
+  var ObservedChannelStop = external_exports.object({
+    reaction_ms: external_exports.number().int(),
+    // median elapsed channel time before the stop (cast-start → interrupt)
+    samples: external_exports.number().int()
+    // interrupts matched to a channel start (the basis of the median)
+  }).strict();
+  var PositioningTech = external_exports.enum(["move_out", "frontal", "line_of_sight", "spread", "stack", "soak", "bait"]);
+  var DisplacementKind = external_exports.enum(["knockback", "pull", "cast_pushback"]);
+  var Vulnerability = external_exports.object({
+    school: SchoolName,
+    // amplified school ('Shadow', 'Fire', 'Physical', 'Frost', …) or the literal 'all'
+    pct: external_exports.number().int(),
+    // +% damage taken
+    stacks: external_exports.boolean().default(false),
+    // repeated applications compound
+    // How long the debuff lasts, in seconds (the tooltip's "for N sec") — so the engine can name the window
+    // a tank must cover with an equal-length mitigation. EDITORIAL for now (the duration index isn't in the
+    // cached DB2 — needs SpellDuration to be data-backed). Omit for a zone/stacking amp with no fixed timer.
+    duration_s: external_exports.number().int().positive().optional()
+  }).strict();
+  var CreatureSpell = external_exports.object({
+    npc_id: external_exports.number().int(),
+    spell_id: external_exports.number().int(),
+    requires_interrupt: external_exports.boolean(),
+    // EDITORIAL  "this cast should be kicked"
+    priority: Priority,
+    // EDITORIAL  default 'trivial' until classified
+    is_aoe: external_exports.boolean(),
+    // hits >1 player; now ALSO derivable from party_targets >= 2 (kept as the simple flag)
+    // ---- damage-threat axes (the avoidance model) ----
+    // MEASURED (cast-spread) cardinality: typical distinct party members hit per cast INSTANCE
+    // (~1 single-target, ~3 "several", ~5 party-wide). null = unmeasured. Joined from
+    // data/observed-cast-spread.json by `npm run suggest-spread`.
+    party_targets: external_exports.number().nullable().default(null),
+    // MEASURED (cast-spread) avoidability: lands on the party regardless of position (avg victims high)
+    // -> the engine routes it to the SURVIVE line (heal/mitigate), vs an avoidable ground/cone you dodge.
+    unavoidable: external_exports.boolean().default(false),
+    // EDITORIAL positioning answer(s) — the "where to stand" techniques that defeat/mitigate it.
+    positioning: external_exports.array(PositioningTech).default([]),
+    // MEASURED (WCL tick flag) / DB2 (periodic aura): applies damage-over-time. A dispellable DoT also
+    // surfaces in the dispel dimension ("dispel to end the ticks"); sustained pressure vs a burst spike.
+    dot: external_exports.boolean().default(false),
+    // DB2-derived (knock effects) / EDITORIAL: the cast knocks back / pulls / pushes back your cast.
+    displacement: external_exports.array(DisplacementKind).default([]),
+    // EDITORIAL — a VULNERABILITY/amplifier: this cast increases damage taken (+pct% of `school`, or 'all'), so a
+    // following same-school hit lands amplified. Often little/no direct damage itself (tool-invisible to the
+    // danger/death/kick accelerators), so it's hand-set from the tooltip. The engine's vulnerability dimension
+    // pairs it with same-school lethal casts in the pull and routes the answer to removal/external. null = not one.
+    vulnerability: Vulnerability.nullable().default(null),
+    // MEASURED (target_roles == [tank] + heavy single-target hit): a TANK BUSTER — its answer is the
+    // tank's active mitigation / an external, not dodge/heal. First-class so the engine can later check
+    // the comp has an external for the lethal ones. Gated on the targeting join; default false.
+    tank_buster: external_exports.boolean().default(false),
+    is_lethal: external_exports.boolean(),
+    // EDITORIAL  lethal at the target key NOW
+    // EDITORIAL  not punishing at low keys but scales (HP/absorb) into a kill/wipe at higher
+    // keys — the advisor names the habit and escalates severity when the party can't answer it.
+    scales_to_lethal: external_exports.boolean(),
+    notes: external_exports.string().nullable(),
+    // EDITORIAL
+    // EDITORIAL — a COMPLETION-EFFECT cast: its effect fires only IF the cast/channel COMPLETES (a
+    // self-rez, a summon), so you STOP it (CC or interrupt) before completion to DENY the effect. Unlike a
+    // damage channel there's no per-tick gradient — any stop before the end works (so this is NOT
+    // channel_timing; it's the inverse arm of the channel taxonomy). The value is the label of what
+    // completing does, used in the warning ("…to deny the <self-resurrection>"). null = not one.
+    completion_effect: external_exports.string().nullable().default(null),
+    // EDITORIAL — player-facing coaching for a bespoke mechanic no structured field captures (a
+    // failure-punish "triggered by failing X", an add to kill, a removal route "decurse or Freedom").
+    // Surfaced by the engine's `notes` dimension as a coaching line. DISTINCT from `notes` above, which
+    // is the curator's internal scratchpad (provenance / DB2 caveats) and is NEVER shown to the player.
+    coaching_note: external_exports.string().nullable().default(null),
+    // EDITORIAL — HIGH-RISK alternatives: viable-but-dangerous plays a player self-assesses (NOT skill-gated —
+    // the danger is factual, shown at every tier). Each is role-tagged so the UI shows it under that role's lens
+    // (a DPS taunt-soak under DPS, etc.). The engine ALSO generates high-risk plays structurally (a Blessing of
+    // Protection on the tank drops aggro), so this field is only for BESPOKE ones no structured rule produces.
+    high_risk: external_exports.array(external_exports.object({ role: external_exports.enum(["tank", "healer", "dps"]), text: external_exports.string() })).default([]),
+    // EDITORIAL — SECONDARY EFFECT: this cast is not something the boss directly casts but a CONSEQUENCE of a
+    // PRIMARY cast (a pool left when a debuff is removed, an add a summon spawns, a death-burst). `secondary_of`
+    // is the PRIMARY's spell_id; the engine attributes the secondary to it ("Stygian Ichor — from Hulking
+    // Fragment"). null = a primary/standalone cast.
+    secondary_of: external_exports.number().int().nullable().default(null),
+    // EDITORIAL — CAST ORDER: this cast's position in the boss's casting CYCLE (1 = cast first, 2 = next, …),
+    // derived from a WCL "Casts (as events)" timeline (the order each distinct mechanic first appears). Lets the
+    // UI present a boss's mechanics CHRONOLOGICALLY (who → what → when) instead of by severity. null = unordered
+    // (sorts after the ordered casts). Hand-set for now; could be auto-derived from the observed-cadence timeline.
+    cast_order: external_exports.number().int().nullable().default(null),
+    // EDITORIAL — REMOVAL TRIGGERS THE EFFECT: dispelling this debuff detonates it (same as letting it expire),
+    // so it is NOT a dispel target. The engine drops it from the dispel/survive dimensions and routes the answer
+    // to the cast's coaching_note (spread/position), per the prevent>avoid>remove>survive precedence. Default false.
+    dispel_detonates: external_exports.boolean().default(false),
+    // EDITORIAL opt-out — for a movement-impairing (rooted/snared) cast that ALSO applies a dispellable
+    // debuff: an ally-castable Freedom removes the WHOLE aura (snare + DoT/Magic), so it's a second full
+    // removal path equal to a dispel — the engine credits it by default. Set true for the RARE exception
+    // where Freedom clears ONLY the movement component (the rest of the debuff lingers). Default false.
+    freedom_partial: external_exports.boolean().default(false),
+    // MEASURED (combat-log cadence pipeline) or EDITORIAL; null = unmeasured. The
+    // recast period (cast + downtime) the timeline-aware engine (L1) consumes;
+    // joined in by the linker from the observed-cadence source. See cadence.md.
+    recast_cooldown_ms: external_exports.number().int().nullable(),
+    recast_cooldown_confidence: CadenceConfidence.nullable(),
+    // MEASURED (WCL Damage-Taken application layer) — which party_role "baskets" this cast
+    // actually lands on. Like cadence, it is encounter-AI behavior, NOT in DB2, and not
+    // hand-guessed; joined in from data/observed-targeting/<slug>.json (the targeting adapter)
+    // by `npm run join-targeting`. null = unmeasured. The engine uses it to make warnings
+    // role-aware ("this Magic debuff lands on your healer/ranged and no one can dispel it") and
+    // to flag casts that bypass the tank. Default null for backward-compatible parsing.
+    target_roles: external_exports.array(PartyRole).nullable().default(null),
+    // MEASURED (combat-log/WCL SPELL_INTERRUPT) — this cast was ACTUALLY interrupted in a real run,
+    // so it IS interruptible regardless of a stale DB2 `is_interruptible` (our 12.1.0 DB2 marks live
+    // kickable casts not-interruptible). One-directional: an observed kick can only PROVE interruptible
+    // (absence isn't proof of the opposite), so it's OR-applied over the DB2 value at export. Joined
+    // from data/observed-interrupts/<slug>.json by `npm run join-interrupts`; default false.
+    interruptible_observed: external_exports.boolean().default(false),
+    // MEASURED kick timing (WCL begincast→Interrupt correlation) — where in the cast bar players land
+    // the kick + the clean-cast baseline. Joined from data/observed-kick-timing.json by
+    // `npm run join-kick-timing`; null = unmeasured. The engine teaches react-kick vs long-kick. Its
+    // presence ALSO proves interruptibility (it's derived from real interrupts), so the export ORs it
+    // into is_interruptible alongside interruptible_observed — one join lights up both signals.
+    observed_kick_point: ObservedKickPoint.nullable().default(null),
+    // MEASURED channel-stop reaction (WCL cast-start → interrupt) for CHANNELED casts — the inverse of
+    // observed_kick_point (stop a channel EARLY, not late). Joined from the same observed-kick-timing.json
+    // by `npm run join-kick-timing`; null = unmeasured. Like observed_kick_point its presence proves
+    // interruptibility (measured from real interrupts), so the export ORs it into is_interruptible too.
+    observed_channel_stop: ObservedChannelStop.nullable().default(null)
+  });
+  var Confidence = external_exports.enum(["db2", "tooltip", "editorial"]);
+  var AbilitySource = external_exports.enum(["baseline", "talent", "pet"]);
+  var PetName = external_exports.enum(["felhunter", "felguard", "imp", "succubus"]);
+  var Condition = external_exports.object({
+    creature_types: external_exports.array(CreatureTypeName).optional(),
+    // Hibernate -> Beast/Dragonkin
+    schools: external_exports.array(SchoolName).optional(),
+    // Blessing of Protection -> Physical
+    requires_pet: external_exports.boolean().optional(),
+    // Warlock/Hunter pet must be active
+    pet: PetName.optional()
+    // WHICH demon provides it (Warlock pet-choice exclusivity)
+  }).strict();
+  var CapabilityAbility = external_exports.object({
+    spell_id: external_exports.number().int(),
+    name: external_exports.string(),
+    source: AbilitySource,
+    cast_time_ms: external_exports.number().int(),
+    // 0 = instant (instant vs casted delineation)
+    confidence: Confidence,
+    verified: external_exports.boolean(),
+    // db2 defaults true; promote keeps verified:true
+    condition: Condition.nullable(),
+    note: external_exports.string().nullable()
+    // ability-level warning (e.g. fear danger, scatter DPS-loss)
+  });
+  var Removal = CapabilityAbility.extend({
+    dispel_type: DispelType,
+    mechanism: external_exports.enum(["dispel", "immunity", "external"]),
+    is_cooldown: external_exports.boolean()
+  });
+  var ControlAbility = CapabilityAbility.extend({
+    kind: external_exports.enum(["interrupt", "cc"]),
+    mechanic: MechanicName.nullable(),
+    // raw DB2 mechanic for cc; null for a pure kick
+    // DB2  SpellCooldowns: max(RecoveryTime, CategoryRecoveryTime) — the recharge the
+    // engine's L1 throughput uses as the real per-kick supply rate. null = no DB2
+    // cooldown row (L1 then falls back to its model constant). Defaulted for
+    // backward-compatible parsing of spec files authored before this field existed.
+    cooldown_ms: external_exports.number().int().nullable().default(null),
+    // DB2 (LOCKED)  interrupt school-lockout duration, for L2 throughput. Parsed from the
+    // spell description's "prevent…for $d" clause (the text names WHICH spell's duration is
+    // the lockout — e.g. Skull Bash → $93985d), resolved against SpellDuration. Only set for
+    // interrupts; null for CC and for any interrupt whose lockout can't be resolved. A kick
+    // locks the cast's school for this window, suppressing every same-school cast in it.
+    lockout_ms: external_exports.number().int().nullable().default(null),
+    // DB2  CC duration (SpellMisc.DurationIndex → SpellDuration). Set for CC; null for a pure
+    // interrupt (its analog is lockout_ms) or when unresolved. The cc-or-kick (L2) suppression
+    // window — a CC stops casting for this long across ALL schools (unlike a school-lock).
+    duration_ms: external_exports.number().int().nullable().default(null),
+    // DB2  AoE control: the ability hits an area of enemies (area/cone implicit target, or a
+    // scripted exception). An AoE CC/interrupt can stop multiple simultaneous casters at once.
+    is_aoe: external_exports.boolean().default(false)
+  });
+  var OffensiveCapability = external_exports.object({
+    available: external_exports.boolean(),
+    abilities: external_exports.array(CapabilityAbility)
+  });
+  var MovementMechanic = external_exports.enum(["rooted", "snared"]);
+  var MovementFreedom = CapabilityAbility.extend({
+    effect: external_exports.enum(["remove", "immunity", "remove_and_immunity"]),
+    target: external_exports.enum(["self", "ally"]),
+    // ally = castable on a teammate (covers the party); self = only the caster
+    // Which mechanics it clears. Default both; snare-only freedoms (Demonic Circle) set ['snared'].
+    mechanics: external_exports.array(MovementMechanic).default(["rooted", "snared"]),
+    // Needs setup / precise timing / a talent to deliver the freedom, so it's an UNRELIABLE answer —
+    // e.g. Soulburn → Demonic Circle: Teleport must be pre-timed to immunize BEFORE the snare lands.
+    // The engine treats conditional-only coverage as weaker (a caution), like a conditional dispel.
+    conditional: external_exports.boolean().default(false),
+    is_cooldown: external_exports.boolean()
+  });
+  var External = CapabilityAbility.extend({
+    mechanism: external_exports.enum(["reduction", "immunity", "death_prevent"]).default("reduction"),
+    target: external_exports.enum(["self", "ally"]).default("ally"),
+    // For a REDUCTION: does it cut one enemy's damage (`single` — Fiery Brand brands a mob) or a slice of
+    // ALL incoming damage (`all` — Shield Wall / Metamorphosis / Pain Suppression)? The engine prefers a
+    // single-target CD against ONE dangerous creature and a blanket CD against multiple. Moot for
+    // immunity/death_prevent (they negate/prevent regardless), so default `all`.
+    scope: external_exports.enum(["single", "all"]).default("all"),
+    // PASSIVE = a death-prevent that auto-procs when you'd die (a "cheat death" safety net — Purgatory),
+    // NOT a cooldown you proactively press. Excluded from the active tank-buster cover selection (the
+    // active CD is the answer; this is the last resort) and surfaced only as a reassurance note.
+    passive: external_exports.boolean().default(false),
+    is_cooldown: external_exports.boolean().default(true)
+  });
+  var SpecCapabilityRollups = external_exports.object({
+    removes_dispel_types: external_exports.array(DispelType),
+    has_interrupt: external_exports.boolean(),
+    stops_available: external_exports.number().int(),
+    cc_types: external_exports.array(MechanicName),
+    soothe: external_exports.boolean(),
+    purge: external_exports.boolean(),
+    // True if the spec brings ANY movement-impair (root/snare) removal/immunity. Defaulted for
+    // backward-compatible parsing of spec files authored before this field existed.
+    frees_movement: external_exports.boolean().default(false),
+    // True if the spec brings an ALLY-castable damage-reduction external (Pain Suppression, Ironbark,
+    // Blessing of Sacrifice, Life Cocoon, …) — the answer the engine checks for a lethal tank-buster.
+    has_external: external_exports.boolean().default(false),
+    // True if the spec brings a SELF target-drop (Vanish, Feign Death, Ice Block, Invisibility) that
+    // fizzles a single-target cast aimed at the dropper.
+    has_target_drop: external_exports.boolean().default(false),
+    // True if the spec brings a PASSIVE self cheat-death (a death_prevent external flagged passive —
+    // Cauterize / Cheat Death / Purgatory) that auto-procs on a would-be-lethal hit. A last-resort
+    // backstop, not an active cooldown; the engine surfaces it only as a reassurance.
+    has_cheat_death: external_exports.boolean().default(false),
+    // True if the spec brings a self ACTIVE personal damage-reduction/immunity CD (Evasion, Cloak of
+    // Shadows, Ice Block, Unending Resolve, Astral Shift, …) — the DPS/healer's own answer to a one-shot
+    // (the squishy analog of the tank's major defensive). True for tanks too (their self majors qualify);
+    // the dps_survival dimension filters to non-tank specs. Defaulted for back-compat parsing.
+    has_personal: external_exports.boolean().default(false)
+  });
+  var PetUtility = external_exports.enum(["interrupt", "cc", "dispel", "purge", "soothe"]);
+  var PetOption = CapabilityAbility.extend({
+    pet: PetName,
+    provides: PetUtility,
+    dispel_type: DispelType.nullable().default(null),
+    // for provides:'dispel' (Singe Magic -> Magic)
+    mechanic: external_exports.string().nullable().default(null)
+    // for provides:'cc' (Seduction -> its DR mechanic)
+  });
+  var GroupBuffKind = external_exports.enum(["lust", "intellect", "stamina", "attack_power", "versatility", "mastery", "magic_vuln", "physical_vuln", "all_vuln"]);
+  var GroupBuff = CapabilityAbility.extend({ kind: GroupBuffKind });
+  var Spec = external_exports.object({
+    spec_id: external_exports.number().int(),
+    // DB2  ChrSpecialization.ID
+    class: external_exports.string(),
+    // DB2  ChrClasses.Name_lang
+    spec_name: external_exports.string(),
+    // DB2  ChrSpecialization.Name_lang
+    role: Role,
+    // DB2  ChrSpecialization.Role
+    party_role: PartyRole,
+    // DB2 role + curated melee/ranged split — the targeting basket
+    removals: external_exports.array(Removal),
+    // friendly dispels
+    soothe: OffensiveCapability,
+    // enemy Enrage removal
+    purge: OffensiveCapability,
+    // enemy Magic removal
+    control: external_exports.array(ControlAbility),
+    // interrupts + all CC
+    disruptive: external_exports.array(CapabilityAbility),
+    // knock-away/scatter abilities (Effect 98/144) — DPS-loss warning
+    // EDITORIAL: removes/prevents movement-impairing (root/snare) effects (shapeshift, Blessing of
+    // Freedom, Tiger's Lust, …). Defaulted [] for backward-compatible parsing of older spec files.
+    movement_freedom: external_exports.array(MovementFreedom).default([]),
+    // EDITORIAL: ALLY-castable damage-reduction cooldowns (Pain Suppression, Guardian Spirit, Ironbark,
+    // Blessing of Sacrifice/Protection/Spellwarding, Life Cocoon, …) — the "external" a comp pre-plans
+    // for a lethal tank-buster (the tank's own actives are assumed; this is the teammate's CD). Seeded in
+    // gen-spec-capabilities, membership-gated, verified workflow. Defaulted [] for back-compat.
+    externals: external_exports.array(External).default([]),
+    // EDITORIAL: SELF target-drops (Vanish, Feign Death, Ice Block, Invisibility, Greater Invisibility)
+    // that remove the caster as a valid target so a single-target cast aimed at them fizzles. Self-only —
+    // answers a cast targeting the dropper. (Night Elf Shadowmeld is the same tool but RACE-gated, so it's
+    // an editorial caveat in the engine note, not derived here.) Defaulted [] for back-compat.
+    target_drop: external_exports.array(CapabilityAbility).default([]),
+    // Warlock pet-choice: the demon the spec fields by DEFAULT (Demonology→felguard for Axe Toss; Affliction/
+    // Destruction→felhunter for Spell Lock). Its abilities are the spec's STANDING capabilities (in the arrays
+    // above); abilities from OTHER pets are mutually exclusive and live in `pet_options`. null = no pet choice
+    // (every other class — a fixed/absent pet). Defaulted for back-compat parsing.
+    default_pet: PetName.nullable().default(null),
+    // Capabilities the spec could field by swapping OFF the default pet (losing its tools) — the engine's
+    // pet_choice flex. Empty for everyone but Affliction/Destruction. Defaulted for back-compat parsing.
+    pet_options: external_exports.array(PetOption).default([]),
+    // GROUP-wide utility (lust + class raid buffs) the spec contributes to the comp — the composition
+    // dimension. DB2-derived membership. Defaulted [] for back-compat parsing.
+    group_buffs: external_exports.array(GroupBuff).default([]),
+    // Combat resurrection (Rebirth / Raise Ally / Soulstone / Intercession) — a recovery utility, NOT a buff,
+    // so it's tracked here rather than in group_buffs. The composition dimension checks the comp has one.
+    // DB2-derived membership. Defaulted [] for back-compat parsing.
+    battle_rez: external_exports.array(CapabilityAbility).default([]),
+    rollups: SpecCapabilityRollups
+  });
+  var BuildInfo = external_exports.object({
+    patch_version: external_exports.string(),
+    build_number: external_exports.number().int(),
+    extracted_at: external_exports.string(),
+    // ISO datetime — the ONLY timestamp in a build (idempotence)
+    source_versions: external_exports.record(external_exports.string(), external_exports.unknown())
+  });
+  var Conflict = external_exports.object({
+    table: external_exports.string(),
+    key: external_exports.string(),
+    field: external_exports.string(),
+    curated_value: external_exports.unknown(),
+    importer_value: external_exports.unknown(),
+    importer_source: external_exports.string(),
+    resolution: external_exports.enum(["kept_curated", "kept_db2", "logged"])
+  });
+  var Manifest = external_exports.object({
+    build_info: BuildInfo,
+    row_counts: external_exports.record(external_exports.string(), external_exports.number().int()),
+    conflicts: external_exports.array(Conflict),
+    notes: external_exports.array(external_exports.string())
+  });
+  var MasterStore = external_exports.object({
+    dungeons: external_exports.array(Dungeon),
+    creatures: external_exports.array(Creature),
+    spells: external_exports.array(Spell),
+    dispel_types: external_exports.array(DispelTypeLookup),
+    mechanics: external_exports.array(MechanicLookup),
+    creature_types: external_exports.array(CreatureTypeLookup),
+    dungeon_creatures: external_exports.array(DungeonCreature),
+    creature_spells: external_exports.array(CreatureSpell),
+    specs: external_exports.array(Spec),
+    build_info: BuildInfo
+  });
+  var ExportedSpell = external_exports.object({
+    spell_id: external_exports.number().int(),
+    name: external_exports.string(),
+    dispel_type: DispelType,
+    mechanic: MechanicName.nullable(),
+    school: SchoolName,
+    cast_time_ms: external_exports.number().int(),
+    // DB2 aura/effect duration in ms (see Spell.duration_ms); null = no finite duration. Feeds the vuln window.
+    duration_ms: external_exports.number().int().nullable().default(null),
+    // DB2 Spell.Description_lang tooltip text (redirects resolved) — see Spell.description. The `audit-tooltips`
+    // scanner reads this to flag mechanics (DoT/AoE/bounce) the measured streams miss. null = none.
+    description: external_exports.string().nullable().default(null),
+    is_channeled: external_exports.boolean(),
+    is_interruptible: external_exports.boolean(),
+    is_stoppable: external_exports.boolean(),
+    // Editorial fields belong to the (creature, spell) pairing — the SAME spell
+    // cast by two creatures can carry different priority — so they are inlined
+    // here rather than on a global spell record.
+    requires_interrupt: external_exports.boolean(),
+    priority: Priority,
+    is_aoe: external_exports.boolean(),
+    // damage-threat axes (see CreatureSpell): cardinality / avoidability / positioning / DoT /
+    // displacement / tank-buster. Measured (cast-spread/targeting) + editorial; defaults keep old
+    // exports parseable.
+    party_targets: external_exports.number().nullable().default(null),
+    unavoidable: external_exports.boolean().default(false),
+    positioning: external_exports.array(PositioningTech).default([]),
+    dot: external_exports.boolean().default(false),
+    displacement: external_exports.array(DisplacementKind).default([]),
+    // EDITORIAL vulnerability/amplifier (see CreatureSpell.vulnerability); "+pct% [school] damage taken" that
+    // the engine pairs with same-school lethal casts in the pull. null = not an amplifier.
+    vulnerability: Vulnerability.nullable().default(null),
+    tank_buster: external_exports.boolean().default(false),
+    is_lethal: external_exports.boolean(),
+    scales_to_lethal: external_exports.boolean(),
+    notes: external_exports.string().nullable(),
+    // EDITORIAL completion-effect (see CreatureSpell.completion_effect); null = not one. A cast whose effect
+    // fires only on completion (self-rez/summon) -> stop it (CC/interrupt) before the end to deny the effect.
+    completion_effect: external_exports.string().nullable().default(null),
+    // EDITORIAL player-facing coaching note (see CreatureSpell.coaching_note); surfaced by the engine's
+    // `notes` dimension. null = none. (The internal `notes` field is never shown to the player.)
+    coaching_note: external_exports.string().nullable().default(null),
+    // EDITORIAL high-risk alternatives (see CreatureSpell.high_risk) — role-tagged risky-but-viable plays.
+    high_risk: external_exports.array(external_exports.object({ role: external_exports.enum(["tank", "healer", "dps"]), text: external_exports.string() })).default([]),
+    // EDITORIAL — SECONDARY EFFECT: the PRIMARY spell_id this cast is a consequence of (see CreatureSpell.secondary_of); null = primary.
+    secondary_of: external_exports.number().int().nullable().default(null),
+    // EDITORIAL — CAST ORDER in the boss's cycle (see CreatureSpell.cast_order); null = unordered (sorts last).
+    cast_order: external_exports.number().int().nullable().default(null),
+    // EDITORIAL — dispelling this debuff detonates it (see CreatureSpell.dispel_detonates); the engine drops it
+    // from the dispel/survive dimensions and answers it via the coaching_note. Default false.
+    dispel_detonates: external_exports.boolean().default(false),
+    // EDITORIAL opt-out (see CreatureSpell.freedom_partial); true = an ally Freedom clears only the
+    // movement component, not the rest of the debuff. Default false = Freedom removes the whole aura.
+    freedom_partial: external_exports.boolean().default(false),
+    // measured/editorial cadence (see CreatureSpell); null = unmeasured.
+    recast_cooldown_ms: external_exports.number().int().nullable(),
+    recast_cooldown_confidence: CadenceConfidence.nullable(),
+    // MEASURED targeting (see CreatureSpell.target_roles); null = unmeasured. The party_role
+    // baskets this cast lands on, joined from observed-targeting; the engine reads it here.
+    target_roles: external_exports.array(PartyRole).nullable().default(null),
+    // MEASURED kick timing (see CreatureSpell.observed_kick_point); null = unmeasured. Where players
+    // land the kick + the clean-cast baseline; the engine teaches react-kick vs long-kick from it.
+    observed_kick_point: ObservedKickPoint.nullable().default(null),
+    // MEASURED channel-stop reaction (see CreatureSpell.observed_channel_stop); null = unmeasured. How long
+    // a channel ticks before it's stopped; the engine teaches "stop it immediately" (the inverse of long-kick).
+    observed_channel_stop: ObservedChannelStop.nullable().default(null)
+  });
+  var ExportedCreature = external_exports.object({
+    npc_id: external_exports.number().int(),
+    name: external_exports.string(),
+    creature_type: CreatureTypeName,
+    base_health: external_exports.number().int().nullable(),
+    is_boss: external_exports.boolean(),
+    // an ADD summoned during a boss encounter (groups under Boss, not Trash); summoned_by names the boss.
+    is_boss_add: external_exports.boolean().default(false),
+    summoned_by: external_exports.number().int().nullable().default(null),
+    avoidable: external_exports.boolean().default(false),
+    // a boss-add that appears every pull (default) is auto-included; true = preventable
+    level: external_exports.number().int().nullable(),
+    display_id: external_exports.number().int().nullable(),
+    classification: external_exports.string().nullable(),
+    forces: external_exports.number().int().nullable(),
+    spells: external_exports.array(ExportedSpell)
+  });
+  var DungeonExport = external_exports.object({
+    dungeon: external_exports.object({
+      dungeon_id: external_exports.number().int(),
+      name: external_exports.string(),
+      map_id: external_exports.number().int(),
+      floor_map_ids: external_exports.array(external_exports.number().int()),
+      parent_map_id: external_exports.number().int().nullable(),
+      expansion: external_exports.string(),
+      season: external_exports.string()
+    }),
+    creatures: external_exports.array(ExportedCreature),
+    specs: external_exports.array(Spec),
+    build_info: BuildInfo
+  });
+  return __toCommonJS(engine_entry_exports);
+})();

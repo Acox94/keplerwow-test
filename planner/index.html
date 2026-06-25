@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=4" />
+<title>Kepler — route planner spike (Pit of Saron)</title>
+<link rel="stylesheet" href="./vendor/leaflet.css" />
+<style>
+  :root { --bg:#11151c; --panel:#1a212c; --ink:#e6edf3; --muted:#8b98a8; --line:#2a3340; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink);
+    font:14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+  #app { display:flex; height:100%; }
+  #map { flex:1 1 auto; height:100%; background:#0b0e13; }
+  /* Leaflet paints CRS.Simple tiles on a dark void; keep it subtle. */
+  .leaflet-container { background:#0b0e13; }
+  /* while painting, kill text/element selection so dragging doesn't highlight the page */
+  #map.painting, #map.painting * { user-select:none; -webkit-user-select:none; }
+
+  #side { flex:0 0 340px; max-width:42vw; height:100%; overflow:hidden; display:flex; flex-direction:column;
+    border-left:1px solid var(--line); background:var(--panel); padding:14px; }
+  .panel-top { flex:1 1 50%; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+  /* Analysis pinned to the bottom HALF of the panel; shared by Comp + Route (hidden on Developer) */
+  .analysis-pane { flex:0 0 50%; min-height:0; display:flex; flex-direction:column;
+    margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
+  .analysis-label { font-size:15px; font-weight:700; margin-bottom:8px; text-align:center; }   /* match the "Comp builder" h1 */
+  .analysis-label .hint { font-weight:400; }
+  #analysis { flex:1; min-height:0; overflow-y:auto; padding-right:4px;
+    scrollbar-width: thin; scrollbar-color: #3a4859 transparent; }
+  h1 { font-size:15px; margin:0 0 2px; }
+  .sub { color:var(--muted); font-size:12px; margin:0 0 12px; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  #tab-route > .row { justify-content:center; }   /* center the New pull / Clear all group */
+  button { background:#222c39; color:var(--ink); border:1px solid var(--line);
+    border-radius:7px; padding:7px 11px; font:inherit; cursor:pointer; }
+  button:hover { border-color:#3a4859; }
+  button.primary { background:#1f6feb; border-color:#1f6feb; }
+  .hint { color:var(--muted); font-size:12px; }
+  /* side-panel tabs: Route ⇄ Comp & analysis */
+  .tab-bar { display:flex; gap:4px; margin:10px 0 12px; border-bottom:1px solid var(--line); }
+  .tab-bar .tab { flex:1; background:transparent; border:0; border-bottom:2px solid transparent;
+    border-radius:0; padding:8px 4px; color:var(--muted); font-weight:600; font-size:12.5px; }
+  .tab-bar .tab:hover { color:var(--ink); }
+  .tab-bar .tab.active { color:var(--ink); border-bottom-color:#1f6feb; }
+  .tabcount { background:#1f6feb; color:#fff; border-radius:9px; padding:0 6px; font-size:10px; font-weight:700; margin-left:2px; }
+  .tabcount:empty { display:none; }
+  .tabpanel { display:none; }
+  .tabpanel.active { display:flex; flex-direction:column; flex:1 1 auto; min-height:0; }
+
+  /* pull list capped to ~3 full rows + a partial peek of the next (scroll cue) + its own scrollbar — tune the rem to taste */
+  /* single scroller: #pulls FILLS the space below the controls and scrolls — no nested scrollbar */
+  #pulls { flex:1 1 auto; min-height:0; overflow-y: auto; margin-top: 10px; padding-right: 4px;
+    scrollbar-width: thin; scrollbar-color: #3a4859 transparent; }
+  #tab-route .totals, #tab-route .row { flex:0 0 auto; }   /* controls stay fixed; only #pulls scrolls */
+  #payload { flex:1 1 auto; min-height:0; }                /* Developer tab: the JSON is the single scroller */
+  #pulls::-webkit-scrollbar, #analysis::-webkit-scrollbar { width: 8px; }
+  #pulls::-webkit-scrollbar-thumb, #analysis::-webkit-scrollbar-thumb { background: #3a4859; border-radius: 4px; }
+  .pull { border:1px solid var(--line); border-left-width:4px; border-radius:8px;
+    padding:8px 10px; margin:10px 0; }
+  .pull.active { background:#202a37; }
+  .pull h3 { margin:0 0 4px; font-size:13px; display:flex; justify-content:space-between; }
+  .pull .mobs { font-size:12.5px; color:#cdd6e0; }
+  .pull .empty { color:var(--muted); font-style:italic; }
+
+  .totals { text-align:center; margin:0 0 18px; padding:2% 0 18px; border-bottom:1px dashed var(--line);
+    font-size:12.5px; line-height:1.55; }
+  .totals b { color:#fff; }
+
+  pre { background:#0d1117; border:1px solid var(--line); border-radius:8px; padding:10px;
+    font-size:11.5px; overflow:auto; color:#9fd0a0; margin:6px 0 0; }
+
+  /* screen-space markers — constant pixel size at ALL zoom levels (the whole point) */
+  .mk { border-radius:50%; border:2px solid #0008; width:100%; height:100%;
+    box-shadow:0 1px 4px #0009; cursor:pointer; transition:transform .08s; }
+  .mk:hover { transform:scale(1.15); }
+  .mk-trash { background:#9aa7b5; }
+  .mk-boss { background:#e5484d; border-radius:3px; transform:rotate(45deg); }
+  .mk-boss:hover { transform:rotate(45deg) scale(1.12); }
+  .mk-sel { box-shadow:0 0 0 3px #fff6, 0 1px 4px #0009; }
+  /* portrait markers: the creature render is the FILL, the border is the pull-color RING */
+  .mk-portrait { background-size:cover; background-position:center top; background-color:#11151c;
+    border:3px solid #9aa7b5; }
+  .mk-portrait.boss { border-color:#e5484d; }
+  /* full-body renders (zamimg webthumbs) — zoom + bias to the top so the circle frames the head/torso */
+  .mk-portrait.mk-fullbody { background-size:167%; background-position:center 17%; }
+  /* creature-type fallback when no portrait render exists yet: a colored blip with a type letter */
+  .mk-fallback { display:flex; align-items:center; justify-content:center; color:#0b0e13;
+    font-weight:800; font-size:14px; line-height:1; }
+  .leaflet-div-icon { background:transparent; border:0; }
+  .note { position:absolute; left:10px; bottom:10px; z-index:500; background:#0b0e13cc;
+    border:1px solid var(--line); border-radius:7px; padding:6px 9px; font-size:11.5px; color:var(--muted); }
+  /* LIVE ROUTE stepper bar — over the map, shown only in live mode */
+  #live-bar { position:absolute; left:50%; bottom:14px; transform:translateX(-50%); z-index:700; display:none;
+    align-items:center; gap:8px; background:#0b0e13ee; border:1px solid var(--line); border-radius:10px;
+    padding:6px 10px; box-shadow:0 2px 10px #000a; }
+  #live-bar button { padding:4px 10px; }
+  #lvLabel { font-size:13px; font-weight:600; min-width:92px; text-align:center; }
+  /* drawing tools */
+  .tools { position:absolute; top:10px; right:10px; z-index:600; display:flex; gap:6px;
+    background:#0b0e13cc; border:1px solid var(--line); border-radius:8px; padding:6px; }
+  .tools button { padding:5px 9px; font-size:12px; }
+  .tools button.on { background:#1f6feb; border-color:#1f6feb; }
+  .tools button:disabled { opacity:.4; cursor:default; }
+  .tools .sep { width:1px; align-self:stretch; background:var(--line); margin:0 2px; }
+  .dh { width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid #ffd166;
+    box-shadow:0 1px 3px #000a; cursor:grab; }     /* shape transform handle */
+  .dh-move { background:#ffd166; }
+  .note-wrap { position:relative; }
+  .note-pin { display:block; width:18px; height:18px; border-radius:50%; background:#ffd166;
+    border:2px solid #11151c; box-shadow:0 1px 4px #0009; cursor:grab; }
+  .dnote { display:none; position:absolute; left:24px; top:-2px; width:max-content; background:#11151c;
+    color:var(--ink); border:1px solid #ffd166; border-radius:6px; padding:2px 7px; font-size:12px;
+    white-space:nowrap; box-shadow:0 1px 5px #0009; }
+  /* notes COLLAPSE to just the pin so they don't obscure the route; the text reveals only when
+     viewed — hover (desktop), .open (tap/click toggle for mobile), or while editing */
+  .note-wrap:hover .dnote, .note-wrap.open .dnote, .dnote.editing { display:inline-block; }
+  .dnote.editing { outline:2px solid #ffd166; cursor:text; background:#1a212c; }
+  /* comp picker + live engine analysis */
+  .comp-row { display:flex; align-items:center; gap:8px; margin:4px 0; }
+  /* center the Comp builder — heading + sub + the role-slot rows as a centered block */
+  #tab-comp h1, #tab-comp .sub { text-align:center; }
+  #comp-rows { max-width:270px; margin:8px auto 0; }
+  .comp-row label { width:52px; color:var(--muted); font-size:12px; }
+  .comp-row select { flex:1; background:#0d1117; color:var(--ink); border:1px solid var(--line);
+    border-radius:6px; padding:5px 6px; font:inherit; }
+  .wcard { display:flex; flex-direction:column; background:var(--panel); border:1px solid var(--bg);
+    border-radius:8px; margin:6px 0; overflow:hidden; }   /* severity = slim TOP bar; message gets full width; frame = a darker shade of the card */
+  .wcard > div { padding:7px 9px; }   /* message + category body (the .wsev bar sits flush above it) */
+  /* card frame = a darker shade of the card's own severity (label) color */
+  .wcard.critical { border-color:#a53437; } .wcard.warning { border-color:#b0771a; }
+  .wcard.caution  { border-color:#999035; } .wcard.info    { border-color:#427099; }
+  .wsev { font-size:10px; text-transform:uppercase; letter-spacing:.06em; padding:3px 9px;
+    color:#11151c; font-weight:700; }   /* full-width slim bar across the card top (column-stretched) */
+  .wsev.critical { background:#e5484d; } .wsev.warning { background:#f5a524; }
+  .wsev.caution  { background:#d4c84a; } .wsev.info    { background:#5b9bd5; }
+  .wmsg { font-size:12.5px; color:#e6edf3; }
+  .wcat { color:var(--muted); font-size:11px; margin-top:3px; }
+  .rb { display:inline-block; background:#222c39; border:1px solid var(--line); border-radius:4px;
+    padding:0 5px; margin-right:3px; font-size:10px; text-transform:capitalize; }
+  .wsummary { font-size:12px; color:#cdd6e0; margin:6px 0; text-align:center; }
+  .wbudget { margin-top:8px; padding-top:8px; border-top:1px dashed var(--line); font-size:11.5px; color:var(--muted); }
+  .wbudget b { color:#f5a524; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="map">
+    <div class="tools">
+      <button id="btnUndo" title="undo (Ctrl+Z)">↶</button>
+      <button id="btnRedo" title="redo (Ctrl+Shift+Z)">↷</button>
+      <span class="sep"></span>
+      <button id="btnArrow" title="add a transformable arrow">➤ Arrow</button>
+      <button id="btnNote" title="add a draggable text note">✎ Note</button>
+      <button id="btnPaint" title="toggle freehand paint">🖌 Paint</button>
+      <button id="btnClearDraw" title="remove all drawings">🗑 Drawings</button>
+    </div>
+    <div class="note">Scroll/pinch = zoom · drag = pan · tap a mob = add to current pull · drag the dots to reshape an arrow</div>
+  </div>
+  <aside id="side">
+    <div class="panel-top">
+      <h1>Route planner — spike</h1>
+      <p class="sub">Pit of Saron · painted in-game map (UiMap) · mob positions + enemy forces from MDT</p>
+      <div class="tab-bar">
+        <button class="tab" data-tab="comp">Comp</button>
+        <button class="tab active" data-tab="route">Route</button>
+        <button class="tab" data-tab="dev">Developer</button>
+      </div>
+
+      <section class="tabpanel" id="tab-comp">
+        <h1 style="margin-top:4px">Comp builder</h1>
+        <p class="sub">5 role slots → the engine's <code>group</code></p>
+        <div id="comp-rows"></div>
+      </section>
+
+      <section class="tabpanel active" id="tab-route">
+        <div class="totals" id="totals"></div>
+        <div class="row">
+          <button class="primary" id="newPull">+ New pull</button>
+          <button id="clear">Clear all</button>
+          <button id="btnLive">▶ Live route</button>
+        </div>
+        <div id="pulls"></div>
+      </section>
+
+      <section class="tabpanel" id="tab-dev">
+        <h1 style="margin-top:4px">Engine payload</h1>
+        <p class="sub">what the map hands the analyzer — <code>Pull[] → {npc_id, count}[]</code></p>
+        <pre id="payload"></pre>
+      </section>
+    </div>
+
+    <!-- Analysis: persistent BOTTOM HALF, shared by the Comp + Route tabs (hidden on Developer) -->
+    <div class="analysis-pane" id="analysisPane">
+      <div class="analysis-label">Live Analysis <span class="tabcount" id="warnCount"></span></div>
+      <div id="analysis"></div>
+    </div>
+  </aside>
+</div>
+
+<script src="./vendor/leaflet.js"></script>
+<script src="./engine.bundle.js"></script>
+<script>
+// ---- the map: a flat image in a pixel coordinate space (CRS.Simple) -----------
+const W = 1920, H = 1280; // native px of MDT's stitched map texture (pit-of-saron-mdt.png)
+const map = L.map('map', { crs: L.CRS.Simple, minZoom: -3, maxZoom: 2,
+  zoomSnap: 0.25, attributionControl: false });
+const bounds = [[0, 0], [H, W]];
+L.imageOverlay('./pit-of-saron-mdt.png', bounds).addTo(map);
+map.fitBounds(bounds);
+map.setMaxBounds(L.latLngBounds(bounds).pad(0.25));
+// pixel (from top-left) -> Leaflet latLng (y is flipped in CRS.Simple)
+const at = (px, py) => L.latLng(H - py, px);
+
+// ---- the mobs: REAL npc_ids + positions from MDT (cache/mdt/PitOfSaron.lua) --------
+// Built by extract-mdt.mjs: each MDT enemy clone mapped onto MDT's OWN stitched texture (the art
+// the clones were authored against) with a single uniform scale + y-flip (px = x*2.2857,
+// py = -y*2.2857 — MDT's 840×560 canvas → the 1920×1280 native texture). npc_id is MDT's MIDNIGHT
+// id, which joins the engine's curated creatures (the WotLK ids the placeholder used carry no spells).
+let MOBS = [];               // populated from pit-of-saron.mobs.json on load
+let FORCES_TOTAL = 0;        // enemy-forces denominator (MDT dungeonTotalCount.normal = 643)
+const portrait = (did) => `https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${did}.jpg`;
+
+// Calibration nudge (texture px). The MDT projection is VERIFIED correct against MDT's own source
+// (blip:SetPoint(CENTER, mapPanelTile1, TOPLEFT, clone.x*scale, clone.y*scale), scale=1 → our ×2.2857;
+// POIs use the same formula; our stitched tiles match MDT's grid edge-for-edge), so no nudge is needed
+// — these stay 0. They remain only as a per-dungeon escape hatch if a future map needs a hand tweak.
+const CAL_DX = 0;   // + moves mobs RIGHT
+const CAL_DY = 0;   // + moves mobs UP
+
+// Many Midnight trash renders aren't on the CDN yet (403). Fall back to a creature-type blip
+// (color + a type letter) so every marker stays identifiable — the asset doc's fallback #2.
+const TYPE_STYLE = {
+  Undead:{ c:'#8a63d2', g:'U' }, Humanoid:{ c:'#5b9bd5', g:'H' }, Elemental:{ c:'#4dd2ff', g:'E' },
+  Dragonkin:{ c:'#d29922', g:'D' }, Demon:{ c:'#e5484d', g:'M' }, Beast:{ c:'#2ea043', g:'B' },
+  Mechanical:{ c:'#9aa7b5', g:'C' }, Aberration:{ c:'#db61a2', g:'A' },
+};
+function applyTypeFallback(el, m) {
+  const s = TYPE_STYLE[m.type] || { c:'#9aa7b5', g:'?' };
+  el.classList.add('mk-fallback');
+  el.style.backgroundImage = 'none';
+  el.style.backgroundColor = s.c;
+  el.textContent = s.g;
+}
+
+// ---- pull state ---------------------------------------------------------------
+const COLORS = ['#1f6feb','#2ea043','#d29922','#a371f7','#db61a2','#2dd4bf'];
+let pulls = [];               // [{ mobs: Set<iid> }]
+let active = -1;              // index of the pull currently being built
+let liveMode = false, liveIdx = 0;   // LIVE ROUTE: pull-by-pull stepper state
+const markers = {};           // iid -> { marker, el, mob }
+
+function pullOf(iid) { return pulls.findIndex(p => p.mobs.has(iid)); }
+
+function newPull() { pulls.push({ mobs: new Set() }); active = pulls.length - 1; render(); }
+
+function toggle(iid) {
+  if (active < 0) newPull();
+  const cur = pulls[active];
+  const existing = pullOf(iid);
+  if (existing === active) cur.mobs.delete(iid);        // tap again = deselect
+  else { if (existing >= 0) pulls[existing].mobs.delete(iid); cur.mobs.add(iid); } // move to current
+  render();
+}
+
+// Wowhead/zamimg modelviewer webthumb (keyed by DISPLAY id) — covers the new Midnight models the
+// Blizzard CDN hasn't published (300×300, alpha). Full-BODY render, so it gets the head-crop class.
+const zamimg = (did) => `https://wow.zamimg.com/modelviewer/live/webthumbs/npc/${did % 256}/${did}.png`;
+
+// portrait loader: try sources in priority order, preloading each so a 403/404 advances to the next
+// with no broken-image flash; if none render, fall to the creature-type letter blip.
+//   1. Blizzard CDN, Midnight displayId  — official, head-&-shoulders "zoom" crop (best framing)
+//   2. zamimg webthumb, Midnight displayId — exact model, covers the CDN gaps (full-body → head-crop)
+//   3. Blizzard CDN, legacy WotLK displayId — own carried-over fallback (head-&-shoulders)
+function loadPortrait(el, m) {
+  const cands = [];
+  if (m.did) { cands.push({ url: portrait(m.did), fullbody: false });
+               cands.push({ url: zamimg(m.did), fullbody: true }); }
+  if (m.legacyDid) cands.push({ url: portrait(m.legacyDid), fullbody: false });
+  let i = 0;
+  (function tryNext() {
+    if (i >= cands.length) { applyTypeFallback(el, m); return; }
+    const c = cands[i++];
+    const img = new Image();
+    img.onload = () => { el.style.backgroundImage = `url(${c.url})`; el.classList.toggle('mk-fullbody', c.fullbody); };
+    img.onerror = tryNext;
+    img.src = c.url;
+  })();
+}
+
+// ---- markers (screen-space divIcons: fixed px size at any zoom) ----------------
+function buildMarkers() {
+  for (const m of MOBS) {
+    const size = m.boss ? 34 : 30;
+    const el = document.createElement('div');
+    el.title = m.name + (m.boss ? ' (boss)' : '') + (m.known ? '' : ' — not in dataset');
+    el.className = 'mk mk-portrait' + (m.boss ? ' boss' : '');
+    loadPortrait(el, m);
+    const icon = L.divIcon({ html: el, className:'', iconSize:[size,size], iconAnchor:[size/2,size/2] });
+    const marker = L.marker(at(m.x, m.y), { icon }).addTo(map);
+    marker.on('click', () => toggle(m.iid)); // bosses are route steps too — clickable like trash
+    markers[m.iid] = { marker, el, mob:m };
+  }
+}
+
+// ---- rollup: the engine contract — group selected instances into {npc_id,count} */
+function rollup(pull) {
+  const by = new Map();
+  for (const iid of pull.mobs) {
+    const m = markers[iid]?.mob;      // skip a stale/unknown iid instead of crashing
+    if (!m) continue;
+    by.set(m.npc_id, (by.get(m.npc_id) ?? 0) + 1);
+  }
+  return [...by.entries()].map(([npc_id, count]) => ({ npc_id, count }));
+}
+const nameFor = (npc_id) => MOBS.find(m => m.npc_id === npc_id)?.name ?? ('#'+npc_id);
+
+// ---- pull OUTLINES: a padded, rounded hull around each pull's mobs (recomputed on select + zoom) ----
+const hullLayer = L.layerGroup().addTo(map);   // sits in the overlay pane → BELOW the mob markers
+const HULL_PAD = 28;                            // px beyond a mob centre (clears the ~16px marker)
+function convexHull(points) {                   // Andrew's monotone chain
+  if (points.length < 3) return points.slice();
+  const pts = points.slice().sort((a,b)=>a.x-b.x||a.y-b.y);
+  const cross=(o,a,b)=>(a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x);
+  const lo=[]; for (const p of pts){ while(lo.length>=2 && cross(lo[lo.length-2],lo[lo.length-1],p)<=0) lo.pop(); lo.push(p); }
+  const up=[]; for (let i=pts.length-1;i>=0;i--){ const p=pts[i]; while(up.length>=2 && cross(up[up.length-2],up[up.length-1],p)<=0) up.pop(); up.push(p); }
+  lo.pop(); up.pop(); return lo.concat(up);
+}
+// hull of disk-samples around each mob ≈ Minkowski sum with a circle → a rounded, padded boundary (1/2/N mobs)
+function pullOutline(mobPts, pad) {
+  const K=32, s=[];   // samples per mob — higher = finer arcs at sharp corners (smoother)
+  for (const p of mobPts) for (let k=0;k<K;k++){ const a=2*Math.PI*k/K; s.push(L.point(p.x+Math.cos(a)*pad, p.y+Math.sin(a)*pad)); }
+  return convexHull(s);
+}
+// Chaikin corner-cutting → smooths the angular hull into a soft closed curve
+function chaikin(pts, iters) {
+  for (let it=0; it<iters; it++) {
+    const out=[];
+    for (let i=0;i<pts.length;i++){ const a=pts[i], b=pts[(i+1)%pts.length];
+      out.push(L.point(a.x*0.75+b.x*0.25, a.y*0.75+b.y*0.25));
+      out.push(L.point(a.x*0.25+b.x*0.75, a.y*0.25+b.y*0.75)); }
+    pts=out;
+  }
+  return pts;
+}
+function renderHulls() {
+  hullLayer.clearLayers();
+  pulls.forEach((p,i)=>{
+    const mobPts=[...p.mobs].map(iid=>markers[iid]?.mob).filter(Boolean).map(m=>map.latLngToLayerPoint(at(m.x,m.y)));
+    if (!mobPts.length) return;
+    const ring = chaikin(pullOutline(mobPts, HULL_PAD), 3).map(pt=>map.layerPointToLatLng(pt));
+    const color = COLORS[i % COLORS.length];
+    const lv = liveMode ? (i===liveIdx ? 1 : i<liveIdx ? 0.4 : 0) : 1;   // LIVE: current bright, earlier faded, later hidden
+    L.polygon(ring, { color, weight:2.5, opacity:0.95*lv, fillColor:color, fillOpacity:0.1*lv,
+      interactive:false, lineJoin:'round', smoothFactor:0 }).addTo(hullLayer);
+  });
+}
+map.on('zoomend', renderHulls);   // markers are screen-space, so re-pad the hull when the zoom changes
+
+// ---- render -------------------------------------------------------------------
+function render() {
+  // marker tint = its pull's color; selection ring on the active pull's mobs
+  for (const iid in markers) {
+    const { el, mob } = markers[iid];
+    const pi = pullOf(iid);
+    el.classList.toggle('mk-sel', pi === active && pi >= 0);
+    const color = pi >= 0 ? COLORS[pi % COLORS.length] : null;
+    if (el.classList.contains('mk-portrait')) {
+      el.style.borderColor = color ?? (mob.boss ? '#e5484d' : '#9aa7b5'); // ring carries the pull color
+    } else if (!mob.boss) {
+      el.style.background = color ?? '#9aa7b5';
+    }
+    // LIVE ROUTE dimming: current pull bright, earlier faded, later/unselected very dim
+    el.style.opacity = liveMode ? (pi===liveIdx ? '1' : (pi>=0 && pi<liveIdx) ? '0.5' : '0.16') : '';
+  }
+  // pull list (Pull 1 -> 2 -> 3 ...)
+  const pullsEl = document.getElementById('pulls');
+  pullsEl.innerHTML = pulls.map((p, i) => {
+    const color = COLORS[i % COLORS.length];
+    const roll = rollup(p);
+    const mobs = roll.length
+      ? roll.map(r => `${r.count}× ${nameFor(r.npc_id)}`).join(', ')
+      : '<span class="empty">tap mobs on the map…</span>';
+    return `<div class="pull ${i===active?'active':''}" style="border-left-color:${color}" data-i="${i}">
+      <h3><span>Pull ${i+1}</span><span class="hint">${[...p.mobs].length} mob(s)</span></h3>
+      <div class="mobs">${mobs}</div></div>`;
+  }).join('') || '<p class="hint">No pulls yet — “+ New pull”, then tap mobs.</p>';
+  pullsEl.querySelectorAll('.pull').forEach(d => d.onclick = () => { active = +d.dataset.i; render(); });
+
+  // cumulative total across the route + REAL enemy forces (Σ selected mobs' count / dungeon total)
+  const total = pulls.reduce((n, p) => n + p.mobs.size, 0);
+  const forces = pulls.reduce((n, p) =>
+    n + [...p.mobs].reduce((s, iid) => s + (markers[iid]?.mob.forces || 0), 0), 0);
+  const pct = FORCES_TOTAL ? Math.round(forces / FORCES_TOTAL * 100) : 0;
+  document.getElementById('totals').innerHTML =
+    `<div>Route: <b>${pulls.length}</b> Pull(s) - <b>${total}</b> Mob(s) Total</div>`
+    + `<div>Enemy forces: <b>${forces}</b> / ${FORCES_TOTAL} (<b>${pct}%</b>)</div>`;
+
+  // the engine-shaped payload (per pull)
+  document.getElementById('payload').textContent = JSON.stringify(
+    pulls.map((p, i) => ({ pull: i+1, mobs: rollup(p) })), null, 2);
+
+  renderHulls();    // padded outline around each pull's mobs
+  renderAnalysis(); // live engine pass on the active pull
+}
+
+document.getElementById('newPull').onclick = newPull;
+document.getElementById('clear').onclick = () => { pulls = []; active = -1; if (liveMode) exitLive(); else render(); };
+
+// ---- LIVE ROUTE: a pull-by-pull stepper for breakdown/analysis (solo form of "follow the leader") ----
+function nonEmptyFrom(from, dir){ const n=pulls.length; let i=from; for(let k=0;k<n;k++){ if(pulls[i]?.mobs.size) return i; i=(i+dir+n)%n; } return -1; }
+function renderLiveBar(){ liveBar.style.display = liveMode ? 'flex' : 'none';
+  if (liveMode) document.getElementById('lvLabel').textContent = `Pull ${liveIdx+1} / ${pulls.length}`; }
+function enterLive(){ const i=nonEmptyFrom(0,1); if(i<0) return; liveMode=true; liveIdx=i; active=i; render(); renderLiveBar(); }
+function exitLive(){ liveMode=false; render(); renderLiveBar(); }
+function liveStep(d){ if(!liveMode) return; const n=pulls.length; let i=liveIdx; do{ i=(i+d+n)%n; } while(!pulls[i]?.mobs.size && i!==liveIdx); liveIdx=i; active=i; render(); renderLiveBar(); }
+const liveBar = document.createElement('div'); liveBar.id='live-bar';
+liveBar.innerHTML = '<button id="lvPrev" title="previous pull (←)">◀</button><span id="lvLabel"></span><button id="lvNext" title="next pull (→)">▶</button><button id="lvExit" title="exit live route (Esc)">✕</button>';
+document.getElementById('map').appendChild(liveBar);
+L.DomEvent.disableClickPropagation(liveBar);
+liveBar.querySelector('#lvPrev').onclick = () => liveStep(-1);
+liveBar.querySelector('#lvNext').onclick = () => liveStep(1);
+liveBar.querySelector('#lvExit').onclick = exitLive;
+document.getElementById('btnLive').onclick = enterLive;
+document.addEventListener('keydown', (ev) => {
+  if (!liveMode || (document.activeElement && document.activeElement.isContentEditable)) return;
+  if (ev.key==='ArrowRight'){ ev.preventDefault(); liveStep(1); }
+  else if (ev.key==='ArrowLeft'){ ev.preventDefault(); liveStep(-1); }
+  else if (ev.key==='Escape'){ exitLive(); }
+});
+
+// side-panel tab switcher: Route (pulls) ⇄ Comp & analysis
+function setTab(name) {
+  document.querySelectorAll('#side .tab-bar .tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('#side .tabpanel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+  document.getElementById('analysisPane').style.display = (name === 'dev') ? 'none' : ''; // Analysis shows on Comp + Route only
+  renderAnalysis(); // re-filter: group warnings on Comp, pull mechanics on Route
+}
+document.querySelectorAll('#side .tab-bar .tab').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+
+// ---- drawing layer: arrows, notes, freehand paint --------------------------
+// A SEPARATE layer from mobs/pulls. In the real app these become part of the ROUTE
+// DOCUMENT (so they MDT-round-trip and later sync). Same CRS.Simple frame, so each
+// shape stores as plain coordinates. (Production would swap this hand-rolled editor
+// for Leaflet-Geoman; the spike proves the capability without the dependency.)
+const drawLayer = L.layerGroup().addTo(map);
+const ll2px = (ll) => map.latLngToLayerPoint(ll);
+const px2ll = (p) => map.layerPointToLatLng(p);
+
+function handle(latlng, cls, onDrag) {
+  const h = L.marker(latlng, { draggable: true, zIndexOffset: 1000,
+    icon: L.divIcon({ className:'', html:`<div class="dh ${cls}"></div>`, iconSize:[14,14], iconAnchor:[7,7] }) }).addTo(drawLayer);
+  h.on('drag', () => onDrag(h.getLatLng()));
+  h.on('click', (e) => L.DomEvent.stopPropagation(e)); // a handle click must not deselect the arrow
+  return h;
+}
+
+// arrow SELECTION: only the selected arrow shows its handles; clicking empty map deselects
+let selectedArrow = null;
+function selectArrow(api){ if (selectedArrow && selectedArrow !== api) selectedArrow.setSelected(false); selectedArrow = api; api.setSelected(true); }
+function deselectArrows(){ if (selectedArrow){ selectedArrow.setSelected(false); selectedArrow = null; } }
+map.on('click', deselectArrows);
+
+// notes: any click that isn't on a note's own pin/bubble closes the pinned-open notes
+document.addEventListener('click', (ev) => {
+  const clicked = ev.target && ev.target.closest ? ev.target.closest('.note-wrap') : null;
+  document.querySelectorAll('.note-wrap.open').forEach(w => { if (w !== clicked) w.classList.remove('open'); });
+});
+
+// ARROW = shaft + computed arrowhead; tail/head handles rotate+scale, mid handle moves the whole thing
+function addArrow() {
+  if (painting) setPaint(false);   // exclusive tools — don't get stuck in paint mode
+  let tail = px2ll(ll2px(map.getCenter()).add(L.point(-70, 25)));
+  let head = px2ll(ll2px(map.getCenter()).add(L.point(70, -25)));
+  const shaft = L.polyline([tail, head], { color:'#ffd166', weight:4 }).addTo(drawLayer);
+  const headPoly = L.polyline([], { color:'#ffd166', weight:4 }).addTo(drawLayer);
+  function redraw() {
+    shaft.setLatLngs([tail, head]);
+    const pT = ll2px(tail), pH = ll2px(head);
+    let ux = pH.x - pT.x, uy = pH.y - pT.y; const len = Math.hypot(ux, uy) || 1; ux/=len; uy/=len;
+    const rot = (x,y,t) => L.point(x*Math.cos(t)-y*Math.sin(t), x*Math.sin(t)+y*Math.cos(t));
+    const bl = 16, sp = 0.5, b1 = rot(-ux,-uy,sp), b2 = rot(-ux,-uy,-sp);
+    headPoly.setLatLngs([ px2ll(L.point(pH.x+bl*b1.x, pH.y+bl*b1.y)), head, px2ll(L.point(pH.x+bl*b2.x, pH.y+bl*b2.y)) ]);
+  }
+  const midLL = () => px2ll(ll2px(tail).add(ll2px(head)).divideBy(2));
+  let prevMid = midLL();
+  const hT = handle(tail, 'dh-end', (ll)=>{ tail=ll; redraw(); prevMid=midLL(); mid.setLatLng(prevMid); });
+  const hH = handle(head, 'dh-end', (ll)=>{ head=ll; redraw(); prevMid=midLL(); mid.setLatLng(prevMid); });
+  const mid = handle(prevMid, 'dh-move', (ll)=>{ const d=ll2px(ll).subtract(ll2px(prevMid)); prevMid=ll;
+    tail=px2ll(ll2px(tail).add(d)); head=px2ll(ll2px(head).add(d)); hT.setLatLng(tail); hH.setLatLng(head); redraw(); });
+  redraw();
+  // handles show only while the arrow is SELECTED (clicked); hidden otherwise
+  const handles = [hT, hH, mid];
+  const api = { setSelected(on){ handles.forEach(h => { const el = h.getElement(); if (el) el.style.display = on ? '' : 'none'; }); } };
+  shaft.on('click', (e) => { L.DomEvent.stop(e); selectArrow(api); });
+  headPoly.on('click', (e) => { L.DomEvent.stop(e); selectArrow(api); });
+  selectArrow(api); // a new arrow starts selected so you can adjust it immediately
+}
+
+// NOTE = draggable text label, double-click to edit
+function addNote() {
+  if (painting) setPaint(false);   // exclusive tools
+  const wrap = document.createElement('div'); wrap.className = 'note-wrap';
+  const pin = document.createElement('span'); pin.className = 'note-pin';
+  const el = document.createElement('div'); el.className = 'dnote'; el.textContent = 'Note — dbl-click to edit';
+  wrap.append(pin, el);
+  const m = L.marker(map.getCenter(), { draggable:true, zIndexOffset:10000, // render notes ABOVE mob markers
+    icon: L.divIcon({ className:'', html: wrap, iconSize:[18,18], iconAnchor:[9,9] }) }).addTo(drawLayer);
+  // COLLAPSED to a pin by default. Hover reveals the text (CSS); click/tap toggles it open for touch.
+  // No stopPropagation here — the global click-outside handler relies on the click bubbling.
+  pin.addEventListener('click', () => { if (!el.isContentEditable) wrap.classList.toggle('open'); });
+  // double-click anywhere on the note edits IN PLACE (contentEditable, not prompt() — webviews suppress it).
+  wrap.addEventListener('dblclick', (ev) => {
+    ev.stopPropagation();          // don't trigger the map's double-click zoom
+    m.dragging.disable();          // stop drag from stealing the click while typing
+    wrap.classList.add('open');
+    el.contentEditable = 'true'; el.classList.add('editing');
+    el.focus(); getSelection().selectAllChildren(el);
+  });
+  el.addEventListener('blur', () => { el.contentEditable = 'false'; el.classList.remove('editing'); m.dragging.enable(); });
+  el.addEventListener('keydown', (ev) => { if (ev.key === 'Enter') { ev.preventDefault(); el.blur(); } });
+}
+
+// FREEHAND = while paint mode is on, drag draws a polyline stroke
+let painting=false, curStroke=null;
+function setPaint(on){ painting=on; document.getElementById('btnPaint').classList.toggle('on', on);
+  const c = map.getContainer(); c.style.cursor = on ? 'crosshair' : ''; c.classList.toggle('painting', on);
+  if (on){ map.dragging.disable(); map.on('mousedown', startStroke); }
+  else { map.dragging.enable(); map.off('mousedown', startStroke); endStroke(); } }
+function startStroke(e){
+  const t = e.originalEvent && e.originalEvent.target;
+  // clicked an existing element (mob / note / arrow / handle)? drop the brush and let it be used instead of painting
+  if (t && t.closest && t.closest('.leaflet-interactive, .note-wrap, .dh, .dnote')) { setPaint(false); return; }
+  if (e.originalEvent) L.DomEvent.preventDefault(e.originalEvent); // stop the browser drag-selection (page highlight)
+  curStroke=L.polyline([e.latlng],{color:'#4dd2ff',weight:3}).addTo(drawLayer);
+  map.on('mousemove', extendStroke); map.once('mouseup', endStroke); }
+function extendStroke(e){ if (curStroke) curStroke.addLatLng(e.latlng); }
+function endStroke(){ map.off('mousemove', extendStroke);
+  if (curStroke){ const s = curStroke;                 // record the finished stroke as one undoable op
+    if (s.getLatLngs().length >= 2) pushOp({ undo: () => drawLayer.removeLayer(s), redo: () => drawLayer.addLayer(s) });
+    else drawLayer.removeLayer(s); }                   // drop a degenerate single-point stroke
+  curStroke=null; }
+
+// ---- undo / redo: a command history of drawing actions (add · paint · clear) ----
+// Each op is reversible. Transform-level undo (handle drags, note edits) is NOT tracked
+// here — that's where adopting Yjs for the route model would give undo/redo for free.
+const undoStack = [], redoStack = [];
+function pushOp(op){ undoStack.push(op); redoStack.length = 0; syncHistory(); }
+function undo(){ const op = undoStack.pop(); if (!op) return; op.undo(); redoStack.push(op); syncHistory(); }
+function redo(){ const op = redoStack.pop(); if (!op) return; op.redo(); undoStack.push(op); syncHistory(); }
+function syncHistory(){ document.getElementById('btnUndo').disabled = !undoStack.length;
+  document.getElementById('btnRedo').disabled = !redoStack.length; }
+// run an "add" action and record EXACTLY the layers it created (diff the layer group)
+function recordAdd(fn){ const before = new Set(); drawLayer.eachLayer(l => before.add(l)); fn();
+  const added = []; drawLayer.eachLayer(l => { if (!before.has(l)) added.push(l); });
+  if (added.length) pushOp({ undo: () => added.forEach(l => drawLayer.removeLayer(l)),
+                             redo: () => added.forEach(l => drawLayer.addLayer(l)) }); }
+function clearDrawings(){ if (painting) setPaint(false);
+  const all = drawLayer.getLayers().slice(); if (!all.length) return;
+  all.forEach(l => drawLayer.removeLayer(l));
+  pushOp({ undo: () => all.forEach(l => drawLayer.addLayer(l)), redo: () => all.forEach(l => drawLayer.removeLayer(l)) }); }
+
+const toolsEl = document.querySelector('.tools');
+L.DomEvent.disableClickPropagation(toolsEl); L.DomEvent.disableScrollPropagation(toolsEl);
+document.getElementById('btnArrow').onclick = () => recordAdd(addArrow);
+document.getElementById('btnNote').onclick = () => recordAdd(addNote);
+document.getElementById('btnPaint').onclick = () => setPaint(!painting);
+document.getElementById('btnClearDraw').onclick = clearDrawings;
+document.getElementById('btnUndo').onclick = undo;
+document.getElementById('btnRedo').onclick = redo;
+// keyboard: Ctrl/Cmd+Z = undo, Ctrl/Cmd+Shift+Z or Ctrl+Y = redo (skip while editing a note)
+document.addEventListener('keydown', (ev) => {
+  if (document.activeElement && document.activeElement.isContentEditable) return;
+  if (!(ev.ctrlKey || ev.metaKey)) return;
+  const k = ev.key.toLowerCase();
+  if (k === 'z' && !ev.shiftKey) { ev.preventDefault(); undo(); }
+  else if ((k === 'z' && ev.shiftKey) || k === 'y') { ev.preventDefault(); redo(); }
+});
+syncHistory();
+
+// ---- ENGINE WIRING: run the REAL analyzePull on the active pull -------------------
+// Uses the bundled pure engine (KeplerEngine.analyzePull) + a real dungeon export.
+// Nothing in src/ is touched — engine.bundle.js is built read-only from it.
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+let dungeon = null;
+let compSlots = [null, null, null, null, null];
+const COMP_SLOTS = [
+  { label:'Tank',   ok: s => s.party_role === 'tank' },
+  { label:'Healer', ok: s => s.party_role === 'healer' },
+  { label:'DPS 1',  ok: s => s.role === 'DPS' },
+  { label:'DPS 2',  ok: s => s.role === 'DPS' },
+  { label:'DPS 3',  ok: s => s.role === 'DPS' },
+];
+
+function renderComp() {
+  if (!dungeon) return;
+  const host = document.getElementById('comp-rows');
+  host.innerHTML = COMP_SLOTS.map((slot, i) => {
+    const opts = dungeon.specs.filter(slot.ok).sort((a,b) => `${a.class} ${a.spec_name}`.localeCompare(`${b.class} ${b.spec_name}`));
+    const chosen = compSlots[i];
+    return `<div class="comp-row"><label>${slot.label}</label>
+      <select data-slot="${i}"><option value="">—</option>${opts.map(s => `<option value="${s.spec_id}"${s.spec_id===chosen?' selected':''}>${esc(s.class)} ${esc(s.spec_name)}</option>`).join('')}</select></div>`;
+  }).join('');
+  host.querySelectorAll('select').forEach(sel => sel.onchange = () => {
+    compSlots[Number(sel.dataset.slot)] = sel.value ? Number(sel.value) : null; renderAnalysis();
+  });
+}
+
+const SEV = { critical:0, warning:1, caution:2, info:3 };
+function setWarn(n){ const wc = document.getElementById('warnCount'); if (wc){ wc.textContent = n ? String(n) : ''; wc.style.display = n ? '' : 'none'; } }
+function renderAnalysis() {
+  setWarn(0);
+  const host = document.getElementById('analysis');
+  if (!host) return;
+  const isComp = (document.querySelector('#side .tab-bar .tab.active')?.dataset.tab) === 'comp';
+  if (!dungeon || !window.KeplerEngine) { host.innerHTML = '<p class="hint">loading engine…</p>'; return; }
+  const pull = pulls[active];
+  const members = pull ? rollup(pull) : [];
+  // Route tab needs a pull; Comp tab analyzes the GROUP even with no pull yet (lust/rez/buffs are comp-level)
+  if (!isComp && !members.length) { host.innerHTML = '<p class="hint">Select mobs in a pull to see its mechanics.</p>'; return; }
+  const group = compSlots.filter(x => x != null);
+  let rep;
+  try { rep = KeplerEngine.analyzePull(dungeon, members, group, { skill:'experienced' }); }
+  catch (e) { host.innerHTML = `<p class="hint">engine error: ${esc(String(e && e.message || e))}</p>`; return; }
+  // Comp tab shows GROUP/composition warnings; Route tab shows the pull's boss/trash mechanics + stop budget
+  const ws = [...rep.warnings].filter(w => isComp ? w.source === 'group' : w.source !== 'group')
+                              .sort((a,b) => SEV[a.severity]-SEV[b.severity]);
+  setWarn(ws.length);
+  const empty = isComp ? 'No composition gaps for this group.' : 'No pull mechanics flagged — this comp covers this pull.';
+  const cards = ws.map(w => `<div class="wcard ${w.severity}">
+      <span class="wsev ${w.severity}">${esc(w.severity)}</span>
+      <div><div class="wmsg">${esc(w.message)}</div>
+        <div class="wcat">${(w.roles && w.roles.length ? w.roles : ['all']).map(r => `<span class="rb ${esc(r)}">${esc(r)}</span>`).join('')} · ${esc(w.category)}${w.source ? ` · ${esc(w.source)}` : ''}</div>
+      </div></div>`).join('') || `<p class="hint">${empty}</p>`;
+  const s = rep.stops;
+  // Live Analysis summary: a CENTERED "Pull N" only (+ an unknown-npc flag when present).
+  // CHANGE 2026-06-25 — the "· Comp N/5 · skill experienced" detail row is removed FOR NOW but kept here
+  // (commented) so it can be re-added later. To restore, fold the detail back into the templates below:
+  //   Comp tab  was:  `<div class="wsummary">Comp ${group.length}/5 · skill experienced</div>`
+  //   Route tab was:  `<div class="wsummary">Pull ${active+1} · Comp ${group.length}/5 · skill experienced${unknownSuffix}</div>`
+  const unknownSuffix = rep.unknown_npcs && rep.unknown_npcs.length ? ` · unknown npc: ${rep.unknown_npcs.join(', ')}` : '';
+  const summary = isComp ? '' : `<div class="wsummary">Pull ${active+1}${unknownSuffix}</div>`;
+  const budget = isComp ? '' :
+    `<div class="wbudget">stops — must-kick ${s.must_kick_demand} vs ${s.interrupt_supply}${s.must_kick_shortfall>0?` <b>SHORT ${s.must_kick_shortfall}</b>`:' ok'} · cc-or-kick ${s.cc_or_kick_demand} vs ${s.cc_stop_supply}${s.cc_shortfall>0?` <b>SHORT ${s.cc_shortfall}</b>`:' ok'}</div>`;
+  host.innerHTML = summary + cards + budget;
+}
+
+// load the real dungeon export, then build the comp picker + first analysis
+fetch('./pit-of-saron.json').then(r => r.json())
+  .then(j => { dungeon = KeplerEngine.DungeonExport.parse(j); renderComp(); renderAnalysis(); })
+  .catch(e => { const h = document.getElementById('analysis'); if (h) h.innerHTML = `<p class="hint">failed to load dungeon: ${esc(String(e && e.message || e))}</p>`; });
+
+// load the REAL mob positions (MDT-derived), drop the markers, then open the first pull
+fetch('./pit-of-saron.mobs.json').then(r => r.json())
+  .then(j => { MOBS = j.mobs.map(m => ({ ...m, x: m.x + CAL_DX, y: m.y - CAL_DY })); FORCES_TOTAL = j.forces_total || 0; buildMarkers(); newPull(); })
+  .catch(e => { document.querySelector('.note').textContent = 'failed to load mob positions: ' + (e && e.message || e); newPull(); });
+</script>
+</body>
+</html>

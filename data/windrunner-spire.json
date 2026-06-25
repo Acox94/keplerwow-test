@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T14:53:48.552Z",
+    "extracted_at": "2026-06-25T19:56:45.375Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -81,21 +81,6 @@
       "is_boss": false,
       "is_boss_add": false,
       "level": null,
-      "name": "Meredy Huntswell",
-      "npc_id": 209059,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Humanoid",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
       "name": "Austin Huxworth",
       "npc_id": 209065,
       "spells": [],
@@ -143,21 +128,6 @@
       "level": null,
       "name": "Blood Beast",
       "npc_id": 217228,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Humanoid",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Archmage Kel'Thuzad",
-      "npc_id": 227223,
       "spells": [],
       "summoned_by": null
     },
@@ -566,7 +536,7 @@
         {
           "cast_order": null,
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Kalis and Latch are a pair — kill one and the survivor enrages, ramping its damage in stacking steps. Bring them down close together so the enraged window stays short.",
           "completion_effect": null,
           "description": "When either Kalis or Latch falls in battle, the other becomes incensed, increasing their damage done by $s1% every $1219554t1 sec.",
           "dispel_detonates": false,
@@ -869,7 +839,7 @@
         {
           "cast_order": null,
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Kalis and Latch are a pair — kill one and the survivor enrages, ramping its damage in stacking steps. Bring them down close together so the enraged window stays short.",
           "completion_effect": null,
           "description": "When either Kalis or Latch falls in battle, the other becomes incensed, increasing their damage done by $s1% every $1219554t1 sec.",
           "dispel_detonates": false,
@@ -3539,21 +3509,6 @@
       "avoidable": false,
       "base_health": null,
       "classification": "Normal",
-      "creature_type": "Non-combat Pet",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Ethereal Brannmorpher",
-      "npc_id": 245374,
-      "spells": [],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
       "creature_type": "Beast",
       "display_id": null,
       "forces": null,
@@ -3632,21 +3587,6 @@
           "vulnerability": null
         }
       ],
-      "summoned_by": null
-    },
-    {
-      "avoidable": false,
-      "base_health": null,
-      "classification": "Normal",
-      "creature_type": "Dragonkin",
-      "display_id": null,
-      "forces": null,
-      "is_boss": false,
-      "is_boss_add": false,
-      "level": null,
-      "name": "Lindormi",
-      "npc_id": 259053,
-      "spells": [],
       "summoned_by": null
     }
   ],
