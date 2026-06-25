@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-24T23:15:50.348Z",
+    "extracted_at": "2026-06-25T06:12:58.438Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -303,7 +303,9 @@
           "secondary_of": null,
           "spell_id": 474496,
           "tank_buster": true,
-          "target_roles": null,
+          "target_roles": [
+            "tank"
+          ],
           "unavoidable": false,
           "vulnerability": null
         },
@@ -339,7 +341,12 @@
           "secondary_of": null,
           "spell_id": 1214081,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": true,
           "vulnerability": null
         }
@@ -391,7 +398,12 @@
           "secondary_of": null,
           "spell_id": 1224801,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": false,
           "vulnerability": null
         },
@@ -427,7 +439,11 @@
           "secondary_of": null,
           "spell_id": 1224903,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "tank"
+          ],
           "unavoidable": false,
           "vulnerability": null
         },
@@ -463,17 +479,22 @@
           "secondary_of": null,
           "spell_id": 1225193,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "healer",
+            "melee_dps",
+            "ranged_dps",
+            "tank"
+          ],
           "unavoidable": true,
           "vulnerability": null
         },
         {
           "cast_order": 3,
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Seranel empowers her own auto-attacks (faster + bonus Arcane damage that lands on the tank) — purge the buff to strip it; if the comp has no purge, the tank mitigates the empowered window.",
           "completion_effect": null,
           "dispel_detonates": false,
-          "dispel_type": "Magic",
+          "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "duration_ms": 15000,
@@ -485,7 +506,7 @@
           "is_stoppable": false,
           "mechanic": null,
           "name": "Hastening Ward",
-          "notes": "From a Casts CSV; self-buff (Buffs CSV). id 1248689 CONFIRMED. Likely a haste empower - consider purge/soothe. ANOMALY: measured targeting shows 'Hastening Ward' dealing TANK-ONLY damage (115 hits, max ~110k) — a cast/impact mismatch (the buff cast vs a same-named damage effect). NOT flagged tank_buster; verify whether the ward pulses/reflects damage to the tank.",
+          "notes": "RESOLVED via DB2 tooltip: a self-empower buff — +attack speed AND auto-attacks deal bonus Arcane damage (id 1271317) to the tank. So the measured 'tank-only damage' is the empowered melee, not a discrete cast -> NOT a tank_buster. It's a purgeable Magic ENEMY buff; dispel_type overridden to None in spell_editorials so the engine's dispel dimension doesn't mis-route it to a healer's dispel (purge != dispel). Purge answer is in the coaching_note.",
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": 1,
@@ -499,7 +520,9 @@
           "secondary_of": null,
           "spell_id": 1248689,
           "tank_buster": false,
-          "target_roles": null,
+          "target_roles": [
+            "tank"
+          ],
           "unavoidable": false,
           "vulnerability": null
         }
