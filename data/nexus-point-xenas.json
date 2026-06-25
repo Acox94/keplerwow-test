@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T13:56:44.820Z",
+    "extracted_at": "2026-06-25T14:00:29.020Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -922,7 +922,7 @@
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
-          "dot": false,
+          "dot": true,
           "duration_ms": 12000,
           "freedom_partial": false,
           "high_risk": [],
@@ -984,7 +984,7 @@
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
-          "dot": false,
+          "dot": true,
           "duration_ms": 10000,
           "freedom_partial": false,
           "high_risk": [],
@@ -1588,11 +1588,11 @@
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
-          "dot": false,
+          "dot": true,
           "duration_ms": null,
           "freedom_partial": false,
           "high_risk": [],
-          "is_aoe": false,
+          "is_aoe": true,
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": false,
