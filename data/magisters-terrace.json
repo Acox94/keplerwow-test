@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T14:36:47.840Z",
+    "extracted_at": "2026-06-25T14:44:14.448Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -956,7 +956,7 @@
         {
           "cast_order": 3,
           "cast_time_ms": 2500,
-          "coaching_note": null,
+          "coaching_note": "Each landing must be soaked — a player stands at every impact point. An unsoaked point erupts into Void Destruction: a party-wide Shadow burst that leaves a stacking DoT (lethal at higher keys).",
           "completion_effect": null,
           "description": "Degentrius launches unstable void energy that bounces to $s2 locations, inflicting $1215157s1 Shadow damage to any player at the point of impact.\r\n\r\nIf no player is in the area the unstable void essence erupts in $@spellname1215161.",
           "dispel_detonates": false,
@@ -977,7 +977,9 @@
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
-          "positioning": [],
+          "positioning": [
+            "soak"
+          ],
           "priority": "priority",
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
@@ -1011,7 +1013,7 @@
           "is_stoppable": false,
           "mechanic": null,
           "name": "Void Destruction",
-          "notes": null,
+          "notes": " | scales_to_lethal+unavoidable EDITORIAL (user 2026-06-25): the punishment for failing Unstable Void Essence soak — party-wide stacking Shadow DoT, unavoidably lethal at higher keys.",
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": null,
@@ -1020,13 +1022,13 @@
           "recast_cooldown_confidence": null,
           "recast_cooldown_ms": null,
           "requires_interrupt": false,
-          "scales_to_lethal": false,
+          "scales_to_lethal": true,
           "school": "Shadow",
           "secondary_of": 1215087,
           "spell_id": 1215161,
           "tank_buster": false,
           "target_roles": null,
-          "unavoidable": false,
+          "unavoidable": true,
           "vulnerability": null
         },
         {

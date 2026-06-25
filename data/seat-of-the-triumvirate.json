@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T14:36:47.840Z",
+    "extracted_at": "2026-06-25T14:44:14.448Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -3227,7 +3227,7 @@
         {
           "cast_order": 2,
           "cast_time_ms": 4000,
-          "coaching_note": null,
+          "coaching_note": "The song itself is not interruptible — instead the Notes of Despair it spawns must be silenced; each radiates Shadow damage to the whole party until dealt with.",
           "completion_effect": null,
           "description": "L'ura performs the $@spellname1265421, immediately inflicting $s1 Shadow damage to all players. This song causes all $@spellname1265420 to radiates $1265424s1 Shadow damage every $1265422t2 sec until they are silenced.",
           "dispel_detonates": false,
@@ -3308,7 +3308,7 @@
         {
           "cast_order": 5,
           "cast_time_ms": 0,
-          "coaching_note": null,
+          "coaching_note": "Each active Note of Despair pulses Shadow damage to nearby players and stacks Anguish until destroyed — the Notes are killed and players avoid clustering near an active one.",
           "completion_effect": null,
           "description": "L'ura shifts the $@spellname1265419 and begins a $@spellname1265689 for $1265589d, inflicting $1271666s1 to players within $1271666a1 yards of each active $@spellname1265420$?diff1|diff2[.]$?diff8[.\r\nEach active $@spellname1265420 afflicts players with $@spellname1265650 every $1265589t3 sec until the $@spellname1265419 are destroyed.]",
           "dispel_detonates": false,
