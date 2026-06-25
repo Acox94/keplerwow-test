@@ -119,6 +119,12 @@
     .w-role .role-badge { justify-self: start; margin-right: 0; }
     .w-role.w-everyone { grid-template-columns: 1fr; } /* universal row: no role badge, full width */
     .w-role-msg { color: var(--ink); }
+    /* HIGH-RISK section: viable-but-dangerous plays (factual danger, shown at every tier; player self-assesses) */
+    .w-highrisk { margin-top: 11px; padding-top: 10px; border-top: 1px dashed #5a4a2e; display: flex; flex-direction: column; gap: 9px; }
+    .w-highrisk .w-role-msg { color: var(--ink-dim); }
+    .w-hr-head { display: flex; align-items: center; gap: 8px; }
+    .hr-badge { font-size: 10px; font-weight: 800; letter-spacing: .5px; color: #ffcaa0; background: #4a2c18; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+    .hr-sub { font-size: 11px; color: var(--ink-dim); font-style: italic; }
     /* read-only boss-mechanic reference card (the internal guide) — muted, dashed, not a warning */
     .w.reference { border-left-style: dashed; border-left-color: var(--ink-dim); opacity: .92; }
     .w.reference .sev { color: var(--ink-dim); }
@@ -157,7 +163,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T09:28:58.230Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T09:58:27.932Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -349,6 +355,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
         is_channeled: s.is_channeled,
         completion_effect: s.completion_effect,
         coaching_note: s.coaching_note,
+        high_risk: s.high_risk,
         secondary_of: s.secondary_of,
         secondary_of_name: s.secondary_of != null ? spellNameById.get(s.secondary_of) ?? null : null,
         // A SECONDARY (a pool/add/death-burst) with no explicit cast_order inherits its PRIMARY's, so it slots
@@ -723,12 +730,18 @@ function analyzeTankBusters(threats, group) {
   const aoe = dangerousCreatures >= 2;
   const answer = (spec, ext) => ({ spec: toResolvedSpec(spec), ability: ext.name, mechanism: ext.mechanism, scope: ext.scope });
   const covers = (ext, school) => schoolCovers(ext.condition?.schools, school);
+  const isMeleeStopImmunity = (ext) => ext.mechanism === "immunity" && ext.target === "ally" && covers(ext, "Physical");
   const cheatExt = (tankSpec?.externals ?? []).find((e) => e.passive && e.mechanism === "death_prevent") ?? null;
   const tank_cheat_death = cheatExt && tankSpec ? answer(tankSpec, cheatExt) : null;
   const out = [];
   for (const t of threats) {
     if (!t.tank_buster) continue;
-    const ally_answers = allyExternals.filter((a) => covers(a.ext, t.school)).map((a) => answer(a.spec, a.ext)).sort((x, y) => MECH_RANK[x.mechanism] - MECH_RANK[y.mechanism]);
+    const ally_answers = allyExternals.filter((a) => covers(a.ext, t.school) && !isMeleeStopImmunity(a.ext)).map((a) => answer(a.spec, a.ext)).sort((x, y) => MECH_RANK[x.mechanism] - MECH_RANK[y.mechanism]);
+    const high_risk = [];
+    for (const s of group) for (const ext of s.externals) {
+      if (!isMeleeStopImmunity(ext) || !covers(ext, t.school)) continue;
+      high_risk.push(s === tankSpec ? { role: "tank", text: `${ext.name} on yourself immunes the hit, but it DROPS YOUR AGGRO \u2014 only with a /cancelaura macro and an instant re-taunt.` } : { role: coarseRole(s.party_role), text: `${ext.name} on the tank immunes the hit, but it DROPS THE TANK'S AGGRO \u2014 coordinate the re-taunt.` });
+    }
     const covering = tankSpec ? tankSelfExternals.filter((e) => covers(e, t.school)) : [];
     const reductions = covering.filter((e) => e.mechanism === "reduction");
     const tankScoped = reductions.some((e) => e.scope === "single") && reductions.some((e) => e.scope === "all");
@@ -737,7 +750,8 @@ function analyzeTankBusters(threats, group) {
       cast: t,
       ally_answers,
       tank_self_answer: selfExt && tankSpec ? answer(tankSpec, selfExt) : null,
-      tank_self_scoped: tankScoped
+      tank_self_scoped: tankScoped,
+      high_risk
     });
   }
   return { threats: out, tank_cheat_death };
@@ -1591,6 +1605,15 @@ function buildCastCard(cast, members) {
   }
   const primary = [...members].sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity])[0];
   const coaching = members.every((m) => m.coaching) && intrinsicSeverity(cast) === "info";
+  const seen = /* @__PURE__ */ new Set();
+  const high_risk = [];
+  for (const hr of [...members.flatMap((m) => m.high_risk ?? []), ...cast.high_risk]) {
+    const k = `${hr.role}|${hr.text}`;
+    if (!seen.has(k)) {
+      seen.add(k);
+      high_risk.push(hr);
+    }
+  }
   return {
     severity,
     category: primary.category,
@@ -1599,7 +1622,8 @@ function buildCastCard(cast, members) {
     subjects: members[0].subjects,
     message: composeDescription(cast, severity),
     role_advice,
-    everyone
+    everyone,
+    high_risk: high_risk.length ? high_risk : void 0
   };
 }
 function tankSurvivalCard(tb, vt) {
@@ -1615,7 +1639,8 @@ function tankSurvivalCard(tb, vt) {
   role_advice.healer = `This tank-buster hits your tank for ${damageLabel(cast)} damage \u2014 ${healMine ? `have ${healMine} ready for them` : allies.length ? `back the tank with ${answerersPhrase(allies, "healer")}` : "pre-heal hard through the amplified window"}.`;
   const note = cast.coaching_note?.trim();
   if (note) role_advice.dps = note;
-  return { severity, category: "tank_buster", consolidated: true, role_advice, message };
+  const high_risk = [...tb.high_risk, ...cast.high_risk];
+  return { severity, category: "tank_buster", consolidated: true, role_advice, message, high_risk: high_risk.length ? high_risk : void 0 };
 }
 function buildWarnings(r, group) {
   const w = [];
@@ -2012,15 +2037,18 @@ function buildWarnings(r, group) {
     if (foldedKeys.has(castKey(tb.cast))) continue;
     const name = labelCast(tb.cast);
     const tbAdvice = tankBusterAdvice(tb);
+    const hr = [...tb.high_risk, ...tb.cast.high_risk];
+    const high_risk = hr.length ? hr : void 0;
     if (!tb.cast.is_lethal) {
       const hint = tb.ally_answers.length ? `, with an external (${externalList(tb.ally_answers)}) if it spikes` : "";
-      w.push({ severity: "info", category: "tank_buster", coaching: true, subjects: subj([tb.cast]), role_advice: tbAdvice, message: `${name} is a tank-buster \u2014 tank actives cover it${hint}.` });
+      w.push({ severity: "info", category: "tank_buster", coaching: true, subjects: subj([tb.cast]), role_advice: tbAdvice, high_risk, message: `${name} is a tank-buster \u2014 tank actives cover it${hint}.` });
     } else if (tb.ally_answers.length > 0) {
       w.push({
         severity: "warning",
         category: "tank_buster",
         subjects: subj([tb.cast]),
         role_advice: tbAdvice,
+        high_risk,
         message: `${name} is a lethal tank-buster \u2014 pre-plan an external on the tank: ${externalList(tb.ally_answers)}.`
       });
     } else if (tb.tank_self_answer) {
@@ -2032,6 +2060,7 @@ function buildWarnings(r, group) {
         category: "tank_buster",
         subjects: subj([tb.cast]),
         role_advice: tbAdvice,
+        high_risk,
         message: `${name} is a lethal tank-buster with no ally external \u2014 your ${a.spec.class} ${a.spec.spec_name} tank should ${verb} it with ${a.ability}${scopeNote}.`
       });
     } else {
@@ -2040,6 +2069,7 @@ function buildWarnings(r, group) {
         category: "tank_buster",
         subjects: subj([tb.cast]),
         role_advice: tbAdvice,
+        high_risk,
         message: `${name} is a lethal tank-buster and the comp brings no external \u2014 the tank should plan a major defensive for it.`
       });
     }
@@ -6582,6 +6612,11 @@ var CreatureSpell = external_exports.object({
   // Surfaced by the engine's `notes` dimension as a coaching line. DISTINCT from `notes` above, which
   // is the curator's internal scratchpad (provenance / DB2 caveats) and is NEVER shown to the player.
   coaching_note: external_exports.string().nullable().default(null),
+  // EDITORIAL — HIGH-RISK alternatives: viable-but-dangerous plays a player self-assesses (NOT skill-gated —
+  // the danger is factual, shown at every tier). Each is role-tagged so the UI shows it under that role's lens
+  // (a DPS taunt-soak under DPS, etc.). The engine ALSO generates high-risk plays structurally (a Blessing of
+  // Protection on the tank drops aggro), so this field is only for BESPOKE ones no structured rule produces.
+  high_risk: external_exports.array(external_exports.object({ role: external_exports.enum(["tank", "healer", "dps"]), text: external_exports.string() })).default([]),
   // EDITORIAL — SECONDARY EFFECT: this cast is not something the boss directly casts but a CONSEQUENCE of a
   // PRIMARY cast (a pool left when a debuff is removed, an add a summon spawns, a death-burst). `secondary_of`
   // is the PRIMARY's spell_id; the engine attributes the secondary to it ("Stygian Ichor — from Hulking
@@ -6877,6 +6912,8 @@ var ExportedSpell = external_exports.object({
   // EDITORIAL player-facing coaching note (see CreatureSpell.coaching_note); surfaced by the engine's
   // `notes` dimension. null = none. (The internal `notes` field is never shown to the player.)
   coaching_note: external_exports.string().nullable().default(null),
+  // EDITORIAL high-risk alternatives (see CreatureSpell.high_risk) — role-tagged risky-but-viable plays.
+  high_risk: external_exports.array(external_exports.object({ role: external_exports.enum(["tank", "healer", "dps"]), text: external_exports.string() })).default([]),
   // EDITORIAL — SECONDARY EFFECT: the PRIMARY spell_id this cast is a consequence of (see CreatureSpell.secondary_of); null = primary.
   secondary_of: external_exports.number().int().nullable().default(null),
   // EDITORIAL — CAST ORDER in the boss's cycle (see CreatureSpell.cast_order); null = unordered (sorts last).
@@ -7096,6 +7133,11 @@ function consolidatedCard(subject, w, lens) {
   const from = subject.secondary_of_name ? ` <span class="w-add">from ${esc(subject.secondary_of_name)}</span>` : "";
   const rows = ROLE_ROW_ORDER.filter((r) => (lens === "all" || lens === r) && w.role_advice?.[r]).map((r) => `<div class="w-role"><span class="role-badge ${r}">${ROLE_LABEL2[r]}</span><span class="w-role-msg">${esc(w.role_advice[r])}</span></div>`).join("");
   const everyone = w.everyone ? `<div class="w-role w-everyone"><span class="w-role-msg">${esc(w.everyone)}</span></div>` : "";
+  const hr = (w.high_risk ?? []).filter((h) => lens === "all" || h.role === lens);
+  const highRisk = hr.length ? `<div class="w-highrisk">
+        <div class="w-hr-head"><span class="hr-badge">&#9888; HIGH-RISK</span> <span class="hr-sub">viable \u2014 you assess if you can execute it</span></div>
+        ${hr.map((h) => `<div class="w-role"><span class="role-badge ${h.role}">${ROLE_LABEL2[h.role]}</span><span class="w-role-msg">${esc(h.text)}</span></div>`).join("")}
+      </div>` : "";
   return `<div class="w ${w.severity} consolidated">
       <div class="w-head">
         <div class="w-title"><span class="w-spell">${esc(subject.spell_name)}${subject.count > 1 ? ` \xD7${subject.count}` : ""}</span> <span class="w-npc">(${esc(subject.npc_name)})</span>${add}${from}</div>
@@ -7103,6 +7145,7 @@ function consolidatedCard(subject, w, lens) {
       </div>
       <div class="w-desc">${esc(w.message)}</div>
       ${everyone || rows ? `<div class="w-roles">${everyone}${rows}</div>` : ""}
+      ${highRisk}
     </div>`;
 }
 function castGroupCard(subject, warnings, lens) {
@@ -7170,6 +7213,7 @@ function renderReport(rep) {
   const lens = state.roleFilter;
   const visible = rep.warnings.filter((w) => {
     if (lens === "all" || w.roles.length === 0 || w.roles.includes(lens)) return true;
+    if ((w.high_risk ?? []).some((h) => h.role === lens)) return true;
     if ((w.subjects?.length ?? 0) > 0) return !w.role_advice || lens in w.role_advice;
     return false;
   });
