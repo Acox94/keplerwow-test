@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T06:12:58.438Z",
+    "extracted_at": "2026-06-25T06:28:06.823Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -1577,10 +1577,10 @@
         {
           "cast_order": null,
           "cast_time_ms": 4000,
-          "coaching_note": null,
+          "coaching_note": "The Voidbender enhances its own weapon — its melee then deals bonus Shadow damage that chains to nearby players. Purge the buff to strip the empower (it's a Magic enhancement, not a player debuff).",
           "completion_effect": null,
           "dispel_detonates": false,
-          "dispel_type": "Magic",
+          "dispel_type": "None",
           "displacement": [],
           "dot": false,
           "duration_ms": 15000,
@@ -1592,7 +1592,7 @@
           "is_stoppable": false,
           "mechanic": null,
           "name": "Abyssal Enhancement",
-          "notes": null,
+          "notes": "SELF-cast weapon enhancement (DB2 ImplicitTarget=1/self; empowered-melee Shadow damage via id 1262527). DB2 types it Magic but it lands no PLAYER debuff -> dispel_type overridden to None in spell_editorials (same class as Hastening Ward, found by the dispel-error audit). Purge answer in the coaching_note.",
           "observed_channel_stop": null,
           "observed_kick_point": {
             "clean_cast_ms": 4002,
