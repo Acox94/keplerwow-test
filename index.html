@@ -163,7 +163,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T12:05:59.647Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T12:32:08.430Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -394,12 +394,15 @@ function analyzePull(dungeon, pull, group, opts = {}) {
   const dps_survival = analyzeDpsSurvival(threats, groupSpecs);
   const pet_choice = analyzePetChoice(groupSpecs, dispels, stops);
   const composition = analyzeComposition(groupSpecs);
+  const allWarnings = buildWarnings({ dispels, stops, soothe, misplays, awareness, throughput, scaling, targeting, movement, cc_on_party, displacement, vulnerability, tank_buster, target_drop, dps_survival, pet_choice, composition, kick_timing, channel_timing, completion_effect, notes, threats }, groupSpecs);
+  const warnedCasts = /* @__PURE__ */ new Set();
+  for (const wn of allWarnings) for (const su of wn.subjects ?? []) warnedCasts.add(`${su.npc_name}\0${su.spell_name}`);
   const boss_reference = [];
   for (const m of members) {
     const c = creatureById.get(m.npc_id);
     if (!c || !(c.is_boss || c.is_boss_add)) continue;
     for (const s of c.spells) {
-      if (s.priority === "priority") continue;
+      if (s.priority === "priority" && warnedCasts.has(`${c.name}\0${s.name}`)) continue;
       boss_reference.push({
         npc_id: c.npc_id,
         npc_name: c.name,
@@ -414,7 +417,9 @@ function analyzePull(dungeon, pull, group, opts = {}) {
         is_interruptible: s.is_interruptible,
         is_stoppable: s.is_stoppable,
         is_aoe: s.is_aoe,
-        is_channeled: s.is_channeled
+        is_channeled: s.is_channeled,
+        curated: s.priority === "priority",
+        cast_order: s.cast_order ?? null
       });
     }
   }
@@ -448,7 +453,7 @@ function analyzePull(dungeon, pull, group, opts = {}) {
     notes,
     boss_reference,
     // Skill gate: an expert sees only the essentials; learning + experienced also get the coaching/heads-ups.
-    warnings: buildWarnings({ dispels, stops, soothe, misplays, awareness, throughput, scaling, targeting, movement, cc_on_party, displacement, vulnerability, tank_buster, target_drop, dps_survival, pet_choice, composition, kick_timing, channel_timing, completion_effect, notes, threats }, groupSpecs).filter((wn) => !wn.coaching || skill !== "expert")
+    warnings: allWarnings.filter((wn) => !wn.coaching || skill !== "expert")
   };
 }
 function normalizePull(pull) {
@@ -7182,13 +7187,15 @@ function referenceCard(e) {
   if (e.is_interruptible) attrs.push("interruptible");
   if (e.is_stoppable) attrs.push("CC-stoppable");
   if (e.is_aoe) attrs.push("AoE");
+  const msg = e.curated ? `Sustained / burst damage \u2014 heal &amp; mitigate through (no reposition, dispel, or kick). <span class="ref-attrs">${esc(attrs.join(" \xB7 "))}</span>` : `Boss mechanic \u2014 not curated yet. <span class="ref-attrs">${esc(attrs.join(" \xB7 "))}</span>`;
+  const badge = e.curated ? "Timeline" : "Reference";
   return `<div class="w reference">
     <div class="w-subjects"><span class="w-spell">${esc(e.spell_name)}${e.count > 1 ? ` \xD7${e.count}` : ""}</span> <span class="w-npc">(${esc(e.npc_name)})</span>${add}</div>
     <div class="w-body">
       <div class="sev">ref</div>
       <div>
-        <div class="msg">Boss mechanic \u2014 not curated yet. <span class="ref-attrs">${esc(attrs.join(" \xB7 "))}</span></div>
-        <div class="cat"><span class="role-badge all">Reference</span><span class="cat-name">boss guide</span></div>
+        <div class="msg">${msg}</div>
+        <div class="cat"><span class="role-badge all">${badge}</span><span class="cat-name">boss guide</span></div>
       </div>
     </div>
   </div>`;
@@ -7225,11 +7232,24 @@ function renderReport(rep) {
   const sections = SOURCE_SECTIONS.map(({ source, label }) => {
     const ws = visible.filter((w) => w.source === source).sort((a, b) => source === "boss" ? castOrderOf(a) - castOrderOf(b) || isSecondary(a) - isSecondary(b) || SEV_RANK[a.severity] - SEV_RANK[b.severity] : SEV_RANK[a.severity] - SEV_RANK[b.severity]);
     const groups = groupBySubject(ws);
+    if (source === "boss") {
+      const ORD = Number.MAX_SAFE_INTEGER;
+      const items = groups.map((g, i) => ({
+        order: g.subject?.cast_order ?? ORD,
+        isRef: 0,
+        seq: i,
+        html: g.subject ? castGroupCard(g.subject, g.warnings, state.roleFilter) : warningCard(g.warnings[0], state.roleFilter)
+      }));
+      if (state.showBoss) for (const e of rep.boss_reference) items.push({ order: e.cast_order ?? ORD, isRef: 1, seq: ORD, html: referenceCard(e) });
+      if (items.length === 0) return "";
+      items.sort((a, b) => a.order - b.order || a.isRef - b.isRef || a.seq - b.seq);
+      return `<h3 class="section-head">${label} <span class="section-count">${items.length}</span></h3>
+        <div class="warnings">${items.map((i) => i.html).join("")}</div>`;
+    }
     const cards = groups.map((g) => g.subject ? castGroupCard(g.subject, g.warnings, state.roleFilter) : warningCard(g.warnings[0], state.roleFilter));
-    const refCards = source === "boss" && state.showBoss ? rep.boss_reference.map(referenceCard) : [];
-    if (cards.length === 0 && refCards.length === 0) return "";
-    return `<h3 class="section-head">${label} <span class="section-count">${cards.length + refCards.length}</span></h3>
-      <div class="warnings">${cards.join("")}${refCards.join("")}</div>`;
+    if (cards.length === 0) return "";
+    return `<h3 class="section-head">${label} <span class="section-count">${cards.length}</span></h3>
+      <div class="warnings">${cards.join("")}</div>`;
   }).join("");
   const body = sections || `<div class="empty">No actionable warnings${state.roleFilter !== "all" ? " for this role" : " \u2014 this comp covers everything this pull throws"}.</div>`;
   $("report").innerHTML = head + filterBar + body + budgetPanel(rep);
