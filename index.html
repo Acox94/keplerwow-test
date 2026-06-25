@@ -163,7 +163,7 @@
 <body>
   <header>
     <h1>Kepler — M+ Pull Advisor <span style="color:var(--ink-dim);font-weight:400">· engine-in-browser spike</span></h1>
-    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T13:10:38.618Z</span></p>
+    <p>The pure <code>analyzePull</code> engine, bundled and running entirely in your browser over a static dungeon export. No server.<span style="opacity:.5"> · build 2026-06-25T13:58:08.714Z</span></p>
   </header>
   <main>
     <div class="controls">
@@ -6524,8 +6524,13 @@ var Spell = external_exports.object({
   // LOCKED  (cast>0||channeled) && SpellInterrupts.InterruptFlags & 0x4
   is_stoppable: external_exports.boolean(),
   // EDITORIAL  CC stops w/o recast; depends on creature AI; default false
-  school: SchoolName
+  school: SchoolName,
   // DB2  SpellMisc.SchoolMask decoded
+  // DB2  Spell.Description_lang (the tooltip text), with `$@spelldescNNNN` REDIRECTS resolved (a cast's
+  // tooltip often points at its impact spell's text — Runic Mark 1224801 -> $@spelldesc1225792). Keeps the
+  // raw $-tokens ($s1/$t2/yards); the structural signatures (DoT "every N sec", AoE "within N yards", bounce)
+  // survive for the tooltip scanner (`audit-tooltips`). null = no description. Defaulted for back-compat.
+  description: external_exports.string().nullable().default(null)
 });
 var DungeonCreature = external_exports.object({
   dungeon_id: external_exports.number().int(),
@@ -6887,6 +6892,9 @@ var ExportedSpell = external_exports.object({
   cast_time_ms: external_exports.number().int(),
   // DB2 aura/effect duration in ms (see Spell.duration_ms); null = no finite duration. Feeds the vuln window.
   duration_ms: external_exports.number().int().nullable().default(null),
+  // DB2 Spell.Description_lang tooltip text (redirects resolved) — see Spell.description. The `audit-tooltips`
+  // scanner reads this to flag mechanics (DoT/AoE/bounce) the measured streams miss. null = none.
+  description: external_exports.string().nullable().default(null),
   is_channeled: external_exports.boolean(),
   is_interruptible: external_exports.boolean(),
   is_stoppable: external_exports.boolean(),
