@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T12:01:13.279Z",
+    "extracted_at": "2026-06-25T12:40:29.329Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2697,7 +2697,7 @@
           "coaching_note": null,
           "completion_effect": null,
           "dispel_detonates": false,
-          "dispel_type": "None",
+          "dispel_type": "Poison",
           "displacement": [],
           "dot": true,
           "duration_ms": 5000,
