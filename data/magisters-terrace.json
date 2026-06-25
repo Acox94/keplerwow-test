@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T12:54:34.556Z",
+    "extracted_at": "2026-06-25T13:07:02.487Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -488,7 +488,7 @@
           "dispel_detonates": false,
           "dispel_type": "None",
           "displacement": [],
-          "dot": false,
+          "dot": true,
           "duration_ms": null,
           "freedom_partial": false,
           "high_risk": [],
@@ -499,7 +499,7 @@
           "is_stoppable": false,
           "mechanic": null,
           "name": "Runic Mark",
-          "notes": "From a Casts CSV (WCL rate-limited); 1224801 = the only 3.00s 'Runic Mark' in DB2. Targeted mark on a player; verify is_lethal/dispellable in-game. | is_lethal:true EDITORIAL (user 2026-06-25): a targeted-mark personal-defensive check — affected player uses a defensive / health pot / healer external. measured deaths thin BECAUSE good players defensive it.",
+          "notes": "From a Casts CSV (WCL rate-limited); 1224801 = the only 3.00s 'Runic Mark' in DB2. Targeted mark on a player; verify is_lethal/dispellable in-game. | is_lethal:true EDITORIAL (user 2026-06-25): a targeted-mark personal-defensive check — affected player uses a defensive / health pot / healer external. measured deaths thin BECAUSE good players defensive it. | dot:true EDITORIAL (user 2026-06-25): tooltip Runic Glaive = cast hit + additional Arcane damage every 1 sec to players within 4 yards, bounces to 1 nearby. Recurring ticks confirmed in WCL events.",
           "observed_channel_stop": null,
           "observed_kick_point": null,
           "party_targets": 1.11,
