@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-25T19:56:45.375Z",
+    "extracted_at": "2026-06-26T06:06:18.439Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -1675,6 +1675,21 @@
     {
       "avoidable": false,
       "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Undead",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Rotting Ghoul",
+      "npc_id": 252558,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
       "classification": "Normal",
       "creature_type": "Undead",
       "display_id": null,
@@ -1724,6 +1739,21 @@
           "vulnerability": null
         }
       ],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Undead",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Quarry Tormentor",
+      "npc_id": 252561,
+      "spells": [],
       "summoned_by": null
     },
     {
@@ -2342,6 +2372,21 @@
       "avoidable": false,
       "base_health": null,
       "classification": "Elite",
+      "creature_type": "Undead",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Plungetalon Gargoyle",
+      "npc_id": 252606,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
       "creature_type": "Humanoid",
       "display_id": null,
       "forces": null,
@@ -2692,6 +2737,21 @@
           "vulnerability": null
         }
       ],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Undead",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Ick",
+      "npc_id": 252625,
+      "spells": [],
       "summoned_by": null
     },
     {
@@ -3763,6 +3823,21 @@
       "level": null,
       "name": "Dryad",
       "npc_id": 255363,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Dragonkin",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Iceborn Proto-Drake",
+      "npc_id": 257190,
       "spells": [],
       "summoned_by": null
     },

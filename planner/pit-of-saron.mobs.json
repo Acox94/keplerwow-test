@@ -636,7 +636,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 964.8,
       "y": 574
     },
@@ -649,7 +649,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 1121.9,
       "y": 787.4
     },
@@ -662,7 +662,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 971.1,
       "y": 965.4
     },
@@ -675,7 +675,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 887.2,
       "y": 992.2
     },
@@ -688,7 +688,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 830.1,
       "y": 1028.9
     },
@@ -701,7 +701,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 746.4,
       "y": 905.6
     },
@@ -714,7 +714,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 719.2,
       "y": 943.8
     },
@@ -727,7 +727,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 752.8,
       "y": 1037.4
     },
@@ -740,7 +740,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 742.8,
       "y": 1076.6
     },
@@ -753,7 +753,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 629.7,
       "y": 1031.4
     },
@@ -766,7 +766,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 547.3,
       "y": 1031.9
     },
@@ -779,7 +779,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 489.3,
       "y": 1093.2
     },
@@ -792,7 +792,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 504.1,
       "y": 1143
     },
@@ -805,7 +805,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 486.8,
       "y": 1233.9
     },
@@ -818,7 +818,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 712.2,
       "y": 1243
     },
@@ -831,7 +831,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 697.7,
       "y": 1162.6
     },
@@ -844,7 +844,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 669.9,
       "y": 1110.8
     },
@@ -857,7 +857,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 447.4,
       "y": 991.6
     },
@@ -870,7 +870,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 580,
       "y": 950.9
     },
@@ -883,7 +883,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 537.8,
       "y": 891.2
     },
@@ -896,7 +896,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 616.2,
       "y": 789.6
     },
@@ -909,7 +909,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 753.1,
       "y": 779.7
     },
@@ -922,7 +922,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 580.8,
       "y": 1068.9
     },
@@ -935,7 +935,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 880.5,
       "y": 920.2
     },
@@ -948,7 +948,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 1031.8,
       "y": 708.3
     },
@@ -961,7 +961,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 820.1,
       "y": 464
     },
@@ -1091,7 +1091,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 821.6,
       "y": 650.2
     },
@@ -1104,7 +1104,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 813.9,
       "y": 638
     },
@@ -1117,7 +1117,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 806.4,
       "y": 624.7
     },
@@ -1130,7 +1130,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 993.3,
       "y": 671.4
     },
@@ -1143,7 +1143,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 987.7,
       "y": 867.4
     },
@@ -1156,7 +1156,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 993.2,
       "y": 884
     },
@@ -1169,7 +1169,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 903.8,
       "y": 947.6
     },
@@ -1182,7 +1182,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 792.4,
       "y": 1000.6
     },
@@ -1195,7 +1195,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 785.6,
       "y": 1016
     },
@@ -1208,7 +1208,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 703.7,
       "y": 944.1
     },
@@ -1221,7 +1221,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 687.6,
       "y": 942.2
     },
@@ -1234,7 +1234,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 711.6,
       "y": 976.4
     },
@@ -1247,7 +1247,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 530.6,
       "y": 1031.5
     },
@@ -1260,7 +1260,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 531.4,
       "y": 1049
     },
@@ -1273,7 +1273,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 515.5,
       "y": 1179.3
     },
@@ -1286,7 +1286,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 496.1,
       "y": 1198
     },
@@ -1299,7 +1299,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 697.8,
       "y": 1184.9
     },
@@ -1312,7 +1312,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 712.6,
       "y": 1220.3
     },
@@ -1325,7 +1325,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 709.7,
       "y": 1106.6
     },
@@ -1338,7 +1338,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 463.5,
       "y": 1000.6
     },
@@ -1351,7 +1351,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 441.5,
       "y": 927.2
     },
@@ -1364,7 +1364,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 458.9,
       "y": 937.5
     },
@@ -1377,7 +1377,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 568.4,
       "y": 868.7
     },
@@ -1390,7 +1390,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 730.5,
       "y": 780.6
     },
@@ -1403,7 +1403,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 916.9,
       "y": 432.3
     },
@@ -1416,7 +1416,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 918.3,
       "y": 415.6
     },
@@ -1429,7 +1429,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 919.7,
       "y": 398.4
     },
@@ -1442,7 +1442,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 614.3,
       "y": 1082
     },
@@ -1455,7 +1455,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 570.3,
       "y": 1087.3
     },
@@ -1468,7 +1468,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 1121.7,
       "y": 874.8
     },
@@ -1481,7 +1481,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 5,
-      "known": false,
+      "known": true,
       "x": 706.2,
       "y": 1134
     },
@@ -2248,7 +2248,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 6,
-      "known": false,
+      "known": true,
       "x": 860.7,
       "y": 612.3
     },
@@ -2261,7 +2261,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 6,
-      "known": false,
+      "known": true,
       "x": 1092,
       "y": 843.5
     },
@@ -2274,7 +2274,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 6,
-      "known": false,
+      "known": true,
       "x": 892.7,
       "y": 914.8
     },
@@ -2287,7 +2287,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 6,
-      "known": false,
+      "known": true,
       "x": 852.1,
       "y": 1019.5
     },
@@ -2300,7 +2300,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 6,
-      "known": false,
+      "known": true,
       "x": 694.6,
       "y": 975.8
     },
@@ -2313,7 +2313,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 6,
-      "known": false,
+      "known": true,
       "x": 463.4,
       "y": 979.4
     },
@@ -2326,7 +2326,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 6,
-      "known": false,
+      "known": true,
       "x": 619.8,
       "y": 936
     },
@@ -2339,7 +2339,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 6,
-      "known": false,
+      "known": true,
       "x": 751.6,
       "y": 799.7
     },
@@ -2430,7 +2430,7 @@
       "legacyDid": null,
       "type": "Dragonkin",
       "forces": 9,
-      "known": false,
+      "known": true,
       "x": 953.5,
       "y": 632.5
     },
@@ -2443,7 +2443,7 @@
       "legacyDid": null,
       "type": "Dragonkin",
       "forces": 9,
-      "known": false,
+      "known": true,
       "x": 1142.5,
       "y": 809.2
     },
@@ -2456,7 +2456,7 @@
       "legacyDid": null,
       "type": "Dragonkin",
       "forces": 9,
-      "known": false,
+      "known": true,
       "x": 806.7,
       "y": 907.7
     },
@@ -2872,7 +2872,7 @@
       "legacyDid": null,
       "type": "Undead",
       "forces": 0,
-      "known": false,
+      "known": true,
       "x": 799.7,
       "y": 549.3
     },
