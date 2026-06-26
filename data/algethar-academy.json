@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-26T06:45:26.429Z",
+    "extracted_at": "2026-06-26T07:40:13.690Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -3493,6 +3493,21 @@
       "avoidable": false,
       "base_health": null,
       "classification": "Normal",
+      "creature_type": "Elemental",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Twister",
+      "npc_id": 198253,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Normal",
       "creature_type": "Undead",
       "display_id": null,
       "forces": null,
@@ -3849,6 +3864,21 @@
       "level": null,
       "name": "Dryad",
       "npc_id": 255261,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Dragonkin",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Astral Projection",
+      "npc_id": 256896,
       "spells": [],
       "summoned_by": null
     },

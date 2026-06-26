@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-26T06:45:26.429Z",
+    "extracted_at": "2026-06-26T07:40:13.690Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -1111,6 +1111,21 @@
       "is_boss": false,
       "is_boss_add": false,
       "level": null,
+      "name": "Shadowguard Defender",
+      "npc_id": 241643,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Humanoid",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
       "name": "Corewright Arcanist",
       "npc_id": 241644,
       "spells": [
@@ -1243,6 +1258,21 @@
       "avoidable": false,
       "base_health": null,
       "classification": "Elite",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Hollowsoul Scrounger",
+      "npc_id": 241645,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
       "creature_type": "Humanoid",
       "display_id": null,
       "forces": null,
@@ -1298,6 +1328,36 @@
           "vulnerability": null
         }
       ],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Duskfright Herald",
+      "npc_id": 241660,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Scouring Voidshaper",
+      "npc_id": 243797,
+      "spells": [],
       "summoned_by": null
     },
     {
@@ -1435,6 +1495,66 @@
           "vulnerability": null
         }
       ],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Reformed Voidling",
+      "npc_id": 248501,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Null Sentinel",
+      "npc_id": 248502,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Dreadflail",
+      "npc_id": 248506,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Cursed Voidcaller",
+      "npc_id": 248706,
+      "spells": [],
       "summoned_by": null
     },
     {
@@ -1591,6 +1711,21 @@
           "vulnerability": null
         }
       ],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Humanoid",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Core Technician",
+      "npc_id": 249711,
+      "spells": [],
       "summoned_by": null
     },
     {
@@ -1877,6 +2012,21 @@
       "is_boss": false,
       "is_boss_add": false,
       "level": null,
+      "name": "Arcane Tripwire",
+      "npc_id": 252870,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
       "name": "Nascent Dreadflail",
       "npc_id": 252903,
       "spells": [
@@ -2046,6 +2196,21 @@
     {
       "avoidable": false,
       "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Beast",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Flarebat",
+      "npc_id": 254928,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
       "classification": "Normal",
       "creature_type": "Not specified",
       "display_id": null,
@@ -2109,6 +2274,21 @@
       "level": null,
       "name": "Fractured Image",
       "npc_id": 255133,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Humanoid",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Fractured Image",
+      "npc_id": 255179,
       "spells": [],
       "summoned_by": null
     },

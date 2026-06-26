@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-26T06:45:26.429Z",
+    "extracted_at": "2026-06-26T07:40:13.690Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -2083,6 +2083,21 @@
       "avoidable": false,
       "base_health": null,
       "classification": "Elite",
+      "creature_type": "Beast",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Hulking Juggernaut",
+      "npc_id": 248678,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
       "creature_type": "Humanoid",
       "display_id": null,
       "forces": null,
@@ -2281,6 +2296,21 @@
     {
       "avoidable": false,
       "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Undead",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Grim Skirmisher",
+      "npc_id": 248690,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
       "classification": "Elite",
       "creature_type": "Undead",
       "display_id": null,
@@ -2371,6 +2401,21 @@
           "vulnerability": null
         }
       ],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Humanoid",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Mire Laborer",
+      "npc_id": 248693,
+      "spells": [],
       "summoned_by": null
     },
     {
@@ -3554,6 +3599,21 @@
           "vulnerability": null
         }
       ],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Undead",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Lost Soul",
+      "npc_id": 253647,
+      "spells": [],
       "summoned_by": null
     },
     {

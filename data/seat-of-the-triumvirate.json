@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-26T06:45:26.429Z",
+    "extracted_at": "2026-06-26T07:40:13.690Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -4266,6 +4266,21 @@
       "level": null,
       "name": "Dryad",
       "npc_id": 255261,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Beast",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Ravenous Umbralfin",
+      "npc_id": 255320,
       "spells": [],
       "summoned_by": null
     },

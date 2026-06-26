@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68256,
-    "extracted_at": "2026-06-26T06:45:26.429Z",
+    "extracted_at": "2026-06-26T07:40:13.690Z",
     "patch_version": "12.0.7",
     "source_versions": {
       "curated": {
@@ -1680,6 +1680,21 @@
       "is_boss": false,
       "is_boss_add": false,
       "level": null,
+      "name": "Hollowsoul Shredder",
+      "npc_id": 234065,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
       "name": "Devouring Tyrant",
       "npc_id": 234066,
       "spells": [
@@ -1906,6 +1921,21 @@
           "vulnerability": null
         }
       ],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Voidling",
+      "npc_id": 234069,
+      "spells": [],
       "summoned_by": null
     },
     {
@@ -2501,6 +2531,21 @@
     {
       "avoidable": false,
       "base_health": null,
+      "classification": "Normal",
+      "creature_type": "Beast",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Void-Infused Brightscale",
+      "npc_id": 241354,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
       "classification": "Elite",
       "creature_type": "Not specified",
       "display_id": null,
@@ -2928,6 +2973,21 @@
       "level": null,
       "name": "Blazing Pyromancer",
       "npc_id": 257161,
+      "spells": [],
+      "summoned_by": null
+    },
+    {
+      "avoidable": false,
+      "base_health": null,
+      "classification": "Elite",
+      "creature_type": "Aberration",
+      "display_id": null,
+      "forces": null,
+      "is_boss": false,
+      "is_boss_add": false,
+      "level": null,
+      "name": "Hollowsoul Shredder",
+      "npc_id": 257447,
       "spells": [],
       "summoned_by": null
     },
