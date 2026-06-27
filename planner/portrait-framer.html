@@ -1,0 +1,229 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Portrait framer — curate round creature icons</title>
+<!--
+  Decouples the wow.export 3D render from the 2D round crop. Load loose head-and-shoulders PNGs, then
+  pan/zoom each inside the marker's circle until it's framed nicely, and Export a square PNG ready to
+  drop in ./portraits/<displayId>.png. The marker masks it round (border-radius) — so the export is the
+  SQUARE the circle is inscribed in; the dark overlay + guides just preview the on-map crop. Dependency-
+  free vanilla canvas. Serve via the planner-spike server → http://localhost:5174/portrait-framer.html
+-->
+<style>
+  :root{ --bg:#0b0e13; --panel:#0d1117; --line:#222a35; --ink:#e6edf3; --mut:#8a97a6; --accent:#2ea043; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg); color:var(--ink); font:14px system-ui,Segoe UI,Roboto,sans-serif; }
+  header{ padding:12px 16px; border-bottom:1px solid var(--line); }
+  header h1{ font-size:16px; margin:0; } header p{ margin:4px 0 0; color:var(--mut); font-size:12px; }
+  main{ display:flex; gap:16px; padding:16px; align-items:flex-start; }
+  .col{ display:flex; flex-direction:column; gap:12px; }
+  .card{ background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px; }
+  .card h2{ font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--mut); margin:0 0 8px; }
+  /* stage: the square framing viewport. Checkerboard shows alpha. */
+  #stage{ position:relative; width:440px; height:440px; border-radius:10px; cursor:grab; touch-action:none;
+    background-color:#1b212b;
+    background-image:linear-gradient(45deg,#161b22 25%,transparent 25%),linear-gradient(-45deg,#161b22 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#161b22 75%),linear-gradient(-45deg,transparent 75%,#161b22 75%);
+    background-size:22px 22px; background-position:0 0,0 11px,11px -11px,-11px 0; overflow:hidden; }
+  #stage.empty{ display:grid; place-items:center; color:var(--mut); text-align:center; }
+  #stage.drag{ outline:2px dashed var(--accent); outline-offset:-2px; }
+  #stage canvas{ position:absolute; inset:0; }
+  #guide{ pointer-events:none; }
+  .controls{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  button{ background:#161b22; color:var(--ink); border:1px solid var(--line); border-radius:7px; padding:6px 10px; cursor:pointer; font:inherit; }
+  button:hover{ background:#21262d; } button.primary{ background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  input[type=range]{ flex:1; min-width:120px; } input[type=text]{ background:#161b22; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:6px 8px; font:inherit; }
+  label{ color:var(--mut); font-size:12px; }
+  .row{ display:flex; gap:8px; align-items:center; }
+  #strip{ display:flex; gap:8px; flex-wrap:wrap; max-width:300px; }
+  #strip .thumb{ width:52px; height:52px; border-radius:50%; border:2px solid var(--line); object-fit:cover; cursor:pointer; background:#161b22; }
+  #strip .thumb.sel{ border-color:var(--accent); }
+  /* live marker preview at real on-map sizes */
+  .previews{ display:flex; gap:16px; align-items:flex-end; }
+  .pv{ text-align:center; color:var(--mut); font-size:11px; }
+  .pv .mk{ border-radius:50%; border:3px solid #9aa7b5; background-size:cover; background-position:center; background-color:#11151c; margin:0 auto 4px; }
+  .hint{ color:var(--mut); font-size:12px; line-height:1.5; }
+  kbd{ background:#161b22; border:1px solid var(--line); border-radius:4px; padding:0 5px; font:12px ui-monospace,monospace; }
+</style>
+
+<header>
+  <h1>✊ Portrait framer</h1>
+  <p>Load loose renders → pan/zoom inside the circle → Export a square PNG for <code>./portraits/&lt;displayId&gt;.png</code>. Drag = move · wheel = zoom.</p>
+</header>
+
+<main>
+  <div class="col">
+    <div id="stage" class="empty">Drop PNGs here, or use “Load images”.<br><br>(transparent renders show the checkerboard)</div>
+    <div class="card">
+      <div class="controls">
+        <button id="fit">Fit</button><button id="fill">Fill circle</button><button id="reset">Reset</button>
+        <label>zoom</label><input id="zoom" type="range" min="5" max="600" value="100">
+      </div>
+    </div>
+  </div>
+
+  <div class="col" style="width:320px">
+    <div class="card">
+      <h2>Export</h2>
+      <div class="row" style="margin-bottom:8px"><label style="width:62px">filename</label><input id="fname" type="text" placeholder="137211" style="flex:1"><span class="mut">.png</span></div>
+      <div class="row" style="margin-bottom:8px"><label style="width:62px">size</label>
+        <select id="size" style="background:#161b22;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px"><option>128</option><option selected>256</option><option>384</option></select>
+        <label class="row" style="margin-left:auto;gap:5px"><input id="guides" type="checkbox" checked> guides</label>
+      </div>
+      <div class="controls"><button id="export" class="primary" style="flex:1">⬇ Export this</button><button id="exportAll">Export all</button></div>
+    </div>
+
+    <div class="card">
+      <h2>On-map preview</h2>
+      <div class="previews">
+        <div class="pv"><div class="mk" id="pv30" style="width:30px;height:30px"></div>30px</div>
+        <div class="pv"><div class="mk" id="pv44" style="width:44px;height:44px;border-color:#e5484d"></div>boss 34</div>
+        <div class="pv"><div class="mk" id="pv96" style="width:96px;height:96px"></div>zoomed</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Batch</h2>
+      <input id="file" type="file" accept="image/png,image/*" multiple style="display:none">
+      <div class="controls" style="margin-bottom:8px"><button id="loadFullbody" class="primary">Load full-body</button><button id="loadPortraits">Load portraits</button><button id="load">Load images…</button><span class="mut" id="count">0 loaded</span></div>
+      <div id="strip"></div>
+    </div>
+
+    <div class="card hint">
+      <b>For a consistent set:</b> keep each creature's <b>eyes on the guide line</b> and head filling the
+      inner ring at the same size. <kbd>Fill circle</kbd> starts cover-framed; zoom out + pan up for head &amp;
+      shoulders. Background &amp; guides never export — only the model (alpha preserved).
+    </div>
+  </div>
+</main>
+
+<script>
+const VP = 440;                          // stage size (px)
+const stage = document.getElementById('stage');
+const imgC = document.createElement('canvas'); imgC.width = imgC.height = VP;
+const guideC = document.createElement('canvas'); guideC.id = 'guide'; guideC.width = guideC.height = VP;
+const ig = imgC.getContext('2d'), gg = guideC.getContext('2d');
+
+const shots = [];          // { name, img, scale, x, y }   (x,y = image top-left in stage px; scale = ×natural)
+let cur = -1;
+
+function fitScale(img){ return Math.min(VP/img.width, VP/img.height); }      // contain
+function fillScale(img){ return Math.max(VP/img.width, VP/img.height); }     // cover the square/circle
+function center(s){ s.x = (VP - s.img.width*s.scale)/2; s.y = (VP - s.img.height*s.scale)/2; }
+
+function draw(){
+  ig.clearRect(0,0,VP,VP);
+  const s = shots[cur];
+  if (s){ ig.imageSmoothingQuality='high'; ig.drawImage(s.img, s.x, s.y, s.img.width*s.scale, s.img.height*s.scale); }
+  // guide overlay: darken outside the circle + rings + eye line
+  gg.clearRect(0,0,VP,VP);
+  const r = VP/2, cx = VP/2, cy = VP/2;
+  gg.fillStyle = 'rgba(11,14,19,0.55)'; gg.fillRect(0,0,VP,VP);
+  gg.globalCompositeOperation = 'destination-out'; gg.beginPath(); gg.arc(cx,cy,r,0,7); gg.fill();
+  gg.globalCompositeOperation = 'source-over';
+  if (document.getElementById('guides').checked){
+    gg.strokeStyle = 'rgba(46,160,67,0.9)'; gg.lineWidth = 1.5; gg.beginPath(); gg.arc(cx,cy,r-1,0,7); gg.stroke();
+    gg.strokeStyle = 'rgba(255,255,255,0.18)'; gg.lineWidth = 1;
+    gg.beginPath(); gg.arc(cx,cy,r*0.62,0,7); gg.stroke();                 // inner "head" ring
+    gg.beginPath(); gg.moveTo(cx-r,cy-r*0.18); gg.lineTo(cx+r,cy-r*0.18); gg.stroke();  // eye line (~9% above centre)
+    gg.beginPath(); gg.moveTo(cx,cy-r); gg.lineTo(cx,cy+r); gg.stroke();   // vertical centre
+  }
+  syncUI();
+}
+
+function syncUI(){
+  const s = shots[cur];
+  document.getElementById('zoom').value = s ? Math.round(s.scale*100) : 100;
+  if (s){ const url = renderExport(96, false).toDataURL();   // small preview render (no guides)
+    for (const id of ['pv30','pv44','pv96']) document.getElementById(id).style.backgroundImage = `url(${url})`; }
+}
+
+// render the framed square to an offscreen canvas at `size`px (image only — never guides/bg)
+function renderExport(size, _){
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const ctx = c.getContext('2d'); ctx.imageSmoothingQuality = 'high';
+  const s = shots[cur]; if (!s) return c;
+  const k = size/VP;
+  ctx.drawImage(s.img, s.x*k, s.y*k, s.img.width*s.scale*k, s.img.height*s.scale*k);
+  return c;
+}
+
+function select(i){ cur = i; const s = shots[i];
+  document.getElementById('fname').value = (s.name||'').replace(/\.[^.]+$/,'');
+  [...document.querySelectorAll('#strip .thumb')].forEach((t,n)=>t.classList.toggle('sel',n===i));
+  stage.classList.remove('empty'); draw();
+}
+
+function addFiles(files){
+  let firstNew = shots.length;
+  [...files].filter(f=>f.type.startsWith('image/')).forEach(f=>{
+    const img = new Image();
+    img.onload = ()=>{ const s = { name:f.name, img, scale:fillScale(img), x:0, y:0 }; center(s); shots.push(s);
+      const t = document.createElement('img'); t.className='thumb'; t.src = img.src; t.title = f.name;
+      const idx = shots.length-1; t.onclick = ()=>select(idx); document.getElementById('strip').appendChild(t);
+      document.getElementById('count').textContent = shots.length + ' loaded';
+      if (cur < 0) select(idx);
+    };
+    img.src = URL.createObjectURL(f);
+  });
+}
+
+// ---- interaction: drag to pan, wheel to zoom at cursor ----
+let drag = null;
+stage.addEventListener('pointerdown', e=>{ if(cur<0) return; drag={ x:e.clientX, y:e.clientY }; stage.setPointerCapture(e.pointerId); stage.style.cursor='grabbing'; });
+stage.addEventListener('pointermove', e=>{ if(!drag) return; const s=shots[cur]; s.x += e.clientX-drag.x; s.y += e.clientY-drag.y; drag={x:e.clientX,y:e.clientY}; draw(); });
+stage.addEventListener('pointerup', e=>{ drag=null; stage.style.cursor='grab'; });
+stage.addEventListener('wheel', e=>{ if(cur<0) return; e.preventDefault(); const s=shots[cur];
+  const rect = stage.getBoundingClientRect(); const mx = e.clientX-rect.left, my = e.clientY-rect.top;
+  const f = Math.exp(-e.deltaY*0.0015); const ns = Math.max(0.05, Math.min(6, s.scale*f));
+  s.x = mx - (mx - s.x)*(ns/s.scale); s.y = my - (my - s.y)*(ns/s.scale); s.scale = ns; draw();
+}, { passive:false });
+
+// drop
+['dragover','dragenter'].forEach(ev=>stage.addEventListener(ev,e=>{e.preventDefault(); stage.classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>stage.addEventListener(ev,e=>{e.preventDefault(); stage.classList.remove('drag');}));
+stage.addEventListener('drop', e=>addFiles(e.dataTransfer.files));
+
+// controls
+document.getElementById('load').onclick = ()=>document.getElementById('file').click();
+document.getElementById('file').onchange = e=>addFiles(e.target.files);
+// one-click load of every render in a served folder (default: ./fullbody/), via the serve.mjs list endpoint
+async function loadFromServer(dir, btn){
+  const old = btn.textContent; btn.textContent = 'Loading…'; btn.disabled = true;
+  try{
+    const res = await fetch(`/api/list/${dir}`); if(!res.ok) throw new Error('HTTP '+res.status);
+    const names = (await res.json()).filter(n=>!/\([^)]*\)\.png$/i.test(n));  // skip browser-dup takes like 142386(2).png
+    if(!names.length){ alert(`No PNGs in /${dir} yet.`); return; }
+    const files = await Promise.all(names.map(async n=>{
+      const r = await fetch(`/${dir}/${encodeURIComponent(n)}`); const blob = await r.blob();
+      return new File([blob], n, { type: blob.type || 'image/png' });
+    }));
+    addFiles(files);
+  }catch(e){ alert(`Couldn't load /${dir} — is the planner-spike server running (node web/planner-spike/serve.mjs)?\n${e.message}`); }
+  finally{ btn.textContent = old; btn.disabled = false; }
+}
+document.getElementById('loadFullbody').onclick = (e)=>loadFromServer('fullbody', e.currentTarget);
+document.getElementById('loadPortraits').onclick = (e)=>loadFromServer('portraits', e.currentTarget);
+document.getElementById('zoom').oninput = e=>{ if(cur<0) return; const s=shots[cur]; const ns=(+e.target.value)/100;
+  s.x = VP/2 - (VP/2 - s.x)*(ns/s.scale); s.y = VP/2 - (VP/2 - s.y)*(ns/s.scale); s.scale = ns; draw(); };
+document.getElementById('fit').onclick = ()=>{ if(cur<0) return; const s=shots[cur]; s.scale=fitScale(s.img); center(s); draw(); };
+document.getElementById('fill').onclick = ()=>{ if(cur<0) return; const s=shots[cur]; s.scale=fillScale(s.img); center(s); draw(); };
+document.getElementById('reset').onclick = ()=>{ if(cur<0) return; const s=shots[cur]; s.scale=fillScale(s.img); center(s); draw(); };
+document.getElementById('guides').onchange = draw;
+function dl(canvas, name){ const a=document.createElement('a'); a.download=(name||'portrait')+'.png'; a.href=canvas.toDataURL('image/png');
+  document.body.appendChild(a); a.click(); a.remove(); }
+document.getElementById('export').onclick = ()=>{ if(cur<0) return; dl(renderExport(+document.getElementById('size').value), document.getElementById('fname').value); };
+// Export all — STAGGERED: browsers (Chrome) throttle a tight loop of programmatic downloads to ~10, so space them out.
+document.getElementById('exportAll').onclick = async ()=>{
+  if(!shots.length) return;
+  const size=+document.getElementById('size').value;
+  const btn=document.getElementById('exportAll'); const old=btn.textContent; btn.disabled=true;
+  for(let i=0;i<shots.length;i++){
+    cur=i; btn.textContent=`Exporting ${i+1}/${shots.length}…`;
+    dl(renderExport(size), (shots[i].name||'portrait').replace(/\.[^.]+$/,''));
+    await new Promise(r=>setTimeout(r,400));
+  }
+  btn.textContent=old; btn.disabled=false; select(cur);
+};
+
+stage.appendChild(imgC); stage.appendChild(guideC);
+draw();
+</script>
