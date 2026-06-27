@@ -168,6 +168,7 @@ var KeplerEngine = (() => {
           tank_buster: s.tank_buster,
           is_lethal: s.is_lethal,
           scales_to_lethal: s.scales_to_lethal,
+          base_damage: s.base_damage,
           is_interruptible: s.is_interruptible,
           is_stoppable: s.is_stoppable,
           is_channeled: s.is_channeled,
@@ -190,12 +191,18 @@ var KeplerEngine = (() => {
         });
       }
     }
+    const lethalHp = opts.lethal_hp_threshold && opts.lethal_hp_threshold > 0 ? opts.lethal_hp_threshold : 5e5;
+    const keyLevel = opts.key_level && opts.key_level > 0 ? opts.key_level : 20;
+    for (const t of threats) {
+      if (!t.is_lethal && t.base_damage != null && t.base_damage * Math.pow(KEYSTONE_DMG_MULT, keyLevel) >= lethalHp) t.is_lethal = true;
+    }
     const dispels = analyzeDispels(threats, groupSpecs);
     const stops = analyzeStops(threats, groupSpecs);
     const soothe = analyzeSoothe(threats, groupSpecs);
     const misplays = analyzeMisplays(groupSpecs);
     const coveredTypes = new Set(dispels.filter((d) => d.covered).map((d) => d.dispel_type));
     const awareness = analyzeAwareness(threats, stops, coveredTypes);
+    const answers = analyzeAnswers(stops, awareness, opts.priority_rate_ratio && opts.priority_rate_ratio > 1 ? opts.priority_rate_ratio : 2);
     const throughput = analyzeThroughput(stops, groupSpecs);
     const movement = analyzeMovement(threats, groupSpecs);
     const scaling = analyzeScaling(threats, stops, soothe, coveredTypes, groupSpecs);
@@ -250,6 +257,7 @@ var KeplerEngine = (() => {
       unknown_npcs,
       dispels,
       stops,
+      answers,
       soothe,
       misplays,
       awareness,
@@ -410,6 +418,53 @@ var KeplerEngine = (() => {
       mitigable_after: stops.unpreventable.filter(
         (t) => coveredTypes.has(t.dispel_type) && t.positioning.length === 0 && !(t.is_aoe && !t.unavoidable)
       )
+    };
+  }
+  var PRIORITY_ABS_MS = 1e4;
+  var KEYSTONE_DMG_MULT = 1.10082;
+  function interruptPriorityReason(t) {
+    if (FRIENDLY_DISPEL_TYPES.includes(t.dispel_type) || t.dot) return "secondary_effect";
+    if (t.mechanic !== null || t.displacement.length > 0 || t.vulnerability !== null || t.tank_buster) return "tertiary_effect";
+    if (t.is_lethal || t.scales_to_lethal) return "high_damage";
+    return null;
+  }
+  function analyzeAnswers(stops, awareness, rateRatio) {
+    const avoidableIds = new Set(awareness.avoidable_casts.map((t) => t.spell_id));
+    const dodge = sumCount(awareness.avoidable_casts);
+    const interruptible = [...stops.must_kick, ...stops.cc_or_kick.filter((t) => t.is_interruptible)].filter((t) => !avoidableIds.has(t.spell_id));
+    const byMob = /* @__PURE__ */ new Map();
+    for (const t of interruptible) {
+      const list = byMob.get(t.npc_id) ?? [];
+      list.push(t);
+      byMob.set(t.npc_id, list);
+    }
+    const interrupts = [];
+    for (const casts of byMob.values()) {
+      const rates = casts.map((c) => c.recast_cooldown_ms).filter((ms) => ms != null && ms > 0);
+      const baseline = rates.length ? Math.min(...rates) : null;
+      const multi = rates.length >= 2;
+      for (const c of casts) {
+        let reason = interruptPriorityReason(c);
+        if (reason === null) {
+          const ms = c.recast_cooldown_ms;
+          const byCadence = multi && ms != null && baseline != null ? ms >= baseline * rateRatio : ms != null && ms >= PRIORITY_ABS_MS;
+          if (byCadence) reason = "cadence";
+        }
+        interrupts.push({ cast: c, priority: reason !== null, reason });
+      }
+    }
+    const sumClassified = (cs) => cs.reduce((n, ci) => n + ci.cast.count, 0);
+    const priority_interrupts = sumClassified(interrupts.filter((ci) => ci.priority));
+    const filler_interrupts = sumClassified(interrupts.filter((ci) => !ci.priority));
+    const cc_stoppable = sumCount(stops.cc_or_kick.filter((t) => !avoidableIds.has(t.spell_id)));
+    return {
+      priority_interrupts,
+      filler_interrupts,
+      dodge,
+      cc_stoppable,
+      interrupt_supply: stops.interrupt_supply,
+      priority_interrupt_shortfall: Math.max(0, priority_interrupts - stops.interrupt_supply),
+      interrupts
     };
   }
   function analyzeScaling(threats, stops, soothe, coveredTypes, group) {
@@ -6765,6 +6820,10 @@ var KeplerEngine = (() => {
     tank_buster: external_exports.boolean().default(false),
     is_lethal: external_exports.boolean(),
     scales_to_lethal: external_exports.boolean(),
+    // MEASURED base (Mythic-+0-de-scaled) damage of the biggest single hit, from the resolved tooltip
+    // (resolve-descriptions). The engine scales it by the keystone multiplier to a target key and flags
+    // high_damage when it clears the player-HP threshold — the damage signal behind is_lethal. null = unknown.
+    base_damage: external_exports.number().nullable().default(null),
     notes: external_exports.string().nullable(),
     // EDITORIAL completion-effect (see CreatureSpell.completion_effect); null = not one. A cast whose effect
     // fires only on completion (self-rez/summon) -> stop it (CC/interrupt) before the end to deny the effect.

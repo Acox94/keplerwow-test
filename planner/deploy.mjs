@@ -9,9 +9,10 @@
  * on Pages, but the MAP + advisor (the test target) are 100% static. Drag-drop
  * framing still works.
  *
- * SHIPS the spike folder EXCEPT: fullbody/ (large source renders, not needed at
- * runtime) and portraits-borrowed/ (ThreeChest renders — must NOT ship). No
- * .env/secrets/logs live under web/planner-spike, so nothing sensitive ships.
+ * SHIPS the spike folder EXCEPT: portraits-borrowed/ (ThreeChest renders — must
+ * NOT ship). fullbody/ IS shipped now — the creature detail card (ctrl/⌘+click a
+ * marker) uses the full-body render as its hero image. No .env/secrets/logs live
+ * under web/planner-spike, so nothing sensitive ships.
  *
  * Usage:  node web/planner-spike/deploy.mjs
  *           → https://acox94.github.io/keplerwow-test/planner/?d=altar-of-fangs
@@ -28,8 +29,8 @@ const REPO = process.env.PAGES_REPO ?? 'https://github.com/Acox94/keplerwow-test
 const run = (cmd, opts = {}) => execSync(cmd, { stdio: 'inherit', ...opts });
 const q = (s) => JSON.stringify(s);
 
-// skip large/borrowed/dev-only paths anywhere in the tree
-const EXCLUDE = /[\\/](fullbody|portraits-borrowed|node_modules|\.git)([\\/]|$)/;
+// skip borrowed/dev-only paths anywhere in the tree (fullbody/ now SHIPS — it's the detail-card hero)
+const EXCLUDE = /[\\/](portraits-borrowed|node_modules|\.git)([\\/]|$)/;
 
 console.log(`[planner-deploy] target: ${REPO}  (subpath: /planner)`);
 const work = mkdtempSync(join(tmpdir(), 'kepler-planner-'));

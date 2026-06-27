@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68301,
-    "extracted_at": "2026-06-27T10:33:36.092Z",
+    "extracted_at": "2026-06-27T16:37:17.912Z",
     "patch_version": "12.1.0",
     "source_versions": {
       "curated": {
@@ -25,25 +25,18 @@
         }
       },
       "dungeons": [
-        "ruby-life-pools",
-        "murder-row",
-        "den-of-nalorakk",
-        "the-blinding-vale",
-        "voidscar-arena",
-        "altar-of-fangs",
-        "temple-of-sethraliss",
-        "kings-rest"
+        "altar-of-fangs"
       ],
       "membership": {
         "source": "file"
       },
-      "season": "midnight-s2"
+      "season": null
     }
   },
   "creatures": [
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 18392945,
       "classification": "Elite",
       "creature_type": "Beast",
       "display_id": 144110,
@@ -55,6 +48,7 @@
       "npc_id": 259445,
       "spells": [
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
@@ -95,6 +89,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
@@ -135,6 +130,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": "Quake hits everyone; the falling stalactites hit hardest (~2.7x) — move out of their impact zones. Skewers Flying Twinfangs / drops Fresh Meat.",
@@ -179,7 +175,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 25545757,
       "classification": "Elite",
       "creature_type": "Beast",
       "display_id": 144156,
@@ -191,6 +187,7 @@
       "npc_id": 259446,
       "spells": [
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
@@ -229,6 +226,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 5000,
           "coaching_note": null,
@@ -267,6 +265,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
@@ -307,6 +306,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
@@ -345,6 +345,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
@@ -383,6 +384,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
@@ -427,7 +429,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 20436606,
       "classification": "Elite",
       "creature_type": "Humanoid",
       "display_id": 145435,
@@ -439,6 +441,7 @@
       "npc_id": 259447,
       "spells": [
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": "Intercept the beams to deny Zul'jan his buff (you take Nature DoT on interception).",
@@ -479,6 +482,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 2000,
           "coaching_note": null,
@@ -519,6 +523,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 1500,
           "coaching_note": null,
@@ -557,6 +562,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 5000,
           "coaching_note": null,
@@ -601,7 +607,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 1471436,
       "classification": "Normal",
       "creature_type": "Beast",
       "display_id": 125502,
@@ -616,7 +622,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 2452393,
       "classification": "Elite",
       "creature_type": "Beast",
       "display_id": 104480,
@@ -631,7 +637,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 2697633,
       "classification": "Elite",
       "creature_type": "Humanoid",
       "display_id": 142340,
@@ -643,6 +649,7 @@
       "npc_id": 261553,
       "spells": [
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": "Enrage — soothe to remove (its melee ramps attack speed).",
@@ -685,7 +692,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 4169068,
       "classification": "Elite",
       "creature_type": "Beast",
       "display_id": 142386,
@@ -697,6 +704,7 @@
       "npc_id": 261554,
       "spells": [
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
@@ -707,14 +715,14 @@
           "displacement": [],
           "dot": true,
           "duration_ms": null,
-          "freedom_partial": false,
+          "freedom_partial": true,
           "high_risk": [],
           "is_aoe": false,
           "is_channeled": false,
           "is_interruptible": true,
           "is_lethal": false,
           "is_stoppable": false,
-          "mechanic": null,
+          "mechanic": "snared",
           "name": "Paralyzing Shots",
           "notes": null,
           "observed_channel_stop": null,
@@ -735,6 +743,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
@@ -779,7 +788,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 735718,
       "classification": "Normal",
       "creature_type": "Beast",
       "display_id": 142375,
@@ -794,7 +803,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 2207154,
       "classification": "Elite",
       "creature_type": "Humanoid",
       "display_id": 142320,
@@ -806,6 +815,7 @@
       "npc_id": 261557,
       "spells": [
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
@@ -844,6 +854,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
@@ -886,7 +897,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 2207154,
       "classification": "Elite",
       "creature_type": "Beast",
       "display_id": 137230,
@@ -898,6 +909,7 @@
       "npc_id": 261560,
       "spells": [
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 4000,
           "coaching_note": null,
@@ -936,6 +948,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 2500,
           "coaching_note": null,
@@ -978,7 +991,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 7847656,
       "classification": "Elite",
       "creature_type": "Beast",
       "display_id": 146299,
@@ -990,6 +1003,7 @@
       "npc_id": 261573,
       "spells": [
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3500,
           "coaching_note": null,
@@ -1030,6 +1044,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
@@ -1070,6 +1085,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 0,
           "coaching_note": null,
@@ -1112,7 +1128,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 4169068,
       "classification": "Elite",
       "creature_type": "Beast",
       "display_id": 137231,
@@ -1124,6 +1140,7 @@
       "npc_id": 262011,
       "spells": [
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
@@ -1162,6 +1179,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
@@ -1204,7 +1222,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 25545757,
       "classification": "Elite",
       "creature_type": "Beast",
       "display_id": 142361,
@@ -1219,7 +1237,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 3678589,
       "classification": "Elite",
       "creature_type": "Humanoid",
       "display_id": 142327,
@@ -1234,7 +1252,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 980957,
       "classification": "Normal",
       "creature_type": "Aberration",
       "display_id": 58535,
@@ -1249,7 +1267,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 490479,
       "classification": "Normal",
       "creature_type": "Not specified",
       "display_id": 144271,
@@ -1279,7 +1297,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 3923828,
       "classification": "Elite",
       "creature_type": "Humanoid",
       "display_id": 137211,
@@ -1291,6 +1309,7 @@
       "npc_id": 270306,
       "spells": [
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": "Applies a heal-absorb — burst through it before the next heal lands.",
@@ -1329,6 +1348,7 @@
           "vulnerability": null
         },
         {
+          "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 3000,
           "coaching_note": null,
@@ -1371,7 +1391,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 3923828,
       "classification": "Elite",
       "creature_type": "Humanoid",
       "display_id": 146372,
@@ -1386,7 +1406,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 24523926,
       "classification": "Elite",
       "creature_type": "Beast",
       "display_id": 142361,
@@ -1401,7 +1421,7 @@
     },
     {
       "avoidable": false,
-      "base_health": null,
+      "base_health": 2452393,
       "classification": null,
       "creature_type": "Not specified",
       "display_id": null,

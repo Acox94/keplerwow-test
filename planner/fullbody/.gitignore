@@ -1,0 +1,5 @@
+# Full-body wow.export source renders — the reusable source for the round headshots
+# in ../portraits/. Track exactly ONE canonical <displayId>.png per creature.
+
+# Browser re-download duplicates (e.g. 142386(2).png) — alternate takes, kept local, re-frame from the canonical.
+*(*).png

@@ -20,6 +20,21 @@ node web/planner-spike/serve.mjs          # → http://localhost:5174
 (serving via the `planner-spike` entry in `.claude/launch.json` also works.) Leaflet is vendored and the
 engine is bundled **read-only** from `src/` — **nothing in the main app or pipeline is modified.**
 
+### Deploy it live (for testers)
+
+```bash
+npm run planner:deploy        # web/planner-spike/deploy.mjs
+```
+
+Publishes the spike to a **`/planner` subpath** of the GitHub Pages repo (leaving the advisor at root) →
+**https://acox94.github.io/keplerwow-test/planner/?d=altar-of-fangs**. Fully static — excludes `fullbody/`
+(big source renders) + `portraits-borrowed/` (must-not-ship). The framer's one-click **Load** buttons need the
+local `/api/list` endpoint so they're inert on Pages; the **map + advisor are 100% static**. Re-deploy after
+curation: build → `cp dist/<season>/<slug>.json web/planner-spike/` → `npm run planner:deploy`.
+
+**Comp + route persist** to `localStorage` (comp global; route per dungeon + floor, keyed on the stable mob
+`iid`s) — a reload keeps each tester's work. **Clear all** resets the route; re-picking comp slots overwrites it.
+
 ### Manual placement editor — `?edit=1`
 
 For dungeons where the combat-log capture can't be cleanly de-duplicated (a cumulative log's re-pull drift
@@ -74,7 +89,8 @@ http://localhost:5174/?d=<slug>&edit=1        (add &f=<n> for a floor)
 | **Pull building** | tap a mob → adds to the current pull; tap again → removes; "+ New pull" | ✅ |
 | **Bosses** | clickable like trash (a boss is a route step); red ring when unassigned, pull-color when in a pull | ✅ |
 | **Pull list** | Pull 1 → 2 → 3 … with per-pull mob rollup + a running cumulative total | ✅ |
-| **Engine payload** | live `Pull[] → {npc_id, count}[]` — the exact `analyzePull` input (on the **Developer** tab) | ✅ |
+| **Creature detail card** | **ctrl/⌘-click a marker** → a read-only modal: full-height fullbody hero + name + badges (`Boss/Elite · creature_type · Mythic-+0 HP`) + a deduped ability list + a description box (verbatim, from `spell-descriptions.json`). Reads `dungeon.creatures` by npc_id; plain click still toggles the pull. **`?frame=1`** = a hero-framing dev tool (drag-pan / wheel-zoom / save / export → `hero-framing.json`) | ✅ |
+| **Engine payload** | live `Pull[] → {npc_id, count}[]` — the exact `analyzePull` input (on the **Developer** tab, with the dungeon's **Data source** provenance) | ✅ |
 | **Comp + live analysis** | a 5-slot comp picker supplies the engine's `group`; the **real `analyzePull`** runs into a **persistent "Live Analysis" pane** (bottom half of the side panel) → ranked warnings + stop budget | ✅ |
 | **Tab-split analysis** | the pane filters on the active tab — **Comp** = composition warnings (lust / battle rez / raid buffs); **Route** = boss/trash mechanics + the stop budget | ✅ |
 | **Comp gaps with no pull** | the Comp tab runs the engine with an *empty* pull, so "No lust / No battle rez" surface the moment you pick specs and clear as you add a luster/rez — before any mob is selected | ✅ |
@@ -82,15 +98,17 @@ http://localhost:5174/?d=<slug>&edit=1        (add &f=<n> for a floor)
 | **Live Route** | a pull-by-pull stepper (▶ Live route → floating `◀ Pull N/Y ▶ ✕` bar + ←/→/Esc); current pull lit, earlier faded, later hidden; the analysis pane follows each step | ✅ |
 | **Warning cards** | severity is a slim full-width bar across the card top (full-width message below); each card framed in a darker shade of its own severity color | ✅ |
 | **Arrows** | transformable: drag endpoints to rotate/scale, drag midpoint to move; **handles hidden until the arrow is clicked** | ✅ |
-| **Notes** | collapse to a pin; **hover (desktop) / tap (mobile)** reveals text; double-click edits in place; render **above** mob markers; **click-outside closes** | ✅ |
+| **Notes** | collapse to a pin; **hover (desktop) / tap (mobile)** reveals text; double-click edits in place; render **above** mob markers; **click-outside closes**; **shift-click removes** (undoable) | ✅ |
 | **Freehand paint** | toggle, drag to draw; **drops the brush** when you click another tool or any element; no page-selection highlight | ✅ |
-| **Undo / redo** | command history over add / paint / clear; ↶ ↷ buttons + `Ctrl+Z` / `Ctrl+Shift+Z` (`Ctrl+Y`) | ✅ |
+| **Undo / redo** | command history over add / paint / **note removal** / clear; ↶ ↷ buttons + `Ctrl+Z` / `Ctrl+Shift+Z` (`Ctrl+Y`) | ✅ |
+| **Theme (arcane)** | the refined arcane direction from `C:\dev\Alpha\kepler-arcane.html` — `--kw-*`/refined palette hoisted to `:root`, legacy vars remapped onto it (cascades, no markup touched), Rajdhani + Inter fonts. Chrome ported to the mock: brand header, styled select, floor pills, segmented tabs, stats + Enemy-forces meter, gradient pull cards, teal buttons, themed Leaflet zoom control | ✅ |
 
 ## Interaction reference
 
 - **Pulls:** tap mobs (incl. bosses) to fill the current pull; "+ New pull" starts the next; "Clear all" resets pulls.
+- **Creature card:** **ctrl/⌘-click a marker** opens its read-only detail (hero / health / abilities / verbatim descriptions); Esc / click-outside / ✕ closes. Plain click still adds to the pull.
 - **Arrow:** adds selected (handles up); click empty map to deselect (clean line); click the arrow to re-select.
-- **Note:** adds a pin; hover or tap to read; double-click to edit (inline, Enter to commit); drag the pin to move; click anywhere off it to collapse.
+- **Note:** adds a pin; hover or tap to read; double-click to edit (inline, Enter to commit); drag the pin to move; click off it to collapse; **shift-click to remove** (undoable).
 - **Paint:** toggles freehand; clicking any tool/element releases it.
 - **History:** ↶ / ↷ or keyboard.
 - **Tabs:** the side panel carries **Comp**, **Route**, and **Developer** tabs above a persistent bottom-half "Live Analysis" pane.
