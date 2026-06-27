@@ -61,6 +61,27 @@ http://localhost:5174/?d=<slug>&edit=1        (add &f=<n> for a floor)
   normal view detects that flag and renders with an **identity fit** (no centroid/`fit` transform), so what you
   placed is exactly what shows. **Clear floor** wipes the current floor.
 
+### Flag editor — `?flagedit=1`
+
+A visual curation back-up for when the engine derivation hasn't caught a mechanic yet: hand-flag the cast and
+watch the advice correct itself instantly, instead of editing JSON. **ctrl/⌘-click a mob** to open its inspector,
+then edit per-ability flags under the description.
+
+```
+http://localhost:5174/?d=<slug>&flagedit=1
+```
+
+- **All editorial fields**, grouped Answer / Avoidance / Danger / Advanced — checkboxes, dropdowns
+  (`priority` / `dispel_type` / `mechanic`), chip multi-selects (`positioning` — frontal/spread/stack/LoS/soak —
+  and `displacement`), and JSON fields for the structured ones (`vulnerability`, `high_risk`).
+- **Live preview**: flipping a flag re-runs the engine in-browser and re-renders the cast's card right there.
+- **💾 Save** writes to the right file automatically — fields marked **✳** (`dispel_type`, `mechanic`,
+  `is_stoppable`/`is_interruptible`/`is_channeled`) → `data/spell_editorials.json`; everything else → the
+  dungeon's `data/creature_spells/<slug>.candidates.json`. **⟳ Rebuild** runs promote → build → copy → reload to
+  bake the flags into the export.
+- **Local only** — the `POST /api/flags` + `/api/rebuild` endpoints live in `serve.mjs`; the deployed Pages site
+  is static and has neither (the buttons are inert there).
+
 ## What's in the folder
 
 | File | What |

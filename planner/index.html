@@ -277,6 +277,7 @@
   .kw-role--tank .kw-role-label, .kw-role--tank .kw-role-ic { color:var(--kw-tank); }
   .kw-role--heal .kw-role-label, .kw-role--heal .kw-role-ic { color:var(--kw-heal); }
   .kw-role--dps .kw-role-label, .kw-role--dps .kw-role-ic { color:var(--kw-dps); }
+  .kw-ab { text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px; color:var(--kw-ink); font-weight:600; }
   .kw-role p { margin:0; font-size:12px; line-height:1.4; color:var(--kw-ink); }
   /* high-risk: viable-but-dangerous plays (engine `high_risk`) — amber, distinct from severity, shown at every tier */
   .kw-highrisk { margin-top:8px; padding:7px 9px; border-radius:7px; border:1px solid rgba(245,165,36,0.4); background:rgba(245,165,36,0.07); }
@@ -365,6 +366,28 @@
   #cdetail .cd-empty { color:var(--muted); font-style:italic; padding:13px 16px; }
   #cdetail .cd-abils::-webkit-scrollbar, #cdetail .cd-desc::-webkit-scrollbar { width:8px; }
   #cdetail .cd-abils::-webkit-scrollbar-thumb, #cdetail .cd-desc::-webkit-scrollbar-thumb { background:#3a4859; border-radius:4px; }
+  /* ---- flag editor (?flagedit=1): per-cast editorial controls in the inspector ---- */
+  #cdetail .cd-foot { flex:0 0 auto; display:flex; align-items:center; gap:8px; padding:8px 14px; border-top:1px solid var(--line); }
+  #cdetail .cd-foot-status { flex:1; font-size:11.5px; color:var(--muted); }
+  #cdetail .cd-foot-status.dirty { color:#ffd166; } #cdetail .cd-foot-status.ok { color:#57c785; } #cdetail .cd-foot-status.err { color:#e5484d; }
+  #cdetail #cdSave { background:#1f6feb; border-color:#1f6feb; } #cdetail #cdRebuild { background:#222c39; }
+  .cd-flags { margin-top:14px; padding-top:12px; border-top:1px dashed var(--line); }
+  .cd-flags-grp { font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); font-weight:700; margin:10px 0 5px; }
+  .cd-flags-grp:first-child { margin-top:0; }
+  .cd-flag { display:flex; align-items:center; gap:8px; padding:3px 0; font-size:12.5px; }
+  .cd-flag > label { flex:0 0 130px; color:#cdd6e0; }
+  .cd-flag input[type=checkbox] { width:15px; height:15px; accent-color:#1f6feb; }
+  .cd-flag select, .cd-flag input[type=number], .cd-flag input[type=text] { flex:1; min-width:0; background:#0d1117; color:var(--ink);
+    border:1px solid var(--line); border-radius:6px; padding:4px 6px; font:inherit; font-size:12px; }
+  .cd-flag textarea { flex:1; min-width:0; background:#0d1117; color:var(--ink); border:1px solid var(--line); border-radius:6px;
+    padding:4px 6px; font:11px ui-monospace,monospace; min-height:34px; resize:vertical; }
+  .cd-flag textarea.bad { border-color:#e5484d; }
+  .cd-chips { display:flex; gap:5px; flex-wrap:wrap; flex:1; }
+  .cd-chip { font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; padding:3px 8px; border-radius:5px; cursor:pointer;
+    background:#0d1117; border:1px solid var(--line); color:var(--muted); user-select:none; }
+  .cd-chip.on { background:#1f3050; border-color:#3a6; color:#e6edf3; }
+  .cd-preview { margin-top:12px; padding-top:10px; border-top:1px dashed var(--line); }
+  .cd-preview-h { font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); font-weight:700; margin-bottom:7px; }
 </style>
 </head>
 <body>
@@ -457,6 +480,7 @@ const FLOOR = FLOORS[_f];
 // stores positions as direct image fractions (0..1 of the PNG) → rendered with an IDENTITY fit (no
 // centroid-pivot capture transform). Both force identity so what-you-place is what-you-store.
 const EDIT = !!_params.get('edit');
+const FLAGEDIT = !!_params.get('flagedit');   // ?flagedit=1 — visual per-cast flag editor in the creature inspector (local only)
 { const sel = document.getElementById('dungeonSel');
   sel.innerHTML = Object.entries(DUNGEONS).map(([k, d]) => `<option value="${k}"${k === DKEY ? ' selected' : ''}>${d.name}</option>`).join('');
   sel.onchange = () => { location.search = '?d=' + sel.value; };
@@ -731,6 +755,11 @@ const _cd = (() => {
         <button class="cd-x" id="cdX" title="close (Esc)">✕</button>
       </div>
       <div class="cd-body"><div class="cd-abils" id="cdAbils"></div><div class="cd-desc" id="cdDesc"></div></div>
+      <div class="cd-foot" id="cdFoot" style="display:none">
+        <span class="cd-foot-status" id="cdFootStatus">flag editor</span>
+        <button id="cdSave" title="write pending flags to the curated files">💾 Save</button>
+        <button id="cdRebuild" title="promote → build → reload (bake flags into the export)">⟳ Rebuild</button>
+      </div>
     </div>
   </div>`;
   document.body.appendChild(root);
@@ -804,6 +833,7 @@ function openCreatureCard(npcId, mk) {
     descEl.innerHTML = `<div class="cd-dname">${esc(s.name || '')}</div>`
       + (meta ? `<div class="cd-dmeta">${esc(meta)}</div>` : '')
       + `<div class="cd-dtext">${esc(text)}</div>`;
+    if (FLAGEDIT) renderFlagEditor(s, npcId, descEl);
   };
   if (!spells.length) {
     abilsEl.innerHTML = `<div class="cd-empty">no curated abilities yet</div>`; descEl.innerHTML = '';
@@ -819,9 +849,111 @@ function openCreatureCard(npcId, mk) {
       if (idx === 0) { row.classList.add('sel'); showDesc(s); }
     });
   }
+  if (FLAGEDIT) _cd.querySelector('#cdFoot').style.display = 'flex';
   _cd.classList.add('open');
 }
 window._spike && (window._spike.openCreatureCard = openCreatureCard);
+
+// ---- flag editor (?flagedit=1): per-cast editorial controls + live preview + save/rebuild --------
+// These fields are spell-level DB2 overrides → spell_editorials.json; everything else is per-cast
+// editorial → the dungeon's .candidates.json. The server (serve.mjs) routes by the same set.
+const KW_ED_FIELDS = new Set(['is_stoppable', 'is_channeled', 'is_interruptible', 'dispel_type', 'mechanic']);
+const KW_FLAG_SPEC = [
+  ['Answer', [
+    ['priority', 'enum', ['priority', 'reference', 'trivial']],
+    ['requires_interrupt', 'bool'], ['is_interruptible', 'bool'], ['is_stoppable', 'bool'], ['is_channeled', 'bool'],
+    ['dispel_type', 'enum', ['None', 'Magic', 'Curse', 'Poison', 'Disease', 'Bleed', 'Enrage']],
+    ['mechanic', 'enum', ['(none)', 'snared', 'rooted', 'stunned', 'silenced', 'disoriented', 'incapacitated', 'fleeing', 'charmed', 'banished']],
+    ['tank_buster', 'bool'],
+  ]],
+  ['Avoidance', [
+    ['positioning', 'multi', ['frontal', 'move_out', 'spread', 'stack', 'los', 'soak']],
+    ['is_aoe', 'bool'], ['unavoidable', 'bool'], ['dot', 'bool'],
+    ['displacement', 'multi', ['knockback', 'pull', 'cast_pushback']],
+  ]],
+  ['Danger', [['is_lethal', 'bool'], ['scales_to_lethal', 'bool']]],
+  ['Advanced', [
+    ['freedom_partial', 'bool'], ['dispel_detonates', 'bool'], ['cast_order', 'num'], ['party_targets', 'num'],
+    ['coaching_note', 'text'], ['completion_effect', 'text'], ['vulnerability', 'json'], ['high_risk', 'json'],
+  ]],
+];
+const kwPending = new Map(); // `${npc_id}:${spell_id}` -> { npc_id, spell_id, editorial:{}, candidate:{} }
+function kwPend(npc_id, spell_id) {
+  const k = npc_id + ':' + spell_id;
+  if (!kwPending.has(k)) kwPending.set(k, { npc_id, spell_id, editorial: {}, candidate: {} });
+  return kwPending.get(k);
+}
+function kwFootStatus(txt, cls) { const el = _cd.querySelector('#cdFootStatus'); if (el) { el.textContent = txt; el.className = 'cd-foot-status' + (cls ? ' ' + cls : ''); } }
+
+function kwFlagControl(s, field, type, opts) {
+  const cur = s[field], ed = KW_ED_FIELDS.has(field);
+  let ctl;
+  if (type === 'bool') ctl = `<input type="checkbox" data-f="${field}" data-t="bool"${cur ? ' checked' : ''}>`;
+  else if (type === 'enum') { const c = (cur == null || cur === '') ? '(none)' : String(cur); ctl = `<select data-f="${field}" data-t="enum">${(opts || []).map(v => `<option${v === c ? ' selected' : ''}>${esc(v)}</option>`).join('')}</select>`; }
+  else if (type === 'num') ctl = `<input type="number" data-f="${field}" data-t="num" value="${cur == null ? '' : cur}" placeholder="—">`;
+  else if (type === 'text') ctl = `<input type="text" data-f="${field}" data-t="text" value="${esc(cur || '')}" placeholder="—">`;
+  else if (type === 'json') ctl = `<textarea data-f="${field}" data-t="json" placeholder="JSON or empty">${cur ? esc(JSON.stringify(cur)) : ''}</textarea>`;
+  else if (type === 'multi') { const set = new Set(Array.isArray(cur) ? cur : []); ctl = `<span class="cd-chips" data-f="${field}" data-t="multi">${(opts || []).map(v => `<span class="cd-chip${set.has(v) ? ' on' : ''}" data-v="${v}">${esc(v)}</span>`).join('')}</span>`; }
+  else ctl = '';
+  return `<div class="cd-flag"><label title="${ed ? 'spell-level → spell_editorials.json' : 'cast editorial → candidates.json'}">${field}${ed ? ' ✳' : ''}</label>${ctl}</div>`;
+}
+
+function renderFlagEditor(s, npc_id, host) {
+  const wrap = document.createElement('div'); wrap.className = 'cd-flags';
+  wrap.innerHTML = KW_FLAG_SPEC.map(([g, fields]) => `<div class="cd-flags-grp">${g}</div>` + fields.map(([f, t, o]) => kwFlagControl(s, f, t, o)).join('')).join('')
+    + `<div class="cd-preview"><div class="cd-preview-h">live preview — this cast</div><div id="cdPrev" class="kw-analysis-panel"></div></div>`;
+  host.appendChild(wrap);
+  wrap.querySelectorAll('[data-f]').forEach((el) => {
+    const field = el.dataset.f, type = el.dataset.t, isEd = KW_ED_FIELDS.has(field);
+    const apply = (val, bad) => {
+      if (el.tagName === 'TEXTAREA') el.classList.toggle('bad', !!bad);
+      if (bad) return;
+      s[field] = val;                                            // mutate the live dungeon spell
+      (isEd ? kwPend(npc_id, s.spell_id).editorial : kwPend(npc_id, s.spell_id).candidate)[field] = val;
+      kwFootStatus('unsaved changes', 'dirty');
+      renderAnalysis(); kwFlagPreview(s, npc_id);                // refresh the route panel + the in-modal preview
+    };
+    if (type === 'bool') el.onchange = () => apply(el.checked);
+    else if (type === 'enum') el.onchange = () => { let v = el.value; if (v === '(none)') v = null; apply(v); };
+    else if (type === 'num') el.onchange = () => apply(el.value === '' ? null : Number(el.value));
+    else if (type === 'text') el.onchange = () => apply(el.value || null);
+    else if (type === 'json') el.onchange = () => { const t = el.value.trim(); if (!t) return apply(null); try { apply(JSON.parse(t)); } catch (e) { apply(undefined, true); } };
+    else if (type === 'multi') el.querySelectorAll('.cd-chip').forEach((chip) => chip.onclick = () => { chip.classList.toggle('on'); apply([...el.querySelectorAll('.cd-chip.on')].map((c) => c.dataset.v)); });
+  });
+  kwFlagPreview(s, npc_id);
+}
+
+function kwFlagPreview(s, npc_id) {
+  const host = _cd.querySelector('#cdPrev'); if (!host || !dungeon || !window.KeplerEngine) return;
+  let rep;
+  try { rep = KeplerEngine.analyzePull(dungeon, [{ npc_id, count: 1 }], compSlots.filter((x) => x != null), { skill: 'experienced', priority_rate_ratio: KW_PRIORITY_RATE_RATIO, lethal_hp_threshold: KW_LETHAL_HP, key_level: KW_KEY_LEVEL }); }
+  catch (e) { host.innerHTML = `<p class="hint">engine error: ${esc(String(e && e.message || e))}</p>`; return; }
+  const ws = rep.warnings.filter((w) => (w.subjects || []).some((su) => su.spell_name === s.name));
+  host.innerHTML = ws.length
+    ? `<div class="kw-stack">${ws.map((w, i) => kwIsNote(w) ? kwNoteHTML(w) : kwCardHTML(w, 'prev' + i, true)).join('')}</div>`
+    : `<p class="hint">no warning — this cast fires no dimension (filler / not priority for this comp).</p>`;
+}
+
+async function kwSaveFlags() {
+  if (!kwPending.size) { kwFootStatus('nothing to save', ''); return; }
+  kwFootStatus('saving…', '');
+  try {
+    for (const p of kwPending.values()) {
+      const r = await fetch('/api/flags', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ slug: DKEY, npc_id: p.npc_id, spell_id: p.spell_id, editorial: p.editorial, candidate: p.candidate }) });
+      const j = await r.json(); if (!j.ok) throw new Error(j.error || 'write failed');
+    }
+    kwPending.clear(); kwFootStatus('saved ✓ — Rebuild to bake into the export', 'ok');
+  } catch (e) { kwFootStatus('save failed: ' + String(e && e.message || e), 'err'); }
+}
+async function kwRebuild() {
+  kwFootStatus('rebuilding (promote → build, ~10s)…', '');
+  try {
+    const r = await fetch('/api/rebuild', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ slug: DKEY }) });
+    const j = await r.json(); if (!j.ok) throw new Error(j.error || 'rebuild failed');
+    kwFootStatus('rebuilt ✓ — reloading…', 'ok'); setTimeout(() => location.reload(), 700);
+  } catch (e) { kwFootStatus('rebuild failed: ' + String(e && e.message || e), 'err'); }
+}
+if (FLAGEDIT) { _cd.querySelector('#cdSave').onclick = kwSaveFlags; _cd.querySelector('#cdRebuild').onclick = kwRebuild; }
 
 // ---- markers (screen-space divIcons: fixed px size at any zoom) ----------------
 function addMobMarker(m) {
@@ -1151,6 +1283,8 @@ syncHistory();
 // Uses the bundled pure engine (KeplerEngine.analyzePull) + a real dungeon export.
 // Nothing in src/ is touched — engine.bundle.js is built read-only from it.
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+// esc + render the engine's `__ability name__` markers as underlined spans (ability names in advice).
+const escU = (s) => esc(s).replace(/__([^_]+)__/g, '<u class="kw-ab">$1</u>');
 let dungeon = null;
 let compSlots = [null, null, null, null, null];
 const COMP_SLOTS = [
@@ -1307,12 +1441,12 @@ function kwCardHTML(w, id, open) {
   const sub = subj ? `cast by <span>${esc(subj.npc_name)}</span> · ${esc(kwPretty(w.category))}` : '';
   const cnt = (subj && subj.count > 1) ? `<span class="kw-cd">×${subj.count}</span>` : '';
   const tags = kwTags(w) + (subj ? `<span class="kw-tag kw-tag--res">${kwResolution(w.category)}</span>` : '');
-  let detail = `<div class="kw-desc">${esc(w.message)}</div>`;
-  if (w.everyone) detail += `<div class="kw-everyone">${esc(w.everyone)}</div>`;
+  let detail = `<div class="kw-desc">${escU(w.message)}</div>`;
+  if (w.everyone) detail += `<div class="kw-everyone">${escU(w.everyone)}</div>`;
   if (w.role_advice) for (const k of ['tank', 'healer', 'dps']) {
     const txt = w.role_advice[k]; if (!txt) continue;
     const r = KW_ROLE[k];
-    detail += `<div class="kw-role ${r.cls}">${r.ic}<span class="kw-role-label">${r.label}</span><p>${esc(txt)}</p></div>`;
+    detail += `<div class="kw-role ${r.cls}">${r.ic}<span class="kw-role-label">${r.label}</span><p>${escU(txt)}</p></div>`;
   }
   if (w.high_risk && w.high_risk.length) {
     detail += `<div class="kw-highrisk"><span class="kw-hr-tag">⚠ High-risk</span>`

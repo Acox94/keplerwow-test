@@ -1119,14 +1119,6 @@ var KeplerEngine = (() => {
     }
     return out;
   }
-  function freersFor(mechanic, group) {
-    const out = [];
-    for (const s of group) {
-      const f = s.movement_freedom.find((m) => m.mechanics.includes(mechanic));
-      if (f) out.push({ role: coarseRole(s.party_role), spec: toResolvedSpec(s), ability: f.name });
-    }
-    return out;
-  }
   function joinAnd(parts) {
     if (parts.length <= 1) return parts[0] ?? "";
     if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
@@ -1151,9 +1143,6 @@ var KeplerEngine = (() => {
   function debuffTypeNoun(casts) {
     const types = [...new Set(casts.map((t) => t.dispel_type))].filter((d) => d !== "None");
     return types.length === 1 ? `${types[0]} debuff` : "debuff";
-  }
-  function impairVerb(mechanic) {
-    return mechanic === "rooted" ? "rooted" : "snared";
   }
   function mitigableAfterAdvice(casts, group) {
     const answerers = [];
@@ -1264,28 +1253,22 @@ var KeplerEngine = (() => {
     return out;
   }
   function movementAdvice(mt, group) {
-    const freers = freersFor(mt.mechanic, group);
-    const hit = hitRolesOf([mt.cast]);
-    const verb = impairVerb(mt.mechanic);
-    const selfOnly = mt.coverage === "self";
-    const lethalTail = mt.lethal_if_unfreed ? " \u2014 lethal if not freed, so be fast" : "";
-    const condTail = mt.coverage === "conditional" ? " (conditional/unreliable \u2014 position as a backup)" : "";
+    const label = mt.mechanic === "rooted" ? "Rooted" : "Slowed";
     const out = {};
     for (const R of ROLE_TAGS) {
-      const amFreer = freers.some((a) => a.role === R);
-      const amHit = hit.size === 0 ? null : hit.has(R);
-      if (freers.length === 0) {
-        out[R] = `No way to clear ${mt.mechanic} in the comp \u2014 position to avoid getting ${verb}${lethalTail}.`;
-      } else if (amFreer) {
-        out[R] = selfOnly ? `You can self-clear ${mt.mechanic} (${myAbilities(freers, R)}), but it won't free a teammate \u2014 they'll have to position${lethalTail}.` : `You can clear ${mt.mechanic} (${myAbilities(freers, R)}) \u2014 free whoever gets ${verb}${lethalTail}.`;
-      } else if (selfOnly) {
-        out[R] = `If you get ${verb} you're stuck \u2014 the comp's only freedom is self-cast (${answerersPhrase(freers, R)}); position to avoid it${lethalTail}.`;
-      } else if (amHit === false) {
-        out[R] = `${answerersPhrase(freers, R)} clears ${mt.mechanic} here.`;
-      } else {
-        out[R] = `If you get ${verb}, ${answerersPhrase(freers, R)} can free you (ally-castable)${lethalTail}.`;
+      const self = /* @__PURE__ */ new Set(), ally = /* @__PURE__ */ new Set();
+      for (const s of group) {
+        if (coarseRole(s.party_role) !== R) continue;
+        for (const m of s.movement_freedom) {
+          if (!m.mechanics.includes(mt.mechanic)) continue;
+          (m.target === "ally" ? ally : self).add(m.name + (m.conditional ? " (conditional)" : ""));
+        }
       }
-      if (condTail && out[R]) out[R] += condTail;
+      const mk = (s) => [...s].map((n) => `__${n}__`).join(" / ");
+      if (ally.size && self.size) out[R] = `${label} \u2014 Self-Clear with ${mk(self)} \u2192 Clear Party (1) with ${mk(ally)}`;
+      else if (ally.size) out[R] = `${label} \u2014 Self-Clear & Clear Party (self+1) with ${mk(ally)}`;
+      else if (self.size) out[R] = `${label} \u2014 Self-Clear with ${mk(self)}`;
+      else out[R] = `${label} \u2014 no clear in your kit; position to avoid it`;
     }
     return out;
   }
@@ -2049,7 +2032,6 @@ var KeplerEngine = (() => {
     }
     const FOLD_CATEGORIES = /* @__PURE__ */ new Set([
       "targeting",
-      "movement",
       "cc",
       "displacement",
       "vulnerability",
