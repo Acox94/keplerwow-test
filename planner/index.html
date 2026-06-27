@@ -317,9 +317,26 @@ let active = -1;              // index of the pull currently being built
 let liveMode = false, liveIdx = 0;   // LIVE ROUTE: pull-by-pull stepper state
 const markers = {};           // iid -> { marker, el, mob }
 
+// ---- persist comp + route to localStorage (a reload keeps a friend's work) -------
+// Comp is GLOBAL (same group everywhere); the route is per dungeon + FLOOR (each floor is its own
+// page with its own mobs/iids). iids are stable (baked in the mobs json), so a saved route re-binds.
+const COMP_KEY = 'kepler-planner:comp';
+const ROUTE_KEY = `kepler-planner:route:${DKEY}:f${FLOOR.sublevel ?? 'all'}`;
+const saveComp = () => { try { localStorage.setItem(COMP_KEY, JSON.stringify(compSlots)); } catch {} };
+const saveRoute = () => { try { localStorage.setItem(ROUTE_KEY, JSON.stringify({ pulls: pulls.map(p => [...p.mobs]), active })); } catch {} };
+function restoreComp() { try { const v = JSON.parse(localStorage.getItem(COMP_KEY) || 'null'); if (Array.isArray(v) && v.length === compSlots.length) compSlots = v.map(x => x == null ? null : Number(x)); } catch {} }
+function restoreRoute() {   // rebuild saved pulls (dropping any iid not on this floor), else a fresh pull
+  let s = null; try { s = JSON.parse(localStorage.getItem(ROUTE_KEY) || 'null'); } catch {}
+  if (s && Array.isArray(s.pulls) && s.pulls.some(a => a && a.length)) {
+    pulls = s.pulls.map(arr => ({ mobs: new Set((arr || []).filter(iid => markers[iid])) }));
+    active = Number.isInteger(s.active) && s.active >= 0 && s.active < pulls.length ? s.active : pulls.length - 1;
+    render(); renderHulls(); renderAnalysis();
+  } else { newPull(); }
+}
+
 function pullOf(iid) { return pulls.findIndex(p => p.mobs.has(iid)); }
 
-function newPull() { pulls.push({ mobs: new Set() }); active = pulls.length - 1; render(); }
+function newPull() { pulls.push({ mobs: new Set() }); active = pulls.length - 1; render(); saveRoute(); }
 
 function toggle(iid) {
   if (active < 0) newPull();
@@ -327,7 +344,7 @@ function toggle(iid) {
   const existing = pullOf(iid);
   if (existing === active) cur.mobs.delete(iid);        // tap again = deselect
   else { if (existing >= 0) pulls[existing].mobs.delete(iid); cur.mobs.add(iid); } // move to current
-  render();
+  render(); saveRoute();
 }
 
 // Wowhead/zamimg modelviewer webthumb (keyed by DISPLAY id) — covers the new Midnight models the
@@ -488,7 +505,7 @@ function render() {
 }
 
 document.getElementById('newPull').onclick = newPull;
-document.getElementById('clear').onclick = () => { pulls = []; active = -1; if (liveMode) exitLive(); else render(); };
+document.getElementById('clear').onclick = () => { pulls = []; active = -1; saveRoute(); if (liveMode) exitLive(); else render(); };
 
 // ---- LIVE ROUTE: a pull-by-pull stepper for breakdown/analysis (solo form of "follow the leader") ----
 function nonEmptyFrom(from, dir){ const n=pulls.length; let i=from; for(let k=0;k<n;k++){ if(pulls[i]?.mobs.size) return i; i=(i+dir+n)%n; } return -1; }
@@ -685,7 +702,7 @@ function renderComp() {
       <select data-slot="${i}"><option value="">—</option>${opts.map(s => `<option value="${s.spec_id}"${s.spec_id===chosen?' selected':''}>${esc(s.class)} ${esc(s.spec_name)}</option>`).join('')}</select></div>`;
   }).join('');
   host.querySelectorAll('select').forEach(sel => sel.onchange = () => {
-    compSlots[Number(sel.dataset.slot)] = sel.value ? Number(sel.value) : null; renderAnalysis();
+    compSlots[Number(sel.dataset.slot)] = sel.value ? Number(sel.value) : null; saveComp(); renderAnalysis();
   });
 }
 
@@ -730,7 +747,7 @@ function renderAnalysis() {
 
 // load the real dungeon export, then build the comp picker + first analysis
 fetch(CFG.dist).then(r => r.json())
-  .then(j => { dungeon = KeplerEngine.DungeonExport.parse(j); renderComp(); renderAnalysis(); if (EDIT) editorBoot(); })
+  .then(j => { dungeon = KeplerEngine.DungeonExport.parse(j); restoreComp(); renderComp(); renderAnalysis(); if (EDIT) editorBoot(); })
   .catch(e => { const h = document.getElementById('analysis'); if (h) h.innerHTML = `<p class="hint">failed to load dungeon: ${esc(String(e && e.message || e))}</p>`; });
 
 // load the REAL mob positions (MDT-derived), drop the markers, then open the first pull
@@ -764,7 +781,7 @@ if (EDIT) {
         PIVOT.u = rows.reduce((s, m) => s + m.x, 0) / rows.length;
         PIVOT.v = rows.reduce((s, m) => s + m.y, 0) / rows.length;
       }
-      MOBS = rows.map(m => ({ ...m, _u: m.x, _v: m.y, x: fitX(m.x), y: fitY(m.y) })); FORCES_TOTAL = j.forces_total || 0; buildMarkers(); window._spike.markers = markers; newPull(); })
+      MOBS = rows.map(m => ({ ...m, _u: m.x, _v: m.y, x: fitX(m.x), y: fitY(m.y) })); FORCES_TOTAL = j.forces_total || 0; buildMarkers(); window._spike.markers = markers; restoreRoute(); })
     .catch(e => { document.querySelector('.note').textContent = 'failed to load mob positions: ' + (e && e.message || e); newPull(); });
 }
 
