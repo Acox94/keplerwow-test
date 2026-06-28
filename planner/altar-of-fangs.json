@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68301,
-    "extracted_at": "2026-06-28T02:27:12.246Z",
+    "extracted_at": "2026-06-28T02:55:55.668Z",
     "patch_version": "12.1.0",
     "source_versions": {
       "curated": {
@@ -659,7 +659,7 @@
           "base_damage": null,
           "cast_order": null,
           "cast_time_ms": 0,
-          "coaching_note": "Enrage — soothe to remove (its melee ramps attack speed).",
+          "coaching_note": "Its melee attack speed ramps the longer it stays enraged.",
           "completion_effect": null,
           "description": null,
           "dispel_detonates": false,
@@ -8871,23 +8871,12 @@
           "Disease",
           "Poison"
         ],
-        "soothe": true,
+        "soothe": false,
         "stops_available": 3
       },
       "soothe": {
-        "abilities": [
-          {
-            "cast_time_ms": 0,
-            "condition": null,
-            "confidence": "db2",
-            "name": "Paralysis",
-            "note": null,
-            "source": "talent",
-            "spell_id": 115078,
-            "verified": true
-          }
-        ],
-        "available": true
+        "abilities": [],
+        "available": false
       },
       "spec_id": 268,
       "spec_name": "Brewmaster",
@@ -9092,23 +9081,12 @@
           "Disease",
           "Poison"
         ],
-        "soothe": true,
+        "soothe": false,
         "stops_available": 3
       },
       "soothe": {
-        "abilities": [
-          {
-            "cast_time_ms": 0,
-            "condition": null,
-            "confidence": "db2",
-            "name": "Paralysis",
-            "note": null,
-            "source": "talent",
-            "spell_id": 115078,
-            "verified": true
-          }
-        ],
-        "available": true
+        "abilities": [],
+        "available": false
       },
       "spec_id": 269,
       "spec_name": "Windwalker",
@@ -9352,23 +9330,12 @@
           "Poison",
           "Magic"
         ],
-        "soothe": true,
+        "soothe": false,
         "stops_available": 2
       },
       "soothe": {
-        "abilities": [
-          {
-            "cast_time_ms": 0,
-            "condition": null,
-            "confidence": "db2",
-            "name": "Paralysis",
-            "note": null,
-            "source": "talent",
-            "spell_id": 115078,
-            "verified": true
-          }
-        ],
-        "available": true
+        "abilities": [],
+        "available": false
       },
       "spec_id": 270,
       "spec_name": "Mistweaver",

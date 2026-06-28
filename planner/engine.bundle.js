@@ -1272,6 +1272,18 @@ var KeplerEngine = (() => {
     }
     return out;
   }
+  function sootheAdvice(group) {
+    const out = {};
+    for (const R of ROLE_TAGS) {
+      const abils = /* @__PURE__ */ new Set();
+      for (const s of group) {
+        if (coarseRole(s.party_role) !== R || !s.rollups.soothe) continue;
+        for (const a of s.soothe.abilities) abils.add(a.name);
+      }
+      if (abils.size) out[R] = `Enrage \u2014 Soothe with ${[...abils].map((n) => `__${n}__`).join(" / ")}`;
+    }
+    return out;
+  }
   function tankBusterAdvice(tb) {
     const allies = tb.ally_answers.map(extAnswerer);
     const lethal = tb.cast.is_lethal;
@@ -1758,7 +1770,18 @@ var KeplerEngine = (() => {
         });
       }
     }
-    if (r.soothe.enrages.length > 0 && !r.soothe.can_soothe) {
+    if (r.soothe.can_soothe) {
+      for (const en of r.soothe.enrages) {
+        w.push({
+          severity: "info",
+          category: "soothe",
+          coaching: true,
+          subjects: subj([en]),
+          role_advice: sootheAdvice(group),
+          message: `${labelCast(en)} is an Enrage \u2014 soothe it to remove.`
+        });
+      }
+    } else if (r.soothe.enrages.length > 0) {
       w.push({
         severity: "warning",
         category: "soothe",

@@ -1285,7 +1285,33 @@ syncHistory();
 // Nothing in src/ is touched — engine.bundle.js is built read-only from it.
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
 // esc + render the engine's `__ability name__` markers as underlined spans (ability names in advice).
-const escU = (s) => esc(s).replace(/__([^_]+)__/g, '<u class="kw-ab">$1</u>');
+// WoW class colors — the ability the player should use to answer a mechanic is tinted by the class that
+// brings it (a Druid's Soothe reads orange, a Monk's Tiger's Lust jade, …).
+const CLASS_COLORS = {
+  'Death Knight':'#C41E3A','Demon Hunter':'#A330C9','Druid':'#FF7C0A','Evoker':'#33937F',
+  'Hunter':'#AAD372','Mage':'#3FC7EB','Monk':'#00FF98','Paladin':'#F48CBA','Priest':'#F0F0F0',
+  'Rogue':'#FFF468','Shaman':'#0070DD','Warlock':'#8788EE','Warrior':'#C69B6D',
+};
+// ability NAME -> class, built from the CURRENT comp's specs (their named capability abilities). Rebuilt
+// each renderAnalysis so the advice tints each ability marker by who actually brings it (the engine wraps
+// ability names in __markers__; a name absent from the comp stays the default underline).
+let ABILITY_CLASS = {};
+function rebuildAbilityClass() {
+  ABILITY_CLASS = {};
+  if (!dungeon) return;
+  const byId = new Map((dungeon.specs || []).map(s => [s.spec_id, s]));
+  for (const id of compSlots) {
+    const s = (id != null) && byId.get(id); if (!s) continue;
+    const buckets = [s.removals, s.soothe && s.soothe.abilities, s.purge, s.control, s.disruptive,
+                     s.movement_freedom, s.externals, s.target_drop, s.pet_options, s.group_buffs];
+    for (const arr of buckets) if (Array.isArray(arr)) for (const a of arr) if (a && a.name) ABILITY_CLASS[a.name] = s.class;
+    if (s.battle_rez && s.battle_rez.name) ABILITY_CLASS[s.battle_rez.name] = s.class;
+  }
+}
+const escU = (s) => esc(s).replace(/__([^_]+)__/g, (_, n) => {
+  const col = CLASS_COLORS[ABILITY_CLASS[n]];
+  return `<u class="kw-ab"${col ? ` style="color:${col}"` : ''}>${n}</u>`;
+});
 let dungeon = null;
 let compSlots = [null, null, null, null, null];
 const COMP_SLOTS = [
@@ -1578,6 +1604,7 @@ document.getElementById('lvExpandAll')?.addEventListener('click', () => {
 
 function renderAnalysis() {
   setWarn(0);
+  rebuildAbilityClass();   // tint ability markers by the current comp's classes
   const host = document.getElementById('analysis');
   if (!host) return;
   host.classList.add('kw-analysis-panel');
