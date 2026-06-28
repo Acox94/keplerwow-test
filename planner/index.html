@@ -1602,6 +1602,163 @@ document.getElementById('lvExpandAll')?.addEventListener('click', () => {
   renderAnalysis();
 });
 
+// ===========================================================================
+// CARD MODEL v2 — spike (?cards=1). The "one cast -> one structured record ->
+// one renderer" path. A cast becomes { expect tags, per-role answers }; a single
+// renderer turns it into the card, so the mechanic is stated ONCE and each axis
+// appears ONCE (no prose assembled across dimensions, no fold/suppress). Runs
+// BESIDE the current cards; zero engine changes. If it lands, this assembler
+// graduates into the engine and replaces buildWarnings' prose.
+// ---------------------------------------------------------------------------
+const CARDS_V2 = _params.get('cards') === '1';
+const V2_REMOVABLE = new Set(['Magic', 'Curse', 'Disease', 'Poison', 'Bleed']);
+const V2_MECH = { snared: 'slow', rooted: 'root', stunned: 'stun', silenced: 'silence', disoriented: 'disorient', incapacitated: 'incapacitate', fleeing: 'fear', charmed: 'charm', banished: 'banish' };
+const V2_COARSE = (r) => r === 'tank' ? 'tank' : r === 'healer' ? 'healer' : 'dps';
+const V2_AXES = new Set(['freedom', 'dispel', 'soothe', 'kick', 'cc']);
+// WHAT TO EXPECT — a concise factual effect line from the cast's structured flags (numbers from the
+// resolved tooltip). NEVER how to answer it.
+function expectV2(cast) {
+  const desc = SPELL_DESC[cast.spell_id] || '';
+  const p = [];
+  if (cast.dot) { const m = desc.match(/for\s+(\d+)\s*(sec|second|min|minute)/i); p.push('DoT' + (m ? ` ${m[1]}${/min/i.test(m[2]) ? 'm' : 's'}` : '')); }
+  if (cast.mechanic && V2_MECH[cast.mechanic]) {
+    let l = V2_MECH[cast.mechanic];
+    if (cast.mechanic === 'snared') { const sm = desc.match(/movement speed by\s+(\d+)%/i); const st = /each tick|with each tick|stack/i.test(desc); if (sm) l = `${st ? 'stacking ' : ''}slow ${sm[1]}%${st ? '/tick' : ''}`; }
+    p.push(l);
+  }
+  if (cast.is_aoe) p.push('AoE');
+  if (cast.tank_buster) p.push('tank hit');
+  for (const d of (cast.displacement || [])) p.push(d === 'knockback' ? 'knockback' : d === 'pull' ? 'pull' : 'cast pushback');
+  if (cast.dispel_type === 'Enrage') p.push('enrage');
+  if (!p.length && cast.school) p.push(`${cast.school} damage`);
+  return p.join(', ');
+}
+// HOW TO DEAL — per coarse role, the abilities that role brings to answer THIS cast's axes, each with its
+// class (for the tint) + scope (self / party / enemy). The single source of "what's my job here".
+function cardAnswers(cast, specs) {
+  const out = { tank: [], healer: [], dps: [] };
+  const push = (role, axis, ability, cls, scope) => { if (ability) out[role].push({ axis, ability, cls, scope }); };
+  const isFreedom = cast.mechanic === 'rooted' || cast.mechanic === 'snared';
+  const isDispel = V2_REMOVABLE.has(cast.dispel_type);
+  const isSoothe = cast.dispel_type === 'Enrage';
+  const isKick = cast.is_interruptible && !cast.is_stoppable;
+  const isCC = cast.is_stoppable;
+  for (const s of specs) {
+    const role = V2_COARSE(s.party_role);
+    if (isFreedom) for (const m of (s.movement_freedom || [])) if ((m.mechanics || []).includes(cast.mechanic)) push(role, 'freedom', m.name, s.class, m.target === 'ally' ? 'party' : 'self');
+    if (isDispel) for (const rm of (s.removals || [])) if (rm.dispel_type === cast.dispel_type) push(role, 'dispel', rm.name, s.class, 'party');
+    if (isSoothe && s.rollups && s.rollups.soothe) for (const a of ((s.soothe && s.soothe.abilities) || [])) push(role, 'soothe', a.name, s.class, 'enemy');
+    if (isKick && s.rollups && s.rollups.has_interrupt) { const k = (s.control || []).find(c => c.kind === 'interrupt'); if (k) push(role, 'kick', k.name, s.class, 'enemy'); }
+    if (isCC) { const cc = (s.control || []).find(c => c.kind === 'cc'); if (cc) push(role, 'cc', cc.name, s.class, 'enemy'); }
+  }
+  for (const k of ['tank', 'healer', 'dps']) { const seen = new Set(); out[k] = out[k].filter(a => seen.has(a.ability) ? false : (seen.add(a.ability), true)); }
+  return out;
+}
+// the universal "everyone moves" answer (positioning / survive) — only when there IS one
+function everyoneV2(cast) {
+  const POS = { move_out: 'move out of it', spread: 'spread out', stack: 'stack up', soak: 'soak it', frontal: 'dodge the frontal', line_of_sight: 'break line of sight', bait: 'bait it away' };
+  const ps = (cast.positioning || []).map(t => POS[t]).filter(Boolean);
+  if (ps.length) return ps.join(', ');
+  if (cast.unavoidable) return 'unavoidable — heal/mitigate through';
+  if (cast.is_aoe || cast.party_targets) return 'avoidable — sidestep it';
+  return null;
+}
+// PRIMARY answer = the headline job. Default priority PREVENT > REMOVE (kick/cc beat dispel/freedom/soothe),
+// with an editorial per-cast `primary_answer` override (a cast you deliberately let land + dispel, or a
+// frontal you dodge rather than kick → override points at a non-ability answer, so no axis leads).
+const V2_PRIORITY = ['kick', 'cc', 'dispel', 'freedom', 'soothe'];
+const V2_AXIS_LABEL = { kick: 'Kick', cc: 'CC', dispel: 'Dispel', freedom: 'Freedom', soothe: 'Soothe' };
+function v2Primary(cast, ans) {
+  const present = new Set();
+  for (const k of ['tank', 'healer', 'dps']) for (const a of ans[k]) present.add(a.axis);
+  if (cast.primary_answer) return present.has(cast.primary_answer) ? cast.primary_answer : null; // override
+  for (const ax of V2_PRIORITY) if (present.has(ax)) return ax;
+  return null;
+}
+function cardTags(cast, ans, primary) {
+  const axes = new Set();
+  for (const k of ['tank', 'healer', 'dps']) for (const a of ans[k]) axes.add(a.axis);
+  const t = primary ? [primary] : [];
+  for (const ax of V2_PRIORITY) if (axes.has(ax) && ax !== primary) t.push(ax);
+  if (cast.dot) t.push('dot');
+  if (cast.is_aoe) t.push('aoe');
+  return t;
+}
+function renderCardV2(c, specs, id, open) {
+  const cast = c.cast, ans = cardAnswers(cast, specs), expect = expectV2(cast), everyone = everyoneV2(cast);
+  const primary = v2Primary(cast, ans), tags = cardTags(cast, ans, primary);
+  const sevCls = KW_SEV_CLASS[c.sev] || 'kw-sev-info';
+  const mut = 'color:var(--kw-ink-3,#7c8696)';
+  const ab = (a) => { const col = CLASS_COLORS[a.cls]; return `<u class="kw-ab"${col ? ` style="color:${col}"` : ''}>${esc(a.ability)}</u>` + (a.scope === 'party' ? ` <span style="${mut}">(party)</span>` : ''); };
+  const chips = tags.map(t => `<span class="kw-tag ${V2_AXES.has(t) ? 'kw-tag--res' : 'kw-tag--fx'}">${esc(t)}</span>`).join('');
+  // a labeled line in the EXPECT style — same look, different job (expect = what / freedom = how)
+  const labelStyle = `${mut};text-transform:uppercase;font-size:10px;letter-spacing:.06em;margin-right:7px`;
+  const section = (label, html) => `<div class="kw-desc"><span style="${labelStyle}">${esc(label)}</span>${html}</div>`;
+  // a block axis label (KICK / FREEDOM …) above its per-role rows — the EXPECT label look, as a divider
+  const axHead = (label) => `<div style="${mut};text-transform:uppercase;font-size:10px;letter-spacing:.06em;margin:10px 0 3px">${esc(label)}</div>`;
+  let body = '';
+  if (expect) body += section('expect', esc(expect));
+  // each ANSWER AXIS is its own labeled group of Tank/Healer/DPS rows (primary first, others by priority).
+  // Freedom resolves the same way Kick does — every role sees its own tool, so both read identically.
+  const present = new Set();
+  for (const k of ['tank', 'healer', 'dps']) for (const a of ans[k]) present.add(a.axis);
+  const axes = [];
+  if (primary && present.has(primary)) axes.push(primary);
+  for (const ax of V2_PRIORITY) if (present.has(ax) && ax !== primary) axes.push(ax);
+  for (const axis of axes) {
+    body += axHead(V2_AXIS_LABEL[axis] || axis);
+    for (const k of ['tank', 'healer', 'dps']) {
+      const list = ans[k].filter(a => a.axis === axis); if (!list.length) continue;
+      const r = KW_ROLE[k];
+      body += `<div class="kw-role ${r.cls}">${r.ic}<span class="kw-role-label">${r.label}</span><p>${list.map(ab).join(` <span style="${mut}">·</span> `)}</p></div>`;
+    }
+  }
+  if (everyone) body += section('everyone', esc(everyone));
+  return `<div class="kw-card kw-card--major ${sevCls}${open ? ' kw-card--open' : ''}" data-card="${esc(id)}">
+      <div class="kw-card-head" role="button" tabindex="0" aria-expanded="${open ? 'true' : 'false'}">
+        <div class="kw-card-hl">
+          <div class="kw-card-htop"><span class="kw-spell">${esc(c.name)}</span><span class="kw-sevb">${KW_SEV_LABEL[c.sev] || ''}</span></div>
+          <div class="kw-hsub">${esc(c.npc)}</div>
+        </div>
+        <div class="kw-hright">${KW_CHEV}</div>
+      </div>
+      <div class="kw-tags">${chips}</div>
+      <div class="kw-detail">${body}</div>
+    </div>`;
+}
+function renderCardsV2(rep) {
+  const specMap = new Map((dungeon.specs || []).map(s => [s.spec_id, s]));
+  const specs = compSlots.filter(x => x != null).map(id => specMap.get(id)).filter(Boolean);
+  const seen = new Map();   // one card per cast; keep the most-severe verdict the engine gave it
+  for (const w of rep.warnings) {
+    if (w.source === 'group' || kwIsAggregate(w)) continue;
+    const su = w.subjects && w.subjects[0]; if (!su) continue;
+    const cast = kwCastFor(w); if (!cast) continue;
+    const key = su.npc_name + '|' + su.spell_name, prev = seen.get(key);
+    if (!prev || SEV[w.severity] < SEV[prev.sev]) seen.set(key, { cast, sev: w.severity, name: su.spell_name, npc: su.npc_name });
+  }
+  const cards = [...seen.values()].sort((a, b) => SEV[a.sev] - SEV[b.sev]);
+  const banner = `<div style="font-size:11px;letter-spacing:.05em;color:var(--accent,#2dd4bf);margin:0 0 9px">card model · v2 spike</div>`;
+  // collapsed by default (header + tags only); expand state lives in expandedCards so it survives re-renders
+  const stack = cards.length ? cards.map(c => { const id = c.npc + '|' + c.name; return renderCardV2(c, specs, id, expandedCards.has(id)); }).join('') : '<p class="hint">No pull mechanics flagged — this comp covers this pull.</p>';
+  return { html: banner + `<div class="kw-stack">${stack}</div>`, n: cards.length };
+}
+// shared expand/collapse wiring (header click/keyboard) — used by the v1 stack and the v2 card path
+function kwWireExpand(host) {
+  host.querySelectorAll('.kw-card--major .kw-card-head').forEach(head => {
+    const card = head.closest('.kw-card'); const id = card.dataset.card; if (!id) return;
+    const toggle = () => {
+      const open = !expandedCards.has(id);
+      if (open) expandedCards.add(id); else expandedCards.delete(id);
+      card.classList.toggle('kw-card--open', open);
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      kwSyncExpandAll();
+    };
+    head.onclick = toggle;
+    head.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
+  });
+}
+
 function renderAnalysis() {
   setWarn(0);
   rebuildAbilityClass();   // tint ability markers by the current comp's classes
@@ -1618,6 +1775,8 @@ function renderAnalysis() {
   let rep;
   try { rep = KeplerEngine.analyzePull(dungeon, members, group, { skill:'experienced', priority_rate_ratio: KW_PRIORITY_RATE_RATIO, lethal_hp_threshold: KW_LETHAL_HP, key_level: KW_KEY_LEVEL }); }
   catch (e) { host.innerHTML = `<p class="hint">engine error: ${esc(String(e && e.message || e))}</p>`; kwSyncExpandAll(); return; }
+  // v2 card-model spike (?cards=1) — structured per-cast cards, beside the current path (Route tab only).
+  if (CARDS_V2 && !isComp) { const v = renderCardsV2(rep); host.innerHTML = v.html; setWarn(v.n); kwWireExpand(host); kwSyncExpandAll(); return; }
   // Comp tab shows GROUP/composition warnings; Route tab shows the pull's boss/trash mechanics.
   // The pull-level interrupt-budget aggregate is hoisted into the Overall Analysis section, so
   // drop it from the per-spell card stack (it's not about the one cast its subjects[0] names).
