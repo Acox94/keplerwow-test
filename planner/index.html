@@ -1615,6 +1615,17 @@ const V2_REMOVABLE = new Set(['Magic', 'Curse', 'Disease', 'Poison', 'Bleed']);
 const V2_MECH = { snared: 'slow', rooted: 'root', stunned: 'stun', silenced: 'silence', disoriented: 'disorient', incapacitated: 'incapacitate', fleeing: 'fear', charmed: 'charm', banished: 'banish' };
 const V2_COARSE = (r) => r === 'tank' ? 'tank' : r === 'healer' ? 'healer' : 'dps';
 const V2_AXES = new Set(['freedom', 'dispel', 'soothe', 'kick', 'cc']);
+// player-facing terminology: most players call a movement slow a "slow", and "snare" gets confused with
+// "root" — so present "slow" everywhere and keep the precise term in a single "Slow = Snare" hover.
+function slowify(s) {
+  return !s ? s : s
+    .replace(/\bSnared\b/g, 'Slowed').replace(/\bsnared\b/g, 'slowed')
+    .replace(/\bSnares\b/g, 'Slows').replace(/\bsnares\b/g, 'slows')
+    .replace(/\bSnare\b/g, 'Slow').replace(/\bsnare\b/g, 'slow');
+}
+const SLOW_HOVER = 'Slow = Snare (a movement-impairing slow)';
+// wrap the word "slow" with the teaching hover (dotted underline signals "definition on hover")
+const slowTerm = (html) => html.replace(/\bslow\b/g, `<abbr title="${SLOW_HOVER}" style="text-decoration-style:dotted;text-underline-offset:2px;cursor:help">slow</abbr>`);
 // WHAT TO EXPECT — a concise factual effect line from the cast's structured flags (numbers from the
 // resolved tooltip). NEVER how to answer it.
 function expectV2(cast) {
@@ -1637,7 +1648,7 @@ function expectV2(cast) {
 // class (for the tint) + scope (self / party / enemy). The single source of "what's my job here".
 function cardAnswers(cast, specs) {
   const out = { tank: [], healer: [], dps: [] };
-  const push = (role, axis, ability, cls, scope) => { if (ability) out[role].push({ axis, ability, cls, scope }); };
+  const push = (role, axis, ability, cls, scope, note) => { if (ability) out[role].push({ axis, ability, cls, scope, note }); };
   const isFreedom = cast.mechanic === 'rooted' || cast.mechanic === 'snared';
   const isDispel = V2_REMOVABLE.has(cast.dispel_type);
   const isSoothe = cast.dispel_type === 'Enrage';
@@ -1645,11 +1656,11 @@ function cardAnswers(cast, specs) {
   const isCC = cast.is_stoppable;
   for (const s of specs) {
     const role = V2_COARSE(s.party_role);
-    if (isFreedom) for (const m of (s.movement_freedom || [])) if ((m.mechanics || []).includes(cast.mechanic)) push(role, 'freedom', m.name, s.class, m.target === 'ally' ? 'party' : 'self');
-    if (isDispel) for (const rm of (s.removals || [])) if (rm.dispel_type === cast.dispel_type) push(role, 'dispel', rm.name, s.class, 'party');
-    if (isSoothe && s.rollups && s.rollups.soothe) for (const a of ((s.soothe && s.soothe.abilities) || [])) push(role, 'soothe', a.name, s.class, 'enemy');
-    if (isKick && s.rollups && s.rollups.has_interrupt) { const k = (s.control || []).find(c => c.kind === 'interrupt'); if (k) push(role, 'kick', k.name, s.class, 'enemy'); }
-    if (isCC) { const cc = (s.control || []).find(c => c.kind === 'cc'); if (cc) push(role, 'cc', cc.name, s.class, 'enemy'); }
+    if (isFreedom) for (const m of (s.movement_freedom || [])) if ((m.mechanics || []).includes(cast.mechanic)) push(role, 'freedom', m.name, s.class, m.target === 'ally' ? 'party' : 'self', m.note);
+    if (isDispel) for (const rm of (s.removals || [])) if (rm.dispel_type === cast.dispel_type) push(role, 'dispel', rm.name, s.class, 'party', rm.note);
+    if (isSoothe && s.rollups && s.rollups.soothe) for (const a of ((s.soothe && s.soothe.abilities) || [])) push(role, 'soothe', a.name, s.class, 'enemy', a.note);
+    if (isKick && s.rollups && s.rollups.has_interrupt) { const k = (s.control || []).find(c => c.kind === 'interrupt'); if (k) push(role, 'kick', k.name, s.class, 'enemy', k.note); }
+    if (isCC) { const cc = (s.control || []).find(c => c.kind === 'cc'); if (cc) push(role, 'cc', cc.name, s.class, 'enemy', cc.note); }
   }
   for (const k of ['tank', 'healer', 'dps']) { const seen = new Set(); out[k] = out[k].filter(a => seen.has(a.ability) ? false : (seen.add(a.ability), true)); }
   return out;
@@ -1689,7 +1700,16 @@ function renderCardV2(c, specs, id, open) {
   const primary = v2Primary(cast, ans), tags = cardTags(cast, ans, primary);
   const sevCls = KW_SEV_CLASS[c.sev] || 'kw-sev-info';
   const mut = 'color:var(--kw-ink-3,#7c8696)';
-  const ab = (a) => { const col = CLASS_COLORS[a.cls]; return `<u class="kw-ab"${col ? ` style="color:${col}"` : ''}>${esc(a.ability)}</u>` + (a.scope === 'party' ? ` <span style="${mut}">(party)</span>` : ''); };
+  // SHORT display name: a "Button (Talent)" name shows just the talent (Jet Stream); the full combo + note
+  // ride the hover title. (Today only Wind Rush Totem (Jet Stream) matches; the durable form is a data-side
+  // display_name field when this graduates into the engine.)
+  const ab = (a) => {
+    const col = CLASS_COLORS[a.cls];
+    const m = a.ability.match(/\s*\(([^()]+)\)\s*$/);
+    const display = m ? m[1] : a.ability;
+    const tip = slowify([display !== a.ability ? a.ability : '', a.note || ''].filter(Boolean).join(' — '));
+    return `<u class="kw-ab"${col ? ` style="color:${col}"` : ''}${tip ? ` title="${esc(tip)}"` : ''}>${esc(slowify(display))}</u>` + (a.scope === 'party' ? ` <span style="${mut}">(party)</span>` : '');
+  };
   const chips = tags.map(t => `<span class="kw-tag ${V2_AXES.has(t) ? 'kw-tag--res' : 'kw-tag--fx'}">${esc(t)}</span>`).join('');
   // a labeled line in the EXPECT style — same look, different job (expect = what / freedom = how)
   const labelStyle = `${mut};text-transform:uppercase;font-size:10px;letter-spacing:.06em;margin-right:7px`;
@@ -1697,7 +1717,7 @@ function renderCardV2(c, specs, id, open) {
   // a block axis label (KICK / FREEDOM …) above its per-role rows — the EXPECT label look, as a divider
   const axHead = (label) => `<div style="${mut};text-transform:uppercase;font-size:10px;letter-spacing:.06em;margin:10px 0 3px">${esc(label)}</div>`;
   let body = '';
-  if (expect) body += section('expect', esc(expect));
+  if (expect) body += section('expect', slowTerm(slowify(esc(expect))));
   // each ANSWER AXIS is its own labeled group of Tank/Healer/DPS rows (primary first, others by priority).
   // Freedom resolves the same way Kick does — every role sees its own tool, so both read identically.
   const present = new Set();
