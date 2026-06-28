@@ -261,6 +261,7 @@
     color:var(--kw-ink-3); background:var(--kw-surface-2); border:1px solid var(--kw-line); border-radius:4px; padding:2px 6px; }
   .kw-tag--role { color:var(--kw-ink-2); }
   .kw-tag--res { color:var(--kw-sev-2); border-color:color-mix(in srgb, var(--kw-sev) 32%, var(--kw-line)); background:var(--kw-sev-soft); }
+  .kw-tag--fx { color:var(--accent-2); border-color:color-mix(in srgb, var(--accent-2) 36%, var(--kw-line)); background:color-mix(in srgb, var(--accent-2) 13%, transparent); }
   /* collapsible detail: description + role advice */
   .kw-detail { display:none; padding:9px 11px 11px; border-top:1px solid var(--kw-line-soft); }
   .kw-card--open .kw-detail { display:block; animation:kw-fade 0.18s ease; }
@@ -1431,6 +1432,75 @@ function kwTags(w) {
   return [role0, w.category, w.source].filter(Boolean)
     .map((t, i) => `<span class="kw-tag${i === 0 ? ' kw-tag--role' : ''}">${esc(t)}</span>`).join('');
 }
+// The card header already shows the spell name + "cast by <npc>", so a description that LEADS with the
+// engine's "<spell> (<npc>)" label (every subject-bearing message does) just repeats the header. Strip
+// that leading label — like the note card does (kwNoteHTML) — so the description reads as the effect
+// alone ("Snares the target."). Single-subject only, and only on an exact prefix match (a multi-subject
+// "A and B …" message keeps its lead).
+function kwDescText(w) {
+  let m = w.message || '';
+  const subj = (w.subjects && w.subjects.length === 1) ? w.subjects[0] : null;
+  if (subj && subj.spell_name) {
+    const lbl = subj.count > 1 ? `${subj.spell_name} ×${subj.count} (${subj.npc_name})` : `${subj.spell_name} (${subj.npc_name})`;
+    if (m.startsWith(lbl)) {
+      m = m.slice(lbl.length).replace(/^[\s:—-]+/, '');
+      if (m) m = m.charAt(0).toUpperCase() + m.slice(1);
+    }
+  }
+  return m;
+}
+// The warning subject carries only spell_name + npc_name (no spell_id), so bridge back to the FULL cast
+// record (dot / mechanic / school / is_aoe / displacement …) in the loaded dungeon by name. The cast is
+// what the description + effect tags describe — the warning's message is ADVICE, not a spell description.
+function kwCastFor(w) {
+  const subj = w.subjects && w.subjects[0];
+  if (!subj || !dungeon) return null;
+  for (const c of dungeon.creatures || []) {
+    if (c.name !== subj.npc_name) continue;
+    const s = (c.spells || []).find(sp => sp.name === subj.spell_name);
+    if (s) return s;
+  }
+  return null;
+}
+// A concise, FACTUAL effect summary of the spell (what it does — never how to answer it). Effect labels
+// come from the structured flags; the numbers (DoT length, slow %) are read from the resolved tooltip
+// (SPELL_DESC), the only place they live today. Falls back to the school's damage when no flag is set.
+const KW_MECH_LABEL = { snared:'Slow', rooted:'Root', stunned:'Stun', silenced:'Silence', disoriented:'Disorient', incapacitated:'Incapacitate', fleeing:'Fear', charmed:'Charm', banished:'Banish' };
+function kwEffectSummary(cast) {
+  if (!cast) return '';
+  const desc = SPELL_DESC[cast.spell_id] || '';
+  const parts = [];
+  if (cast.dot) {
+    const m = desc.match(/for\s+(\d+)\s*(sec|second|min|minute)/i);
+    parts.push('DoT' + (m ? ` (${m[1]}${/min/i.test(m[2]) ? 'm' : 's'})` : ''));
+  }
+  if (cast.mechanic && KW_MECH_LABEL[cast.mechanic]) {
+    let label = KW_MECH_LABEL[cast.mechanic];
+    if (cast.mechanic === 'snared') {
+      const sm = desc.match(/movement speed by\s+(\d+)%/i);
+      const stacks = /with each tick|each tick|stack/i.test(desc);
+      if (sm) label = `Slow (${stacks ? 'stacks ' : ''}${sm[1]}%${stacks ? '/tick' : ''})`;
+    }
+    parts.push(label);
+  }
+  if (cast.is_aoe) parts.push('AoE');
+  const disp = Array.isArray(cast.displacement) ? cast.displacement : [];
+  if (disp.includes('knockback')) parts.push('Knockback');
+  if (disp.includes('pull')) parts.push('Pull');
+  if (disp.includes('cast_pushback')) parts.push('Cast pushback');
+  if (cast.tank_buster) parts.push('Tank-targeted');
+  // No generic "school damage" fallback: when a cast carries no structured EFFECT, return '' so the card
+  // keeps the engine message (a curated coaching_note / warning is more useful than a bare "Nature damage").
+  return parts.join(' · ');
+}
+// Effect TAGS (DoT / AoE) — compact badges alongside the role/category/resolution tags.
+function kwEffectTags(cast) {
+  if (!cast) return '';
+  const t = [];
+  if (cast.dot) t.push('DoT');
+  if (cast.is_aoe) t.push('AoE');
+  return t.map(x => `<span class="kw-tag kw-tag--fx">${esc(x)}</span>`).join('');
+}
 function kwCardHTML(w, id, open) {
   const subj = w.subjects && w.subjects[0];
   const sevCls = KW_SEV_CLASS[w.severity] || 'kw-sev-info';
@@ -1440,8 +1510,13 @@ function kwCardHTML(w, id, open) {
   const title = subj ? subj.spell_name : kwSubjectlessTitle(w);
   const sub = subj ? `cast by <span>${esc(subj.npc_name)}</span> · ${esc(kwPretty(w.category))}` : '';
   const cnt = (subj && subj.count > 1) ? `<span class="kw-cd">×${subj.count}</span>` : '';
-  const tags = kwTags(w) + (subj ? `<span class="kw-tag kw-tag--res">${kwResolution(w.category)}</span>` : '');
-  let detail = `<div class="kw-desc">${escU(w.message)}</div>`;
+  // The description describes the SPELL (its effects), so prefer the factual effect summary derived from
+  // the cast; fall back to the (subject-stripped) engine message when no cast/effects resolve. The DoT/AoE
+  // effect tags ride alongside the role/category/resolution tags.
+  const cast = kwCastFor(w);
+  // effect tags (DoT/AoE) before the resolution tag (FREEDOM/KICK/…), so the spell's effects read first
+  const tags = kwTags(w) + kwEffectTags(cast) + (subj ? `<span class="kw-tag kw-tag--res">${kwResolution(w.category)}</span>` : '');
+  let detail = `<div class="kw-desc">${escU(kwEffectSummary(cast) || kwDescText(w))}</div>`;
   if (w.everyone) detail += `<div class="kw-everyone">${escU(w.everyone)}</div>`;
   if (w.role_advice) for (const k of ['tank', 'healer', 'dps']) {
     const txt = w.role_advice[k]; if (!txt) continue;

@@ -1848,13 +1848,9 @@ var KeplerEngine = (() => {
       const verb = mt.mechanic === "rooted" ? "roots" : "snares";
       const moveAdvice = movementAdvice(mt, group);
       if (mt.coverage === "none") {
-        w.push(mt.lethal_if_unfreed ? { severity: "critical", category: "movement", subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on} and no one in the group can clear ${mt.mechanic} (shapeshift / Blessing of Freedom / Tiger's Lust \u2026) \u2014 lethal if not freed.` } : { severity: "caution", category: "movement", subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} your party${on} and no group spec can remove ${mt.mechanic} \u2014 position to avoid it (no movement freedom for it in the comp).` });
-      } else if (mt.coverage === "ally") {
-        w.push({ severity: "caution", category: "movement", coaching: true, subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target \u2014 clearable on anyone by ${freeList(mt.free_specs)} (ally-castable freedom).` });
-      } else if (mt.coverage === "self") {
-        w.push({ severity: "caution", category: "movement", coaching: true, subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on} \u2014 only self-clearable (${freeList(mt.free_specs)}); a ${mt.mechanic} player without their own freedom is stuck. Bring an ally-castable freedom or position.` });
+        w.push(mt.lethal_if_unfreed ? { severity: "critical", category: "movement", subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on} \u2014 no spec in the comp can clear ${mt.mechanic}; lethal if not freed.` } : { severity: "caution", category: "movement", subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} your party${on} \u2014 no spec in the comp can clear ${mt.mechanic}.` });
       } else {
-        w.push({ severity: "caution", category: "movement", coaching: true, subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on} \u2014 only a conditional freedom covers it (${freeList(mt.free_specs)}; e.g. Soulburn-timed Demonic Circle) \u2014 unreliable; treat as uncovered and position.` });
+        w.push({ severity: "caution", category: "movement", coaching: true, subjects: subj([mt.cast]), role_advice: moveAdvice, message: `${name} ${verb} the target${on}.` });
       }
     }
     const canKick = r.stops.interrupt_supply > 0;
@@ -2077,7 +2073,7 @@ var KeplerEngine = (() => {
         message: `${sumCount(avoidable)} avoidable cast(s) \u2014 reposition${lethal ? " (lethal if you stand in it)" : ""}: ${avoidable.map((t) => `${t.spell_name} [${avoidanceHint(t)}]`).join(", ")}.`
       });
     }
-    const dotShown = r.awareness.dot_casts.filter((t) => !mitigableKeys.has(castKey(t)) && notCarded(t));
+    const dotShown = r.awareness.dot_casts.filter((t) => !mitigableKeys.has(castKey(t)) && notCarded(t) && !freedomRemovesDebuff(t, group));
     if (dotShown.length > 0) {
       const removable = dotShown.some((t) => FRIENDLY_DISPEL_TYPES.includes(t.dispel_type));
       w.push({
