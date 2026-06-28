@@ -1713,11 +1713,13 @@ function renderCardV2(c, specs, id, open) {
   const chips = tags.map(t => `<span class="kw-tag ${V2_AXES.has(t) ? 'kw-tag--res' : 'kw-tag--fx'}">${esc(t)}</span>`).join('');
   // a labeled line in the EXPECT style — same look, different job (expect = what / freedom = how)
   const labelStyle = `${mut};text-transform:uppercase;font-size:10px;letter-spacing:.06em;margin-right:7px`;
-  const section = (label, html) => `<div class="kw-desc"><span style="${labelStyle}">${esc(label)}</span>${html}</div>`;
+  // EFFECT (the "what") carries more weight than the muted answer labels (KICK / FREEDOM), so it stands out
+  const effectLabelStyle = `color:var(--kw-ink-2,#c8cedb);text-transform:uppercase;font-size:10px;letter-spacing:.06em;margin-right:7px;font-weight:700`;
+  const section = (label, html, lbl) => `<div class="kw-desc"><span style="${lbl || labelStyle}">${esc(label)}</span>${html}</div>`;
   // a block axis label (KICK / FREEDOM …) above its per-role rows — the EXPECT label look, as a divider
   const axHead = (label) => `<div style="${mut};text-transform:uppercase;font-size:10px;letter-spacing:.06em;margin:10px 0 3px">${esc(label)}</div>`;
   let body = '';
-  if (expect) body += section('expect', slowTerm(slowify(esc(expect))));
+  if (expect) body += section('effect', `<span style="color:var(--kw-ink,#e9edf4)">${slowTerm(slowify(esc(expect)))}</span>`, effectLabelStyle);
   // each ANSWER AXIS is its own labeled group of Tank/Healer/DPS rows (primary first, others by priority).
   // Freedom resolves the same way Kick does — every role sees its own tool, so both read identically.
   const present = new Set();
@@ -1730,19 +1732,22 @@ function renderCardV2(c, specs, id, open) {
     for (const k of ['tank', 'healer', 'dps']) {
       const list = ans[k].filter(a => a.axis === axis); if (!list.length) continue;
       const r = KW_ROLE[k];
-      body += `<div class="kw-role ${r.cls}">${r.ic}<span class="kw-role-label">${r.label}</span><p>${list.map(ab).join(` <span style="${mut}">·</span> `)}</p></div>`;
+      body += `<div class="kw-role ${r.cls}">${r.ic}<span class="kw-role-label">${k === 'healer' ? 'Heal' : r.label}</span><p>${list.map(ab).join(` <span style="${mut}">·</span> `)}</p></div>`;
     }
   }
   if (everyone) body += section('everyone', esc(everyone));
   return `<div class="kw-card kw-card--major ${sevCls}${open ? ' kw-card--open' : ''}" data-card="${esc(id)}">
-      <div class="kw-card-head" role="button" tabindex="0" aria-expanded="${open ? 'true' : 'false'}">
-        <div class="kw-card-hl">
-          <div class="kw-card-htop"><span class="kw-spell">${esc(c.name)}</span><span class="kw-sevb">${KW_SEV_LABEL[c.sev] || ''}</span></div>
-          <div class="kw-hsub">${esc(c.npc)}</div>
+      <div class="kw-card-head" role="button" tabindex="0" aria-expanded="${open ? 'true' : 'false'}" style="flex-direction:column;align-items:stretch;gap:3px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="kw-spell" style="flex:1;min-width:0">${esc(c.name)}</span>
+          <span class="kw-sevb" style="font-size:11px">${KW_SEV_LABEL[c.sev] || ''}</span>
+          <div class="kw-hright">${KW_CHEV}</div>
         </div>
-        <div class="kw-hright">${KW_CHEV}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="kw-hsub" style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(c.npc)}">${esc(c.npc)}</div>
+          <div class="kw-tags" style="padding:0;flex:0 0 auto;justify-content:flex-end">${chips}</div>
+        </div>
       </div>
-      <div class="kw-tags">${chips}</div>
       <div class="kw-detail">${body}</div>
     </div>`;
 }
