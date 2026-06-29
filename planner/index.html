@@ -1795,6 +1795,9 @@ const V2_BLUE_TAGS = new Set(['dispel', 'freedom', 'dot']); // these three chips
 const V2_POS = { move_out: 'move out of it', spread: 'spread out', stack: 'stack up', soak: 'soak it', frontal: 'dodge the frontal', line_of_sight: 'break line of sight', bait: 'bait it away' };
 // the spell-icon box is tinted by the cast's PRIMARY resolution axis (null = neutral line color)
 const V2_RES_COLOR = { kick: '#27d3c0', cc: '#8b7ff0', displace: '#d27f4a', dispel: '#5b9bd5', freedom: '#57c785', soothe: '#e8b400' };
+// A DISPEL/SOOTHE card keys on the dispel TYPE, not a generic "dispel" colour: the type drives the headline,
+// the icon box, the card's left edge AND the answer text. Curse = "decurse"; Enrage = the soothe answer.
+const DISPEL_TYPE_COLOR = { Magic: '#007cf6', Curse: '#ae2eea', Poison: '#91d700', Disease: '#e37313', Bleed: '#fe0517', Enrage: '#e60217' };
 // spell_id -> dungeon spell record (school / cast_time / priority for the hover card); built lazily once loaded
 let _spellByIdCache = null;
 function spellRec(id) {
@@ -1871,8 +1874,8 @@ function renderCardV2(card, id, open) {
   // SHORT display name: a "Button (Talent)" name shows just the talent (Jet Stream); the full combo + note
   // ride the hover title. (Today only Wind Rush Totem (Jet Stream) matches; the durable form is a data-side
   // display_name field — kept renderer-side for now, see the plan's out-of-scope.)
-  const ab = (a) => {
-    const col = CLASS_COLORS[a.class];
+  const ab = (a, overrideCol) => {
+    const col = overrideCol || CLASS_COLORS[a.class];
     const m = a.ability.match(/\s*\(([^()]+)\)\s*$/);
     const display = m ? m[1] : a.ability;
     const tip = slowify([display !== a.ability ? a.ability : '', a.note || ''].filter(Boolean).join(' — '));
@@ -1898,9 +1901,13 @@ function renderCardV2(card, id, open) {
   // Damage/Effect rows (right). The curated card-effects.json line splits on ' · ' — 1st segment = Damage,
   // each remaining = an Effect row; an uncurated cast shows its thin-token line as a single Effect row.
   const fdid = CARD_ICONS[card.spell_id];
-  const resColor = V2_RES_COLOR[primary] || 'var(--kw-line,#2a2e3d)';
   // hover-card content rides on the icon's data-* (drawn by the floating #kw-tip): name · "school · cast · priority" · description
   const rec = spellRec(card.spell_id);
+  // DISPEL/SOOTHE cards take the dispel-TYPE colour (Poison green, Magic blue …) as the card accent — driving
+  // the headline, the icon box and the left edge — instead of the generic resolution colour.
+  const primaryTypeColor = primary === 'dispel' ? (DISPEL_TYPE_COLOR[rec && rec.dispel_type] || null)
+    : primary === 'soothe' ? DISPEL_TYPE_COLOR.Enrage : null;
+  const resColor = primaryTypeColor || V2_RES_COLOR[primary] || 'var(--kw-line,#2a2e3d)';
   const cms = rec ? rec.cast_time_ms : 0;
   const meta = [rec && rec.school, cms > 0 ? `${cms % 1000 === 0 ? cms / 1000 : (cms / 1000).toFixed(1)}s cast` : (rec ? 'instant' : ''), rec && rec.priority].filter(Boolean).join(' · ');
   const tipDesc = (SPELL_DESC[card.spell_id] || '').replace(/\r\n/g, '\n').replace(/\n{2,}/g, '\n').trim();
@@ -1927,10 +1934,13 @@ function renderCardV2(card, id, open) {
   for (const ax of V2_PRIORITY) if (present.has(ax) && ax !== primary) axes.push(ax);
   for (const axis of axes) {
     body += axHead(V2_AXIS_LABEL[axis] || axis);
+    // a dispel/soothe answer is shown in its dispel-TYPE colour (not the answerer's class colour)
+    const axisColor = axis === 'dispel' ? (DISPEL_TYPE_COLOR[rec && rec.dispel_type] || null)
+      : axis === 'soothe' ? DISPEL_TYPE_COLOR.Enrage : null;
     for (const k of ['tank', 'healer', 'dps']) {
       const list = ans[k].filter(a => a.axis === axis); if (!list.length) continue;
       const r = KW_ROLE[k];
-      body += `<div class="kw-role ${r.cls}" style="margin-left:9px">${r.ic}<span class="kw-role-label">${k === 'healer' ? 'Heal' : r.label}</span><p>${list.map(ab).join(` <span style="${mut}">·</span> `)}</p></div>`;
+      body += `<div class="kw-role ${r.cls}" style="margin-left:9px">${r.ic}<span class="kw-role-label">${k === 'healer' ? 'Heal' : r.label}</span><p>${list.map(a => ab(a, axisColor)).join(` <span style="${mut}">·</span> `)}</p></div>`;
     }
   }
   if (everyone) body += section('everyone', esc(everyone));
@@ -1939,8 +1949,8 @@ function renderCardV2(card, id, open) {
   const cdMs = rec && rec.recast_cooldown_ms;
   const cdTxt = cdMs ? ` <span class="kw-cd">(${Math.round(cdMs / 1000)}s)</span>` : '';
   const solLabel = primary ? (V2_SOLUTION_LABEL[primary] || primary) : (KW_SEV_LABEL[card.severity] || '');
-  // colour the headline by the RESOLUTION (matches the icon box), not the severity; severity word keeps its colour
-  const solColor = primary ? (V2_RES_COLOR[primary] || '#0796ff') : 'var(--kw-sev-2)';
+  // colour the headline by the dispel TYPE (dispel/soothe) or else the RESOLUTION (matches the icon box), not severity
+  const solColor = primaryTypeColor || (primary ? (V2_RES_COLOR[primary] || '#0796ff') : 'var(--kw-sev-2)');
   // dispel-icons/<key>.png — dispel answers key on the dispel TYPE (magic/curse/poison/disease/bleed),
   // others on the resolution (interrupt/cc/freedom/enrage/displace). Missing file -> the placeholder square.
   const solKey = !primary ? null
@@ -1951,7 +1961,7 @@ function renderCardV2(card, id, open) {
   const solIcon = solKey
     ? `<img class="kw-sol-icon-img" src="dispel-icons/${solKey}.png" alt="" onerror="this.outerHTML='<span class=&quot;kw-sol-icon&quot; style=&quot;border-color:${solColor}&quot;></span>'">`
     : '';
-  return `<div class="kw-card kw-card--major ${sevCls}${open ? ' kw-card--open' : ''}" data-card="${esc(id)}">
+  return `<div class="kw-card kw-card--major ${sevCls}${open ? ' kw-card--open' : ''}" data-card="${esc(id)}"${primaryTypeColor ? ` style="border-left-color:${primaryTypeColor}"` : ''}>
       <div class="kw-card-head" role="button" tabindex="0" aria-expanded="${open ? 'true' : 'false'}" style="flex-direction:column;align-items:stretch;gap:3px">
         <div style="display:flex;align-items:center;gap:8px">
           <span class="kw-spell" style="flex:1;min-width:0">${esc(card.spell_name)}${cdTxt}</span>
