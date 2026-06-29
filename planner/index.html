@@ -296,6 +296,23 @@
   .kw-role--heal .kw-role-label, .kw-role--heal .kw-role-ic { color:var(--kw-heal); }
   .kw-role--dps .kw-role-label, .kw-role--dps .kw-role-ic { color:var(--kw-dps); }
   .kw-ab { text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px; color:var(--kw-ink); font-weight:600; }
+  /* v2 card: spell icon (box tinted by the resolution; hover = full description) + Damage/Effect rows */
+  .kw-fx-row { display:flex; gap:10px; align-items:flex-start; margin:3px 0 6px; }
+  .kw-spicon { position:relative; flex:0 0 auto; width:42px; height:42px; border-radius:8px; border:2px solid var(--kw-line);
+    overflow:hidden; background:var(--kw-surface-2,#1e2130); display:flex; align-items:center; justify-content:center; cursor:help; }
+  .kw-spicon img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .kw-spicon-fb { font-family:var(--fd); font-weight:700; font-size:17px; color:var(--kw-ink-3,#7c8696); }
+  .kw-fx-lines { flex:1 1 auto; min-width:0; align-self:center; }
+  .kw-df { display:flex; gap:8px; align-items:baseline; line-height:1.5; }
+  .kw-df-l { flex:0 0 auto; min-width:54px; color:var(--kw-ink-3,#7c8696); text-transform:uppercase; font-size:10px; letter-spacing:.05em; font-weight:700; }
+  .kw-df-v { color:var(--kw-ink,#e9edf4); font-size:12.5px; }
+  /* floating spell tooltip (icon hover) — mounted on <body> so the panel's overflow can't clip it */
+  #kw-tip { position:fixed; z-index:9999; max-width:300px; display:none; pointer-events:none;
+    background:#171922; border:1px solid #2a2e3d; border-radius:9px; padding:9px 11px;
+    box-shadow:0 10px 28px -10px rgba(0,0,0,.75); font-family:'Inter',system-ui,sans-serif; }
+  #kw-tip .kw-tip-title { font-family:'Rajdhani',system-ui,sans-serif; font-weight:700; font-size:14.5px; color:#e9edf4; line-height:1.2; }
+  #kw-tip .kw-tip-meta { font-size:11px; color:#7c8696; margin:2px 0 6px; }
+  #kw-tip .kw-tip-desc { font-size:12.5px; line-height:1.45; color:#c8cedb; white-space:pre-wrap; }
   .kw-role p { margin:0; font-size:12px; line-height:1.4; color:var(--kw-ink); }
   /* high-risk: viable-but-dangerous plays (engine `high_risk`) — amber, distinct from severity, shown at every tier */
   .kw-highrisk { margin-top:8px; padding:7px 9px; border-radius:7px; border:1px solid rgba(245,165,36,0.4); background:rgba(245,165,36,0.07); }
@@ -658,6 +675,8 @@ let SPELL_DESC = {};             // spell_id -> verbatim WoW description (sideca
 fetch('./spell-descriptions.json').then(r => r.ok ? r.json() : {}).then(m => { SPELL_DESC = m || {}; kwInjectBaseDamage(); if (dungeon) renderAnalysis(); }).catch(() => {});
 let CARD_EFFECTS = {};           // spell_id -> CURATED concise effect distillation (card-effects.json); the card's EFFECT line
 fetch('./card-effects.json').then(r => r.ok ? r.json() : {}).then(m => { CARD_EFFECTS = m || {}; if (dungeon) renderAnalysis(); }).catch(() => {});
+let CARD_ICONS = {};             // spell_id -> icon FileDataID (spell-icons.json); the card loads icons/<fdid>.png
+fetch('./spell-icons.json').then(r => r.ok ? r.json() : {}).then(m => { CARD_ICONS = m || {}; if (dungeon) renderAnalysis(); }).catch(() => {});
 
 // The resolved tooltip carries MEASURED (+0-de-scaled) damage as text ("Inflicts 27,175 Nature damage").
 // We have no structured damage field in the export yet, so the planner parses the biggest "N damage"
@@ -1655,6 +1674,31 @@ const CARDS_V2 = _params.get('cards') === '1';
 const V2_MECH = { snared: 'slow', rooted: 'root', stunned: 'stun', silenced: 'silence', disoriented: 'disorient', incapacitated: 'incapacitate', fleeing: 'fear', charmed: 'charm', banished: 'banish' };
 const V2_AXES = new Set(['freedom', 'dispel', 'soothe', 'kick', 'cc']);
 const V2_POS = { move_out: 'move out of it', spread: 'spread out', stack: 'stack up', soak: 'soak it', frontal: 'dodge the frontal', line_of_sight: 'break line of sight', bait: 'bait it away' };
+// the spell-icon box is tinted by the cast's PRIMARY resolution axis (null = neutral line color)
+const V2_RES_COLOR = { kick: '#27d3c0', cc: '#8b7ff0', dispel: '#5b9bd5', freedom: '#57c785', soothe: '#e8b400' };
+// spell_id -> dungeon spell record (school / cast_time / priority for the hover card); built lazily once loaded
+let _spellByIdCache = null;
+function spellRec(id) {
+  if (!_spellByIdCache && dungeon) { _spellByIdCache = new Map(); for (const c of dungeon.creatures || []) for (const s of c.spells || []) _spellByIdCache.set(s.spell_id, s); }
+  return _spellByIdCache ? _spellByIdCache.get(id) : undefined;
+}
+// the floating spell tooltip — one element on <body>, filled + positioned from a hovered icon's data-* (so it
+// escapes the analysis panel's overflow). Content: name + "school · cast · priority" + the resolved description.
+const _kwTip = document.createElement('div'); _kwTip.id = 'kw-tip';
+_kwTip.innerHTML = '<div class="kw-tip-title"></div><div class="kw-tip-meta"></div><div class="kw-tip-desc"></div>';
+document.body.appendChild(_kwTip);
+function _kwTipShow(el) {
+  _kwTip.querySelector('.kw-tip-title').textContent = el.dataset.tn || '';
+  _kwTip.querySelector('.kw-tip-meta').textContent = el.dataset.tm || '';
+  const dd = _kwTip.querySelector('.kw-tip-desc'); const d = el.dataset.td || ''; dd.textContent = d; dd.style.display = d ? '' : 'none';
+  _kwTip.style.display = 'block';
+  const r = el.getBoundingClientRect(), tw = _kwTip.offsetWidth, th = _kwTip.offsetHeight;
+  let x = r.right + 8; if (x + tw > innerWidth - 6) x = r.left - tw - 8; if (x < 6) x = 6;
+  let y = r.top; if (y + th > innerHeight - 6) y = innerHeight - th - 6; if (y < 6) y = 6;
+  _kwTip.style.left = x + 'px'; _kwTip.style.top = y + 'px';
+}
+document.addEventListener('mouseover', (e) => { const ic = e.target.closest && e.target.closest('.kw-spicon'); if (ic) _kwTipShow(ic); });
+document.addEventListener('mouseout', (e) => { const ic = e.target.closest && e.target.closest('.kw-spicon'); if (ic && !ic.contains(e.relatedTarget)) _kwTip.style.display = 'none'; });
 // player-facing terminology: most players call a movement slow a "slow", and "snare" gets confused with
 // "root" — so present "slow" everywhere and keep the precise term in a single "Slow = Snare" hover.
 function slowify(s) {
@@ -1722,15 +1766,30 @@ function renderCardV2(card, id, open) {
   // a block axis label (KICK / FREEDOM …) above its per-role rows — the EXPECT label look, as a divider
   const axHead = (label) => `<div style="${mut};text-transform:uppercase;font-size:10px;letter-spacing:.06em;margin:10px 0 3px">${esc(label)}</div>`;
   let body = '';
-  // EFFECT = the CURATED concise distillation (card-effects.json) when present — ' · ' splits into one line
-  // per segment (primary, then secondaries). Falls back to the auto thin-token line for uncurated casts.
+  // ---- EFFECT BLOCK: spell icon (left; box tinted by the resolution, hover = full description) + the
+  // Damage/Effect rows (right). The curated card-effects.json line splits on ' · ' — 1st segment = Damage,
+  // each remaining = an Effect row; an uncurated cast shows its thin-token line as a single Effect row.
+  const fdid = CARD_ICONS[card.spell_id];
+  const resColor = V2_RES_COLOR[primary] || 'var(--kw-line,#2a2e3d)';
+  // hover-card content rides on the icon's data-* (drawn by the floating #kw-tip): name · "school · cast · priority" · description
+  const rec = spellRec(card.spell_id);
+  const cms = rec ? rec.cast_time_ms : 0;
+  const meta = [rec && rec.school, cms > 0 ? `${cms % 1000 === 0 ? cms / 1000 : (cms / 1000).toFixed(1)}s cast` : (rec ? 'instant' : ''), rec && rec.priority].filter(Boolean).join(' · ');
+  const tipDesc = (SPELL_DESC[card.spell_id] || '').replace(/\r\n/g, '\n').replace(/\n{2,}/g, '\n').trim();
+  const iconBox = `<div class="kw-spicon" style="border-color:${resColor}" data-tn="${esc(card.spell_name)}" data-tm="${esc(meta)}" data-td="${esc(tipDesc)}">`
+    + `<span class="kw-spicon-fb">${esc((card.spell_name || '?').slice(0, 1))}</span>`
+    + (fdid ? `<img src="icons/${fdid}.png" alt="" onerror="this.remove()">` : '')
+    + `</div>`;
+  const dfRow = (label, txt) => `<div class="kw-df"><span class="kw-df-l">${label}</span><span class="kw-df-v">${slowTerm(slowify(esc(txt)))}</span></div>`;
   const curatedEffect = CARD_EFFECTS[card.spell_id];
+  let fxRows = '';
   if (curatedEffect) {
-    const lines = String(curatedEffect).split(' · ').map(s => s.trim()).filter(Boolean).map(s => slowTerm(slowify(esc(s)))).join('<br>');
-    body += section('effect', `<span style="color:var(--kw-ink,#e9edf4)">${lines}</span>`, effectLabelStyle);
+    const segs = String(curatedEffect).split(' · ').map(s => s.trim()).filter(Boolean);
+    fxRows = segs.map((s, i) => dfRow(i === 0 ? 'Damage' : 'Effect', s)).join('');
   } else if (expect) {
-    body += section('effect', `<span style="color:var(--kw-ink,#e9edf4)">${slowTerm(slowify(esc(expect)))}</span>`, effectLabelStyle);
+    fxRows = dfRow('Effect', expect);
   }
+  body += `<div class="kw-fx-row">${iconBox}<div class="kw-fx-lines">${fxRows}</div></div>`;
   // each ANSWER AXIS is its own labeled group of Tank/Healer/DPS rows (primary first, others by priority).
   // Freedom resolves the same way Kick does — every role sees its own tool, so both read identically.
   const present = new Set();
@@ -1743,7 +1802,7 @@ function renderCardV2(card, id, open) {
     for (const k of ['tank', 'healer', 'dps']) {
       const list = ans[k].filter(a => a.axis === axis); if (!list.length) continue;
       const r = KW_ROLE[k];
-      body += `<div class="kw-role ${r.cls}">${r.ic}<span class="kw-role-label">${k === 'healer' ? 'Heal' : r.label}</span><p>${list.map(ab).join(` <span style="${mut}">·</span> `)}</p></div>`;
+      body += `<div class="kw-role ${r.cls}" style="margin-left:9px">${r.ic}<span class="kw-role-label">${k === 'healer' ? 'Heal' : r.label}</span><p>${list.map(ab).join(` <span style="${mut}">·</span> `)}</p></div>`;
     }
   }
   if (everyone) body += section('everyone', esc(everyone));
