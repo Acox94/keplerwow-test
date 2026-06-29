@@ -47,29 +47,14 @@ var KeplerEngine = (() => {
     const types = condition?.creature_types;
     return !types || types.length === 0 || types.includes(creature_type);
   }
-  var CC_STOP_RANK = {
-    stunned: 0,
-    silenced: 0,
-    frozen: 0,
-    // hard hold, keep DPSing
-    banished: 1,
-    // hard hold, but the target goes untargetable (Cyclone/Banish)
-    incapacitated: 2,
-    polymorphed: 2,
-    asleep: 2,
-    sapped: 2,
-    shackled: 2,
-    disoriented: 2,
-    charmed: 2,
-    // break on damage
-    fleeing: 3,
-    horrified: 3,
-    turned: 3
-    // break on damage AND scatter the pack (misplay risk)
-  };
-  var ccStopRank = (mechanic) => CC_STOP_RANK[mechanic] ?? 2;
+  var HARD_STOP_MECHANICS = /* @__PURE__ */ new Set(["stunned", "silenced", "banished"]);
   function bestStoppingCc(s, creature_type) {
-    return s.control.filter((c) => c.kind === "cc" && c.mechanic !== null && STOPPING_MECHANICS.has(c.mechanic) && creatureTypeAllowed(c.condition, creature_type)).sort((a, b) => ccStopRank(a.mechanic) - ccStopRank(b.mechanic) || Number(b.is_aoe) - Number(a.is_aoe))[0] ?? null;
+    return s.control.filter((c) => c.kind === "cc" && c.mechanic !== null && HARD_STOP_MECHANICS.has(c.mechanic) && creatureTypeAllowed(c.condition, creature_type)).sort((a, b) => (a.cast_time_ms === 0 ? 0 : 1) - (b.cast_time_ms === 0 ? 0 : 1) || Number(b.is_aoe) - Number(a.is_aoe))[0] ?? null;
+  }
+  var SELF_MOBILITY_DISRUPTIVE = /* @__PURE__ */ new Set([781, 198793, 152175]);
+  var GRIP_DISRUPTIVE = /* @__PURE__ */ new Set([49576, 108199]);
+  function bestDisplacer(s, creature_type) {
+    return s.disruptive.filter((d) => !SELF_MOBILITY_DISRUPTIVE.has(d.spell_id) && creatureTypeAllowed(d.condition, creature_type)).sort((a, b) => (a.cast_time_ms === 0 ? 0 : 1) - (b.cast_time_ms === 0 ? 0 : 1))[0] ?? null;
   }
   var MOVEMENT_IMPAIR_MECHANICS = /* @__PURE__ */ new Set(["rooted", "snared"]);
   var CASTER_ROLES = /* @__PURE__ */ new Set(["healer", "ranged_dps"]);
@@ -408,6 +393,7 @@ var KeplerEngine = (() => {
     for (const s of group) {
       const spec = toResolvedSpec(s);
       for (const d of s.disruptive) {
+        if (GRIP_DISRUPTIVE.has(d.spell_id)) continue;
         scatter_abilities.push({ spec, spell_id: d.spell_id, spell_name: d.name, note: d.note });
       }
       for (const c of s.control) {
@@ -2302,7 +2288,7 @@ var KeplerEngine = (() => {
   var CARD_REMOVABLE = /* @__PURE__ */ new Set(["Magic", "Curse", "Disease", "Poison", "Bleed"]);
   var CARD_EFFECT_MECHANICS = /* @__PURE__ */ new Set(["snared", "rooted", "stunned", "silenced", "disoriented", "incapacitated", "fleeing", "charmed", "banished"]);
   var CARD_POS_TECHS = /* @__PURE__ */ new Set(["move_out", "frontal", "line_of_sight", "spread", "stack", "soak", "bait"]);
-  var CARD_AXIS_PRIORITY = ["kick", "cc", "dispel", "freedom", "soothe"];
+  var CARD_AXIS_PRIORITY = ["kick", "cc", "displace", "dispel", "freedom", "soothe"];
   function cardAnswersFor(cast, group) {
     const out = { tank: [], healer: [], dps: [] };
     const add = (role, axis, ability, cls, scope, note) => {
@@ -2313,6 +2299,7 @@ var KeplerEngine = (() => {
     const isSoothe = cast.dispel_type === "Enrage";
     const isKick = cast.is_interruptible;
     const isCC = cast.is_stoppable;
+    const isDisplace = isCC && !isKick && !cast.is_boss;
     for (const s of group) {
       const role = coarseRole(s.party_role);
       if (isFreedom) {
@@ -2329,6 +2316,10 @@ var KeplerEngine = (() => {
       if (isCC) {
         const cc = bestStoppingCc(s, cast.creature_type);
         if (cc) add(role, "cc", cc.name, s.class, "enemy", cc.note);
+      }
+      if (isDisplace) {
+        const d = bestDisplacer(s, cast.creature_type);
+        if (d) add(role, "displace", d.name, s.class, "enemy", d.note);
       }
     }
     for (const role of ROLE_TAGS) {
@@ -2359,6 +2350,7 @@ var KeplerEngine = (() => {
     const present = /* @__PURE__ */ new Set();
     for (const role of ROLE_TAGS) for (const a of answers[role]) present.add(a.axis);
     if (cast.primary_answer) return present.has(cast.primary_answer) ? cast.primary_answer : null;
+    if (present.has("soothe")) return "soothe";
     for (const ax of CARD_AXIS_PRIORITY) if (present.has(ax)) return ax;
     return null;
   }

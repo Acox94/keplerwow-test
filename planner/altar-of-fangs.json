@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68301,
-    "extracted_at": "2026-06-29T01:53:41.061Z",
+    "extracted_at": "2026-06-29T07:24:41.254Z",
     "patch_version": "12.1.0",
     "source_versions": {
       "curated": {
@@ -718,7 +718,7 @@
           "completion_effect": null,
           "description": "The Twinfang spits numbing venom at players, inflicting $1307269s1 Nature damage on impact and an additional $1294569s2 Nature damage every $1294569t2 sec for $1294569d.\r\n\r\nAffected players become paralyzed over time, reducing their movement speed by $1294569s1% with each tick. ",
           "dispel_detonates": false,
-          "dispel_type": "None",
+          "dispel_type": "Magic",
           "displacement": [],
           "dot": true,
           "duration_ms": null,
@@ -4799,7 +4799,28 @@
         }
       ],
       "default_pet": null,
-      "disruptive": [],
+      "disruptive": [
+        {
+          "cast_time_ms": 0,
+          "condition": null,
+          "confidence": "editorial",
+          "name": "Death Grip",
+          "note": "Pulls the caster to you — interrupts its cast (stacks, does not scatter).",
+          "source": "baseline",
+          "spell_id": 49576,
+          "verified": true
+        },
+        {
+          "cast_time_ms": 0,
+          "condition": null,
+          "confidence": "editorial",
+          "name": "Gorefiend's Grasp",
+          "note": "Pulls enemies to a target — interrupts their casts (AoE).",
+          "source": "talent",
+          "spell_id": 108199,
+          "verified": true
+        }
+      ],
       "externals": [
         {
           "cast_time_ms": 0,
@@ -4971,7 +4992,28 @@
         }
       ],
       "default_pet": null,
-      "disruptive": [],
+      "disruptive": [
+        {
+          "cast_time_ms": 0,
+          "condition": null,
+          "confidence": "editorial",
+          "name": "Death Grip",
+          "note": "Pulls the caster to you — interrupts its cast (stacks, does not scatter).",
+          "source": "baseline",
+          "spell_id": 49576,
+          "verified": true
+        },
+        {
+          "cast_time_ms": 0,
+          "condition": null,
+          "confidence": "editorial",
+          "name": "Gorefiend's Grasp",
+          "note": "Pulls enemies to a target — interrupts their casts (AoE).",
+          "source": "talent",
+          "spell_id": 108199,
+          "verified": true
+        }
+      ],
       "externals": [
         {
           "cast_time_ms": 0,
@@ -5183,7 +5225,28 @@
         }
       ],
       "default_pet": null,
-      "disruptive": [],
+      "disruptive": [
+        {
+          "cast_time_ms": 0,
+          "condition": null,
+          "confidence": "editorial",
+          "name": "Death Grip",
+          "note": "Pulls the caster to you — interrupts its cast (stacks, does not scatter).",
+          "source": "baseline",
+          "spell_id": 49576,
+          "verified": true
+        },
+        {
+          "cast_time_ms": 0,
+          "condition": null,
+          "confidence": "editorial",
+          "name": "Gorefiend's Grasp",
+          "note": "Pulls enemies to a target — interrupts their casts (AoE).",
+          "source": "talent",
+          "spell_id": 108199,
+          "verified": true
+        }
+      ],
       "externals": [
         {
           "cast_time_ms": 0,
@@ -9719,6 +9782,16 @@
           "source": "baseline",
           "spell_id": 368970,
           "verified": true
+        },
+        {
+          "cast_time_ms": 0,
+          "condition": null,
+          "confidence": "editorial",
+          "name": "Wing Buffet",
+          "note": "Knocks enemies away — unstacks the pull (AoE/cleave DPS loss).",
+          "source": "baseline",
+          "spell_id": 357214,
+          "verified": true
         }
       ],
       "externals": [
@@ -9891,6 +9964,16 @@
           "note": "Knocks enemies away — unstacks the pull (AoE/cleave DPS loss).",
           "source": "baseline",
           "spell_id": 368970,
+          "verified": true
+        },
+        {
+          "cast_time_ms": 0,
+          "condition": null,
+          "confidence": "editorial",
+          "name": "Wing Buffet",
+          "note": "Knocks enemies away — unstacks the pull (AoE/cleave DPS loss).",
+          "source": "baseline",
+          "spell_id": 357214,
           "verified": true
         }
       ],
@@ -10135,6 +10218,16 @@
           "note": "Knocks enemies away — unstacks the pull (AoE/cleave DPS loss).",
           "source": "baseline",
           "spell_id": 368970,
+          "verified": true
+        },
+        {
+          "cast_time_ms": 0,
+          "condition": null,
+          "confidence": "editorial",
+          "name": "Wing Buffet",
+          "note": "Knocks enemies away — unstacks the pull (AoE/cleave DPS loss).",
+          "source": "baseline",
+          "spell_id": 357214,
           "verified": true
         }
       ],
