@@ -1779,8 +1779,14 @@ function renderCardV2(card, id, open) {
     const tip = slowify([display !== a.ability ? a.ability : '', a.note || ''].filter(Boolean).join(' — '));
     return `<u class="kw-ab"${col ? ` style="color:${col}"` : ''}${tip ? ` title="${esc(tip)}"` : ''}>${esc(slowify(display))}</u>` + (a.scope === 'party' ? ` <span style="${mut}">(party)</span>` : '');
   };
-  // the highest-tier resolution (primary) is shown in the header; drop it from the chips so it's not doubled
-  const chips = tags.filter(t => t !== primary).map(t => `<span class="kw-tag ${V2_AXES.has(t) ? 'kw-tag--res' : 'kw-tag--fx'}${V2_BLUE_TAGS.has(t) ? ' kw-tag--blue' : ''}">${esc(t)}</span>`).join('');
+  // the highest-tier resolution (primary) is shown in the header; drop it from the chips so it's not doubled.
+  // each answer-axis chip takes ITS resolution colour (V2_RES_COLOR) — matching the headline, fixed regardless
+  // of the card's severity; effect chips (dot/aoe) keep their own treatment (dot = the shared #0796ff).
+  const chips = tags.filter(t => t !== primary).map(t => {
+    const rc = V2_RES_COLOR[t];
+    if (rc) return `<span class="kw-tag" style="color:${rc};border-color:color-mix(in srgb, ${rc} 38%, var(--kw-line));background:color-mix(in srgb, ${rc} 13%, transparent)">${esc(t)}</span>`;
+    return `<span class="kw-tag kw-tag--fx${V2_BLUE_TAGS.has(t) ? ' kw-tag--blue' : ''}">${esc(t)}</span>`;
+  }).join('');
   // a labeled line in the EXPECT style — same look, different job (expect = what / freedom = how)
   const labelStyle = `${mut};text-transform:uppercase;font-size:10px;letter-spacing:.06em;margin-right:7px`;
   // EFFECT (the "what") carries more weight than the muted answer labels (KICK / FREEDOM), so it stands out
