@@ -1,0 +1,1395 @@
+{
+  "_note": "DB2-DERIVED talent picker source (gen-talent-choices). spec_id → card-relevant talent controls: a CHOICE (TraitNode Type==2, pick one — default options[0]) renders as a dropdown; a TOGGLE (independent talent, default ON) renders as a checkbox. Baseline/pet abilities are never here. Re-run after promote:specs.",
+  "_build": "12.1.0.68301",
+  "specs": {
+    "62": {
+      "class": "Mage",
+      "spec_name": "Arcane",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 101883,
+          "options": [
+            {
+              "spell_id": 31661,
+              "name": "Dragon's Breath"
+            },
+            {
+              "spell_id": 157980,
+              "name": "Supernova"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 110959,
+          "name": "Greater Invisibility"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 45438,
+          "name": "Ice Block"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 157997,
+          "name": "Ice Nova"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 383121,
+          "name": "Mass Polymorph"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 475,
+          "name": "Remove Curse"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 212653,
+          "name": "Shimmer"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 30449,
+          "name": "Spellsteal"
+        }
+      ]
+    },
+    "63": {
+      "class": "Mage",
+      "spec_name": "Fire",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 101883,
+          "options": [
+            {
+              "spell_id": 31661,
+              "name": "Dragon's Breath"
+            },
+            {
+              "spell_id": 157980,
+              "name": "Supernova"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 86949,
+          "name": "Cauterize"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 110959,
+          "name": "Greater Invisibility"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 45438,
+          "name": "Ice Block"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 157997,
+          "name": "Ice Nova"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 383121,
+          "name": "Mass Polymorph"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 475,
+          "name": "Remove Curse"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 212653,
+          "name": "Shimmer"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 30449,
+          "name": "Spellsteal"
+        }
+      ]
+    },
+    "64": {
+      "class": "Mage",
+      "spec_name": "Frost",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 101883,
+          "options": [
+            {
+              "spell_id": 31661,
+              "name": "Dragon's Breath"
+            },
+            {
+              "spell_id": 157980,
+              "name": "Supernova"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 110959,
+          "name": "Greater Invisibility"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 45438,
+          "name": "Ice Block"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 157997,
+          "name": "Ice Nova"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 383121,
+          "name": "Mass Polymorph"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 475,
+          "name": "Remove Curse"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 212653,
+          "name": "Shimmer"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 30449,
+          "name": "Spellsteal"
+        }
+      ]
+    },
+    "65": {
+      "class": "Paladin",
+      "spec_name": "Holy",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 4987,
+          "name": "Cleanse"
+        }
+      ]
+    },
+    "66": {
+      "class": "Paladin",
+      "spec_name": "Protection",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 31935,
+          "name": "Avenger's Shield"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 204018,
+          "name": "Blessing of Spellwarding"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 213644,
+          "name": "Cleanse Toxins"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 96231,
+          "name": "Rebuke"
+        }
+      ]
+    },
+    "70": {
+      "class": "Paladin",
+      "spec_name": "Retribution",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 213644,
+          "name": "Cleanse Toxins"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 96231,
+          "name": "Rebuke"
+        }
+      ]
+    },
+    "71": {
+      "class": "Warrior",
+      "spec_name": "Arms",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 118038,
+          "name": "Die by the Sword"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 5246,
+          "name": "Intimidating Shout"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 46968,
+          "name": "Shockwave"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 23920,
+          "name": "Spell Reflection"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 107570,
+          "name": "Storm Bolt"
+        }
+      ]
+    },
+    "72": {
+      "class": "Warrior",
+      "spec_name": "Fury",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 5246,
+          "name": "Intimidating Shout"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 46968,
+          "name": "Shockwave"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 23920,
+          "name": "Spell Reflection"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 107570,
+          "name": "Storm Bolt"
+        }
+      ]
+    },
+    "73": {
+      "class": "Warrior",
+      "spec_name": "Protection",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 386071,
+          "name": "Disrupting Shout"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 5246,
+          "name": "Intimidating Shout"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 871,
+          "name": "Shield Wall"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 46968,
+          "name": "Shockwave"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 107570,
+          "name": "Storm Bolt"
+        }
+      ]
+    },
+    "102": {
+      "class": "Druid",
+      "spec_name": "Balance",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 82237,
+          "options": [
+            {
+              "spell_id": 99,
+              "name": "Incapacitating Roar"
+            },
+            {
+              "spell_id": 5211,
+              "name": "Mighty Bash"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 82229,
+          "options": [
+            {
+              "spell_id": 2908,
+              "name": "Soothe"
+            },
+            {
+              "spell_id": 33786,
+              "name": "Cyclone"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 2637,
+          "name": "Hibernate"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 102359,
+          "name": "Mass Entanglement"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 2782,
+          "name": "Remove Corruption"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 78675,
+          "name": "Solar Beam"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 132469,
+          "name": "Typhoon"
+        }
+      ]
+    },
+    "103": {
+      "class": "Druid",
+      "spec_name": "Feral",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 82237,
+          "options": [
+            {
+              "spell_id": 99,
+              "name": "Incapacitating Roar"
+            },
+            {
+              "spell_id": 5211,
+              "name": "Mighty Bash"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 82229,
+          "options": [
+            {
+              "spell_id": 2908,
+              "name": "Soothe"
+            },
+            {
+              "spell_id": 33786,
+              "name": "Cyclone"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 2637,
+          "name": "Hibernate"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 102359,
+          "name": "Mass Entanglement"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 2782,
+          "name": "Remove Corruption"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 106839,
+          "name": "Skull Bash"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 132469,
+          "name": "Typhoon"
+        }
+      ]
+    },
+    "104": {
+      "class": "Druid",
+      "spec_name": "Guardian",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 82237,
+          "options": [
+            {
+              "spell_id": 99,
+              "name": "Incapacitating Roar"
+            },
+            {
+              "spell_id": 5211,
+              "name": "Mighty Bash"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 82229,
+          "options": [
+            {
+              "spell_id": 2908,
+              "name": "Soothe"
+            },
+            {
+              "spell_id": 33786,
+              "name": "Cyclone"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 2637,
+          "name": "Hibernate"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 102359,
+          "name": "Mass Entanglement"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 2782,
+          "name": "Remove Corruption"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 106839,
+          "name": "Skull Bash"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 61336,
+          "name": "Survival Instincts"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 132469,
+          "name": "Typhoon"
+        }
+      ]
+    },
+    "105": {
+      "class": "Druid",
+      "spec_name": "Restoration",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 82237,
+          "options": [
+            {
+              "spell_id": 99,
+              "name": "Incapacitating Roar"
+            },
+            {
+              "spell_id": 5211,
+              "name": "Mighty Bash"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 82229,
+          "options": [
+            {
+              "spell_id": 2908,
+              "name": "Soothe"
+            },
+            {
+              "spell_id": 33786,
+              "name": "Cyclone"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 2637,
+          "name": "Hibernate"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 102342,
+          "name": "Ironbark"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 102359,
+          "name": "Mass Entanglement"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 132469,
+          "name": "Typhoon"
+        }
+      ]
+    },
+    "250": {
+      "class": "Death Knight",
+      "spec_name": "Blood",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 221562,
+          "name": "Asphyxiate"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 207167,
+          "name": "Blinding Sleet"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 111673,
+          "name": "Control Undead"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 108199,
+          "name": "Gorefiend's Grasp"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 47528,
+          "name": "Mind Freeze"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 114556,
+          "name": "Purgatory"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 212552,
+          "name": "Wraith Walk"
+        }
+      ]
+    },
+    "251": {
+      "class": "Death Knight",
+      "spec_name": "Frost",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 221562,
+          "name": "Asphyxiate"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 207167,
+          "name": "Blinding Sleet"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 111673,
+          "name": "Control Undead"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 108199,
+          "name": "Gorefiend's Grasp"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 47528,
+          "name": "Mind Freeze"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 212552,
+          "name": "Wraith Walk"
+        }
+      ]
+    },
+    "252": {
+      "class": "Death Knight",
+      "spec_name": "Unholy",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 221562,
+          "name": "Asphyxiate"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 207167,
+          "name": "Blinding Sleet"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 111673,
+          "name": "Control Undead"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 108199,
+          "name": "Gorefiend's Grasp"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 47528,
+          "name": "Mind Freeze"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 212552,
+          "name": "Wraith Walk"
+        }
+      ]
+    },
+    "253": {
+      "class": "Hunter",
+      "spec_name": "Beast Mastery",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 147362,
+          "name": "Counter Shot"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 1513,
+          "name": "Scare Beast"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 19801,
+          "name": "Tranquilizing Shot"
+        }
+      ]
+    },
+    "254": {
+      "class": "Hunter",
+      "spec_name": "Marksmanship",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 147362,
+          "name": "Counter Shot"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 1513,
+          "name": "Scare Beast"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 19801,
+          "name": "Tranquilizing Shot"
+        }
+      ]
+    },
+    "255": {
+      "class": "Hunter",
+      "spec_name": "Survival",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 187707,
+          "name": "Muzzle"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 1513,
+          "name": "Scare Beast"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 19801,
+          "name": "Tranquilizing Shot"
+        }
+      ]
+    },
+    "256": {
+      "class": "Priest",
+      "spec_name": "Discipline",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 82710,
+          "options": [
+            {
+              "spell_id": 605,
+              "name": "Mind Control"
+            },
+            {
+              "spell_id": 205364,
+              "name": "Dominate Mind"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 528,
+          "name": "Dispel Magic"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 33206,
+          "name": "Pain Suppression"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 527,
+          "name": "Purify"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 9484,
+          "name": "Shackle Horror"
+        }
+      ]
+    },
+    "257": {
+      "class": "Priest",
+      "spec_name": "Holy",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 82710,
+          "options": [
+            {
+              "spell_id": 605,
+              "name": "Mind Control"
+            },
+            {
+              "spell_id": 205364,
+              "name": "Dominate Mind"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 528,
+          "name": "Dispel Magic"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 47788,
+          "name": "Guardian Spirit"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 527,
+          "name": "Purify"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 9484,
+          "name": "Shackle Horror"
+        }
+      ]
+    },
+    "258": {
+      "class": "Priest",
+      "spec_name": "Shadow",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 82710,
+          "options": [
+            {
+              "spell_id": 605,
+              "name": "Mind Control"
+            },
+            {
+              "spell_id": 205364,
+              "name": "Dominate Mind"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 528,
+          "name": "Dispel Magic"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 213634,
+          "name": "Purify Disease"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 9484,
+          "name": "Shackle Horror"
+        }
+      ]
+    },
+    "259": {
+      "class": "Rogue",
+      "spec_name": "Assassination",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 31230,
+          "name": "Cheat Death"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 1776,
+          "name": "Gouge"
+        }
+      ]
+    },
+    "260": {
+      "class": "Rogue",
+      "spec_name": "Outlaw",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 31230,
+          "name": "Cheat Death"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 1776,
+          "name": "Gouge"
+        }
+      ]
+    },
+    "261": {
+      "class": "Rogue",
+      "spec_name": "Subtlety",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 31230,
+          "name": "Cheat Death"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 1776,
+          "name": "Gouge"
+        }
+      ]
+    },
+    "262": {
+      "class": "Shaman",
+      "spec_name": "Elemental",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 102917,
+          "options": [
+            {
+              "spell_id": 370,
+              "name": "Purge"
+            },
+            {
+              "spell_id": 378773,
+              "name": "Greater Purge"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 108271,
+          "name": "Astral Shift"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 192058,
+          "name": "Capacitor Totem"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 51886,
+          "name": "Cleanse Spirit"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 51514,
+          "name": "Hex"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 58875,
+          "name": "Spirit Walk"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 192077,
+          "name": "Wind Rush Totem (Jet Stream)"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 57994,
+          "name": "Wind Shear"
+        }
+      ]
+    },
+    "263": {
+      "class": "Shaman",
+      "spec_name": "Enhancement",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 102917,
+          "options": [
+            {
+              "spell_id": 370,
+              "name": "Purge"
+            },
+            {
+              "spell_id": 378773,
+              "name": "Greater Purge"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 108271,
+          "name": "Astral Shift"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 192058,
+          "name": "Capacitor Totem"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 51886,
+          "name": "Cleanse Spirit"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 51514,
+          "name": "Hex"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 58875,
+          "name": "Spirit Walk"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 192077,
+          "name": "Wind Rush Totem (Jet Stream)"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 57994,
+          "name": "Wind Shear"
+        }
+      ]
+    },
+    "264": {
+      "class": "Shaman",
+      "spec_name": "Restoration",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 102917,
+          "options": [
+            {
+              "spell_id": 370,
+              "name": "Purge"
+            },
+            {
+              "spell_id": 378773,
+              "name": "Greater Purge"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 108271,
+          "name": "Astral Shift"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 192058,
+          "name": "Capacitor Totem"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 51514,
+          "name": "Hex"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 77130,
+          "name": "Purify Spirit"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 58875,
+          "name": "Spirit Walk"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 192077,
+          "name": "Wind Rush Totem (Jet Stream)"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 57994,
+          "name": "Wind Shear"
+        }
+      ]
+    },
+    "265": {
+      "class": "Warlock",
+      "spec_name": "Affliction",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 71947,
+          "options": [
+            {
+              "spell_id": 5484,
+              "name": "Howl of Terror"
+            },
+            {
+              "spell_id": 30283,
+              "name": "Shadowfury"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 710,
+          "name": "Banish"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 48020,
+          "name": "Demonic Circle: Teleport"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 6789,
+          "name": "Mortal Coil"
+        }
+      ]
+    },
+    "266": {
+      "class": "Warlock",
+      "spec_name": "Demonology",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 71947,
+          "options": [
+            {
+              "spell_id": 5484,
+              "name": "Howl of Terror"
+            },
+            {
+              "spell_id": 30283,
+              "name": "Shadowfury"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 710,
+          "name": "Banish"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 48020,
+          "name": "Demonic Circle: Teleport"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 6789,
+          "name": "Mortal Coil"
+        }
+      ]
+    },
+    "267": {
+      "class": "Warlock",
+      "spec_name": "Destruction",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 71947,
+          "options": [
+            {
+              "spell_id": 5484,
+              "name": "Howl of Terror"
+            },
+            {
+              "spell_id": 30283,
+              "name": "Shadowfury"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 710,
+          "name": "Banish"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 48020,
+          "name": "Demonic Circle: Teleport"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 6789,
+          "name": "Mortal Coil"
+        }
+      ]
+    },
+    "268": {
+      "class": "Monk",
+      "spec_name": "Brewmaster",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 218164,
+          "name": "Detox"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 116705,
+          "name": "Spear Hand Strike"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 116841,
+          "name": "Tiger's Lust"
+        }
+      ]
+    },
+    "269": {
+      "class": "Monk",
+      "spec_name": "Windwalker",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 218164,
+          "name": "Detox"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 116705,
+          "name": "Spear Hand Strike"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 116841,
+          "name": "Tiger's Lust"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 152175,
+          "name": "Whirling Dragon Punch"
+        }
+      ]
+    },
+    "270": {
+      "class": "Monk",
+      "spec_name": "Mistweaver",
+      "controls": [
+        {
+          "type": "choice",
+          "node": 80574,
+          "options": [
+            {
+              "spell_id": 115310,
+              "name": "Revival"
+            },
+            {
+              "spell_id": 388615,
+              "name": "Restoral"
+            }
+          ]
+        },
+        {
+          "type": "toggle",
+          "spell_id": 115450,
+          "name": "Detox"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 116849,
+          "name": "Life Cocoon"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 116841,
+          "name": "Tiger's Lust"
+        }
+      ]
+    },
+    "577": {
+      "class": "Demon Hunter",
+      "spec_name": "Havoc",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 179057,
+          "name": "Chaos Nova"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 278326,
+          "name": "Consume Magic"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 217832,
+          "name": "Imprison"
+        }
+      ]
+    },
+    "581": {
+      "class": "Demon Hunter",
+      "spec_name": "Vengeance",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 179057,
+          "name": "Chaos Nova"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 278326,
+          "name": "Consume Magic"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 204021,
+          "name": "Fiery Brand"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 217832,
+          "name": "Imprison"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 202137,
+          "name": "Sigil of Silence"
+        }
+      ]
+    },
+    "1467": {
+      "class": "Evoker",
+      "spec_name": "Devastation",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 374251,
+          "name": "Cauterizing Flame"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 351338,
+          "name": "Quell"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 370665,
+          "name": "Rescue"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 360806,
+          "name": "Sleep Walk"
+        }
+      ]
+    },
+    "1468": {
+      "class": "Evoker",
+      "spec_name": "Preservation",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 374251,
+          "name": "Cauterizing Flame"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 370665,
+          "name": "Rescue"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 360806,
+          "name": "Sleep Walk"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 357170,
+          "name": "Time Dilation"
+        }
+      ]
+    },
+    "1473": {
+      "class": "Evoker",
+      "spec_name": "Augmentation",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 374251,
+          "name": "Cauterizing Flame"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 351338,
+          "name": "Quell"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 370665,
+          "name": "Rescue"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 360806,
+          "name": "Sleep Walk"
+        }
+      ]
+    },
+    "1480": {
+      "class": "Demon Hunter",
+      "spec_name": "Devourer",
+      "controls": [
+        {
+          "type": "toggle",
+          "spell_id": 278326,
+          "name": "Consume Magic"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 217832,
+          "name": "Imprison"
+        },
+        {
+          "type": "toggle",
+          "spell_id": 1234195,
+          "name": "Void Nova"
+        }
+      ]
+    }
+  }
+}

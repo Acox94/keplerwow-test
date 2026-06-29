@@ -47,9 +47,9 @@ var KeplerEngine = (() => {
     const types = condition?.creature_types;
     return !types || types.length === 0 || types.includes(creature_type);
   }
-  var HARD_STOP_MECHANICS = /* @__PURE__ */ new Set(["stunned", "silenced", "banished"]);
+  var STOP_ANSWER_MECHANICS = /* @__PURE__ */ new Set(["stunned", "silenced", "banished", "incapacitated"]);
   function bestStoppingCc(s, creature_type) {
-    return s.control.filter((c) => c.kind === "cc" && c.mechanic !== null && HARD_STOP_MECHANICS.has(c.mechanic) && creatureTypeAllowed(c.condition, creature_type)).sort((a, b) => (a.cast_time_ms === 0 ? 0 : 1) - (b.cast_time_ms === 0 ? 0 : 1) || Number(b.is_aoe) - Number(a.is_aoe))[0] ?? null;
+    return s.control.filter((c) => c.kind === "cc" && c.mechanic !== null && STOP_ANSWER_MECHANICS.has(c.mechanic) && creatureTypeAllowed(c.condition, creature_type)).sort((a, b) => (a.cast_time_ms === 0 ? 0 : 1) - (b.cast_time_ms === 0 ? 0 : 1) || Number(b.is_aoe) - Number(a.is_aoe))[0] ?? null;
   }
   var SELF_MOBILITY_DISRUPTIVE = /* @__PURE__ */ new Set([781, 198793, 152175]);
   var GRIP_DISRUPTIVE = /* @__PURE__ */ new Set([49576, 108199]);
@@ -142,10 +142,18 @@ var KeplerEngine = (() => {
       });
     }
     const groupSpecs = [];
+    const latentTalents = [];
     for (const id of group) {
       const s = specById.get(id);
       if (!s) throw new Error(`[engine] unknown spec_id ${id} (not in dungeon.specs)`);
-      groupSpecs.push(s);
+      const selected = opts.talents?.[id];
+      if (selected === void 0) {
+        groupSpecs.push(s);
+        continue;
+      }
+      const { effective, latent } = applyTalentSelection(s, new Set(selected));
+      groupSpecs.push(effective);
+      latentTalents.push(...latent);
     }
     const resolvedGroup = groupSpecs.map(toResolvedSpec);
     const threats = [];
@@ -231,6 +239,7 @@ var KeplerEngine = (() => {
     const dps_survival = analyzeDpsSurvival(threats, groupSpecs);
     const pet_choice = analyzePetChoice(groupSpecs, dispels, stops);
     const composition = analyzeComposition(groupSpecs);
+    const talentGap = analyzeTalentGap(latentTalents, { dispels, stops, answers, soothe, movement, tank_buster, composition });
     const allWarnings = buildWarnings({ dispels, stops, soothe, misplays, awareness, throughput, scaling, targeting, movement, cc_on_party, displacement, vulnerability, tank_buster, target_drop, dps_survival, pet_choice, composition, kick_timing, channel_timing, completion_effect, notes, threats }, groupSpecs);
     const warnedCasts = /* @__PURE__ */ new Set();
     for (const wn of allWarnings) for (const su of wn.subjects ?? []) warnedCasts.add(`${su.npc_name}\0${su.spell_name}`);
@@ -260,6 +269,7 @@ var KeplerEngine = (() => {
         });
       }
     }
+    for (const w of talentGap.warnings) allWarnings.push(w);
     const warnings = allWarnings.filter((wn) => !wn.coaching || skill !== "expert");
     const cards = buildCards(threats, warnings, groupSpecs, answers);
     return {
@@ -291,6 +301,7 @@ var KeplerEngine = (() => {
       channel_timing,
       completion_effect,
       notes,
+      talent_suggestions: talentGap.suggestions,
       boss_reference,
       cards,
       warnings
@@ -307,6 +318,150 @@ var KeplerEngine = (() => {
   }
   function toResolvedSpec(s) {
     return { spec_id: s.spec_id, class: s.class, spec_name: s.spec_name, role: s.role, party_role: s.party_role };
+  }
+  function applyTalentSelection(spec, selected) {
+    const keep = (a) => a.source !== "talent" || selected.has(a.spell_id);
+    const dropped = (a) => a.source === "talent" && !selected.has(a.spell_id);
+    const removals = spec.removals.filter(keep);
+    const control = spec.control.filter(keep);
+    const disruptive = spec.disruptive.filter(keep);
+    const movement_freedom = spec.movement_freedom.filter(keep);
+    const externals = spec.externals.filter(keep);
+    const target_drop = spec.target_drop.filter(keep);
+    const group_buffs = spec.group_buffs.filter(keep);
+    const battle_rez = spec.battle_rez.filter(keep);
+    const sootheAb = spec.soothe.abilities.filter(keep);
+    const purgeAb = spec.purge.abilities.filter(keep);
+    const soothe = { available: sootheAb.length > 0, abilities: sootheAb };
+    const purge = { available: purgeAb.length > 0, abilities: purgeAb };
+    const effective = {
+      ...spec,
+      removals,
+      soothe,
+      purge,
+      control,
+      disruptive,
+      movement_freedom,
+      externals,
+      target_drop,
+      group_buffs,
+      battle_rez,
+      rollups: {
+        removes_dispel_types: [...new Set(removals.map((r) => r.dispel_type))],
+        has_interrupt: control.some((c) => c.kind === "interrupt"),
+        stops_available: new Set(
+          control.filter((c) => c.kind === "interrupt" || c.kind === "cc" && c.mechanic !== null && STOPPING_MECHANICS.has(c.mechanic)).map((c) => c.spell_id)
+        ).size,
+        cc_types: [...new Set(control.filter((c) => c.kind === "cc" && c.mechanic).map((c) => c.mechanic))].sort(),
+        soothe: soothe.available,
+        purge: purge.available,
+        frees_movement: movement_freedom.length > 0,
+        has_external: externals.some((e) => e.target === "ally" && !e.passive),
+        has_target_drop: target_drop.length > 0,
+        has_cheat_death: externals.some((e) => e.passive && e.mechanism === "death_prevent"),
+        has_personal: externals.some((e) => e.target === "self" && !e.passive && (e.mechanism === "reduction" || e.mechanism === "immunity"))
+      }
+    };
+    const latent = [];
+    const dispelBySpell = /* @__PURE__ */ new Map();
+    for (const r of spec.removals) {
+      if (!dropped(r) || r.mechanism !== "dispel") continue;
+      const e = dispelBySpell.get(r.spell_id) ?? { name: r.name, types: [] };
+      e.types.push(r.dispel_type);
+      dispelBySpell.set(r.spell_id, e);
+    }
+    for (const [spell_id, e] of dispelBySpell) latent.push({ spec, spell_id, name: e.name, axis: "dispel", dispel_types: [...new Set(e.types)] });
+    for (const a of spec.soothe.abilities) if (dropped(a)) latent.push({ spec, spell_id: a.spell_id, name: a.name, axis: "soothe" });
+    const seenCtl = /* @__PURE__ */ new Set();
+    for (const c of spec.control) {
+      if (!dropped(c) || seenCtl.has(c.spell_id)) continue;
+      if (c.kind === "interrupt") {
+        latent.push({ spec, spell_id: c.spell_id, name: c.name, axis: "interrupt" });
+        seenCtl.add(c.spell_id);
+      } else if (c.kind === "cc" && c.mechanic !== null && STOPPING_MECHANICS.has(c.mechanic)) {
+        latent.push({ spec, spell_id: c.spell_id, name: c.name, axis: "cc" });
+        seenCtl.add(c.spell_id);
+      }
+    }
+    for (const m of spec.movement_freedom) if (dropped(m)) latent.push({ spec, spell_id: m.spell_id, name: m.name, axis: "freedom", ally: m.target === "ally" && !m.conditional });
+    for (const e of spec.externals) if (dropped(e) && e.target === "ally" && !e.passive) latent.push({ spec, spell_id: e.spell_id, name: e.name, axis: "external", ally: true });
+    for (const b of spec.group_buffs) if (dropped(b) && b.kind === "lust") latent.push({ spec, spell_id: b.spell_id, name: b.name, axis: "lust" });
+    for (const b of spec.battle_rez) if (dropped(b)) latent.push({ spec, spell_id: b.spell_id, name: b.name, axis: "battle_rez" });
+    return { effective, latent };
+  }
+  function threatSubjects(ts) {
+    return ts.map((t) => ({ spell_name: t.spell_name, npc_name: t.npc_name, count: t.count, is_boss: t.is_boss, is_boss_add: t.is_boss_add, summoned_by_name: t.summoned_by_name, secondary_of_name: t.secondary_of_name, target_roles: t.target_roles, cast_order: t.cast_order }));
+  }
+  function analyzeTalentGap(latent, rep) {
+    const suggestions = [];
+    const warnings = [];
+    const emit = (e, gap, casts, lethal) => {
+      const spec = toResolvedSpec(e.spec);
+      suggestions.push({ spec, spell_id: e.spell_id, ability: e.name, axis: e.axis, gap, lethal });
+      const subjects = casts.length ? threatSubjects(casts) : void 0;
+      const source = !casts.length ? "group" : casts.some((c) => c.is_boss || c.is_boss_add) ? "boss" : "trash";
+      warnings.push({
+        severity: lethal ? "warning" : "caution",
+        category: "talent_gap",
+        message: `Missing talent \u2014 ${e.spec.class} ${e.spec.spec_name} could spec ${e.name} to cover this pull's ${gap}; it isn't in the selected talents.`,
+        coaching: !lethal,
+        source,
+        roles: [coarseRole(e.spec.party_role)],
+        ...subjects ? { subjects } : {}
+      });
+    };
+    for (const e of latent) {
+      switch (e.axis) {
+        case "dispel": {
+          const openTypes = (e.dispel_types ?? []).filter((dt) => {
+            const d = rep.dispels.find((x) => x.dispel_type === dt);
+            return d && !d.covered && d.required > 0;
+          });
+          if (!openTypes.length) break;
+          const casts = openTypes.flatMap((dt) => rep.dispels.find((x) => x.dispel_type === dt).casts);
+          emit(e, `${openTypes.join("/")} dispel`, casts, casts.some((c) => c.is_lethal));
+          break;
+        }
+        case "soothe": {
+          if (rep.soothe.enrages.length > 0 && !rep.soothe.can_soothe)
+            emit(e, "Enrage soothe", rep.soothe.enrages, rep.soothe.enrages.some((c) => c.is_lethal));
+          break;
+        }
+        case "interrupt": {
+          if (rep.stops.must_kick_shortfall > 0)
+            emit(e, "interrupt coverage", rep.stops.must_kick, rep.stops.must_kick.some((c) => c.is_lethal));
+          break;
+        }
+        case "cc": {
+          if (rep.stops.cc_or_kick.length > 0 && rep.stops.cc_stop_supply === 0)
+            emit(e, "CC stop coverage", rep.stops.cc_or_kick, rep.stops.cc_or_kick.some((c) => c.is_lethal));
+          break;
+        }
+        case "freedom": {
+          if (!rep.movement.threats.length) break;
+          const uncovered = rep.movement.threats.filter((t) => !t.covered);
+          const relevant = e.ally ? !rep.movement.ally_free ? rep.movement.threats : [] : uncovered;
+          if (!relevant.length) break;
+          const casts = relevant.map((t) => t.cast);
+          emit(e, "snare/root clear (Freedom)", casts, relevant.some((t) => t.lethal_if_unfreed));
+          break;
+        }
+        case "external": {
+          const open = rep.tank_buster.threats.filter((t) => t.cast.is_lethal && t.ally_answers.length === 0);
+          if (open.length) emit(e, "tank-buster external", open.map((t) => t.cast), true);
+          break;
+        }
+        case "lust": {
+          if (!rep.composition.lust.covered) emit(e, "Lust", [], false);
+          break;
+        }
+        case "battle_rez": {
+          if (!rep.composition.battle_rez.covered) emit(e, "Battle rez", [], false);
+          break;
+        }
+      }
+    }
+    return { suggestions, warnings };
   }
   function analyzeDispels(threats, group) {
     const out = [];

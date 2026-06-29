@@ -229,6 +229,26 @@
   .comp-row label { width:52px; color:var(--muted); font-size:12px; }
   .comp-row select { flex:1; background:#0d1117; color:var(--ink); border:1px solid var(--line);
     border-radius:6px; padding:5px 6px; font:inherit; }
+  /* talent picker — choice nodes ("Bash OR Roar") render as a dropdown; independent talents as checkboxes */
+  #tab-comp #talent-wrap h1, #tab-comp #talent-wrap .sub { text-align:center; }
+  #talent-rows { max-width:270px; margin:6px auto 0; }
+  .talent-spec { margin:12px 0 2px; }
+  .talent-spec-head { font-family:var(--fd); font-weight:700; font-size:12px; letter-spacing:.04em; margin:0 0 5px; text-align:center; }
+  .talent-choice { display:flex; align-items:center; gap:7px; margin:5px 0; }
+  .talent-choice .talent-or { width:22px; font-size:9.5px; letter-spacing:.08em; color:var(--muted); text-transform:uppercase; text-align:right; flex:none; }
+  .talent-choice select { flex:1; background:#0d1117; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:4px 6px; font:inherit; font-size:12px; }
+  .talent-toggle { display:flex; align-items:center; gap:7px; margin:4px 0 4px 22px; font-size:12px; color:var(--ink); cursor:pointer; }
+  .talent-toggle input { accent-color:#33937F; width:14px; height:14px; flex:none; }
+  /* "Missing talents" callout in the Live Analysis pane (rendered from rep.talent_suggestions) */
+  .kw-tg { margin-top:12px; border-top:1px solid var(--line); padding-top:9px; }
+  .kw-tg-head { font-family:var(--fd); font-weight:700; font-size:12px; letter-spacing:.04em; margin-bottom:6px; }
+  .kw-tg-sub { color:var(--muted); font-weight:400; letter-spacing:0; }
+  .kw-tg-row { display:flex; align-items:center; gap:7px; padding:3px 0; font-size:12px; }
+  .kw-tg-dot { width:7px; height:7px; border-radius:50%; background:#6b7280; flex:none; }
+  .kw-tg-dot--lethal { background:#f0b429; }
+  .kw-tg-ability { font-weight:600; }
+  .kw-tg-gap { color:var(--muted); }
+  .kw-tg-who { margin-left:auto; color:var(--muted); font-size:11px; white-space:nowrap; }
   /* ============================================================
      Live Analysis cards — ported from the Alpha design pack (mechanic-card.css).
      Two-tier expand-on-demand card. Severity = card-scale (left edge bar + label);
@@ -466,6 +486,11 @@
         <h1 style="margin-top:4px">Comp builder</h1>
         <p class="sub">5 role slots → the engine's <code>group</code></p>
         <div id="comp-rows"></div>
+        <div id="talent-wrap" style="display:none">
+          <h1 style="margin-top:18px">Talent Selection</h1>
+          <p class="sub">pick what you took — the cards credit only these</p>
+          <div id="talent-rows"></div>
+        </div>
       </section>
 
       <section class="tabpanel" id="tab-route">
@@ -631,8 +656,11 @@ const markers = {};           // iid -> { marker, el, mob }
 // Comp is GLOBAL (same group everywhere); the route is per dungeon + FLOOR (each floor is its own
 // page with its own mobs/iids). iids are stable (baked in the mobs json), so a saved route re-binds.
 const COMP_KEY = 'kepler-planner:comp';
+const TALENT_KEY = 'kepler-planner:talents';   // GLOBAL too — your spec's build follows you across dungeons
 const ROUTE_KEY = `kepler-planner:route:${DKEY}:f${FLOOR.sublevel ?? 'all'}`;
 const saveComp = () => { try { localStorage.setItem(COMP_KEY, JSON.stringify(compSlots)); } catch {} };
+const saveTalents = () => { try { localStorage.setItem(TALENT_KEY, JSON.stringify(talentSel)); } catch {} };
+function restoreTalents() { try { const v = JSON.parse(localStorage.getItem(TALENT_KEY) || 'null'); if (v && typeof v === 'object') talentSel = Object.fromEntries(Object.entries(v).map(([k, a]) => [k, Array.isArray(a) ? a.map(Number) : []])); } catch {} }
 const saveRoute = () => { try { localStorage.setItem(ROUTE_KEY, JSON.stringify({ pulls: pulls.map(p => [...p.mobs]), active })); } catch {} };
 function restoreComp() { try { const v = JSON.parse(localStorage.getItem(COMP_KEY) || 'null'); if (Array.isArray(v) && v.length === compSlots.length) compSlots = v.map(x => x == null ? null : Number(x)); } catch {} }
 function restoreRoute() {   // rebuild saved pulls (dropping any iid not on this floor), else a fresh pull
@@ -697,6 +725,8 @@ let CARD_EFFECTS = {};           // spell_id -> CURATED concise effect distillat
 fetch('./card-effects.json').then(r => r.ok ? r.json() : {}).then(m => { CARD_EFFECTS = m || {}; if (dungeon) renderAnalysis(); }).catch(() => {});
 let CARD_ICONS = {};             // spell_id -> icon FileDataID (spell-icons.json); the card loads icons/<fdid>.png
 fetch('./spell-icons.json').then(r => r.ok ? r.json() : {}).then(m => { CARD_ICONS = m || {}; if (dungeon) renderAnalysis(); }).catch(() => {});
+let TALENT_CHOICES = {};         // spec_id -> { class, spec_name, controls[] } (talent-choices.json, DB2-derived) — the picker source
+fetch('./talent-choices.json').then(r => r.ok ? r.json() : {}).then(m => { TALENT_CHOICES = (m && m.specs) || {}; if (dungeon) { renderTalents(); renderAnalysis(); } }).catch(() => {});
 
 // The resolved tooltip carries MEASURED (+0-de-scaled) damage as text ("Inflicts 27,175 Nature damage").
 // We have no structured damage field in the export yet, so the planner parses the biggest "N damage"
@@ -990,7 +1020,7 @@ function renderFlagEditor(s, npc_id, host) {
 function kwFlagPreview(s, npc_id) {
   const host = _cd.querySelector('#cdPrev'); if (!host || !dungeon || !window.KeplerEngine) return;
   let rep;
-  try { rep = KeplerEngine.analyzePull(dungeon, [{ npc_id, count: 1 }], compSlots.filter((x) => x != null), { skill: 'experienced', priority_rate_ratio: KW_PRIORITY_RATE_RATIO, lethal_hp_threshold: KW_LETHAL_HP, key_level: KW_KEY_LEVEL }); }
+  try { rep = KeplerEngine.analyzePull(dungeon, [{ npc_id, count: 1 }], compSlots.filter((x) => x != null), { skill: 'experienced', priority_rate_ratio: KW_PRIORITY_RATE_RATIO, lethal_hp_threshold: KW_LETHAL_HP, key_level: KW_KEY_LEVEL, talents: buildTalentsArg() }); }
   catch (e) { host.innerHTML = `<p class="hint">engine error: ${esc(String(e && e.message || e))}</p>`; return; }
   const ws = rep.warnings.filter((w) => (w.subjects || []).some((su) => su.spell_name === s.name));
   host.innerHTML = ws.length
@@ -1391,6 +1421,7 @@ const escU = (s) => esc(s).replace(/__([^_]+)__/g, (_, n) => {
 });
 let dungeon = null;
 let compSlots = [null, null, null, null, null];
+let talentSel = {};   // spec_id -> [selected talent spell_ids]; absent spec = its default (all toggles on, choices = first option)
 const COMP_SLOTS = [
   { label:'Tank',   ok: s => s.party_role === 'tank' },
   { label:'Healer', ok: s => s.party_role === 'healer' },
@@ -1409,7 +1440,74 @@ function renderComp() {
       <select data-slot="${i}"><option value="">—</option>${opts.map(s => `<option value="${s.spec_id}"${s.spec_id===chosen?' selected':''}>${esc(s.class)} ${esc(s.spec_name)}</option>`).join('')}</select></div>`;
   }).join('');
   host.querySelectorAll('select').forEach(sel => sel.onchange = () => {
-    compSlots[Number(sel.dataset.slot)] = sel.value ? Number(sel.value) : null; saveComp(); renderAnalysis();
+    compSlots[Number(sel.dataset.slot)] = sel.value ? Number(sel.value) : null; saveComp(); renderTalents(); renderAnalysis();
+  });
+}
+
+// ---- talent picker: per-comp-spec controls (choice = dropdown, independent = checkbox) -----------
+// The DB2-derived talent-choices.json lists each spec's CARD-RELEVANT talents. Knowing what the player
+// took lets the engine credit only those tools (recommend Roar vs Bash) AND flag a talent they're MISSING
+// for the dungeon (talent_suggestions). DEFAULT = all toggles on + each choice's first option, so a fresh
+// comp behaves like before (no false "nobody can interrupt" alarms) and the player refines from there.
+function defaultTalentSel(t) {
+  const def = [];
+  for (const c of t.controls || []) {
+    if (c.type === 'choice') { if (c.options && c.options[0]) def.push(c.options[0].spell_id); }
+    else def.push(c.spell_id);
+  }
+  return def;
+}
+function ensureTalentSel(id, t) { if (!talentSel[id]) talentSel[id] = defaultTalentSel(t); }
+// the engine `talents` arg: { spec_id -> [selected spell_ids] } for each distinct comp spec that has
+// talent controls. undefined when the sidecar hasn't loaded (engine then keeps all talents = old behavior).
+function buildTalentsArg() {
+  if (!TALENT_CHOICES || !Object.keys(TALENT_CHOICES).length) return undefined;
+  const out = {}; const seen = new Set();
+  for (const id of compSlots) {
+    if (id == null || seen.has(id)) continue; seen.add(id);
+    const t = TALENT_CHOICES[String(id)];
+    if (!t || !(t.controls || []).length) continue;
+    ensureTalentSel(id, t); out[id] = talentSel[id] || [];
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+function renderTalents() {
+  const wrap = document.getElementById('talent-wrap'), host = document.getElementById('talent-rows');
+  if (!wrap || !host) return;
+  const seen = new Set(); const groups = [];
+  for (const id of compSlots) {
+    if (id == null || seen.has(id)) continue; seen.add(id);
+    const t = TALENT_CHOICES[String(id)];
+    if (!t || !(t.controls || []).length) continue;
+    ensureTalentSel(id, t); groups.push([id, t]);
+  }
+  if (!groups.length) { wrap.style.display = 'none'; host.innerHTML = ''; return; }
+  wrap.style.display = '';
+  host.innerHTML = groups.map(([id, t]) => {
+    const sel = new Set(talentSel[id] || []);
+    const col = CLASS_COLORS[t.class] || 'var(--ink)';
+    const rows = t.controls.map((c, ci) => {
+      if (c.type === 'choice') {
+        const cur = c.options.find(o => sel.has(o.spell_id)) || c.options[0];
+        return `<div class="talent-choice"><span class="talent-or">or</span><select data-spec="${id}" data-ctl="${ci}">${
+          c.options.map(o => `<option value="${o.spell_id}"${o.spell_id === cur.spell_id ? ' selected' : ''}>${esc(o.name)}</option>`).join('')
+        }</select></div>`;
+      }
+      return `<label class="talent-toggle"><input type="checkbox" data-spec="${id}" data-spell="${c.spell_id}"${sel.has(c.spell_id) ? ' checked' : ''}>${esc(c.name)}</label>`;
+    }).join('');
+    return `<div class="talent-spec"><div class="talent-spec-head" style="color:${col}">${esc(t.class)} ${esc(t.spec_name)}</div>${rows}</div>`;
+  }).join('');
+  host.querySelectorAll('select[data-ctl]').forEach(el => el.onchange = () => {
+    const id = Number(el.dataset.spec), t = TALENT_CHOICES[String(id)], ctl = t.controls[Number(el.dataset.ctl)];
+    const set = new Set(talentSel[id] || []);
+    for (const o of ctl.options) set.delete(o.spell_id);   // a choice node holds exactly one option
+    set.add(Number(el.value));
+    talentSel[id] = [...set]; saveTalents(); renderAnalysis();
+  });
+  host.querySelectorAll('input[type=checkbox][data-spell]').forEach(cb => cb.onchange = () => {
+    const id = Number(cb.dataset.spec), set = new Set(talentSel[id] || []);
+    if (cb.checked) set.add(Number(cb.dataset.spell)); else set.delete(Number(cb.dataset.spell));
+    talentSel[id] = [...set]; saveTalents(); renderAnalysis();
   });
 }
 
@@ -1893,6 +1991,22 @@ function kwWireExpand(host) {
   });
 }
 
+// "Missing talents" — the payoff of the picker: talents the comp HASN'T specced that would close a gap
+// in THIS pull (engine `rep.talent_suggestions`). Lethal gaps get the amber dot. Shown in both render paths.
+function kwTalentSuggestionsHTML(rep) {
+  const sugs = rep.talent_suggestions || [];
+  if (!sugs.length) return '';
+  const rows = sugs.map(s => {
+    const col = CLASS_COLORS[s.spec.class] || 'var(--ink)';
+    return `<div class="kw-tg-row" title="${esc(s.spec.class + ' ' + s.spec.spec_name)} hasn't specced ${esc(s.ability)}">` +
+      `<span class="kw-tg-dot${s.lethal ? ' kw-tg-dot--lethal' : ''}"></span>` +
+      `<span class="kw-tg-ability" style="color:${col}">${esc(s.ability)}</span>` +
+      `<span class="kw-tg-gap">${esc(s.gap)}</span>` +
+      `<span class="kw-tg-who">${esc(s.spec.spec_name)}</span></div>`;
+  }).join('');
+  return `<div class="kw-tg"><div class="kw-tg-head">Missing talents <span class="kw-tg-sub">— not specced, would help this pull</span></div>${rows}</div>`;
+}
+
 function renderAnalysis() {
   setWarn(0);
   rebuildAbilityClass();   // tint ability markers by the current comp's classes
@@ -1907,14 +2021,16 @@ function renderAnalysis() {
   if (!isComp && !members.length) { host.innerHTML = '<p class="hint">Select mobs in a pull to see its mechanics.</p>'; kwSyncExpandAll(); return; }
   const group = compSlots.filter(x => x != null);
   let rep;
-  try { rep = KeplerEngine.analyzePull(dungeon, members, group, { skill:'experienced', priority_rate_ratio: KW_PRIORITY_RATE_RATIO, lethal_hp_threshold: KW_LETHAL_HP, key_level: KW_KEY_LEVEL }); }
+  try { rep = KeplerEngine.analyzePull(dungeon, members, group, { skill:'experienced', priority_rate_ratio: KW_PRIORITY_RATE_RATIO, lethal_hp_threshold: KW_LETHAL_HP, key_level: KW_KEY_LEVEL, talents: buildTalentsArg() }); }
   catch (e) { host.innerHTML = `<p class="hint">engine error: ${esc(String(e && e.message || e))}</p>`; kwSyncExpandAll(); return; }
   // v2 card-model spike (?cards=1) — structured per-cast cards, beside the current path (Route tab only).
-  if (CARDS_V2 && !isComp) { const v = renderCardsV2(rep); host.innerHTML = v.html; setWarn(v.n); kwWireExpand(host); kwSyncExpandAll(); return; }
+  if (CARDS_V2 && !isComp) { const v = renderCardsV2(rep); host.innerHTML = v.html + kwTalentSuggestionsHTML(rep); setWarn(v.n); kwWireExpand(host); kwSyncExpandAll(); return; }
   // Comp tab shows GROUP/composition warnings; Route tab shows the pull's boss/trash mechanics.
   // The pull-level interrupt-budget aggregate is hoisted into the Overall Analysis section, so
   // drop it from the per-spell card stack (it's not about the one cast its subjects[0] names).
-  const ws = [...rep.warnings].filter(w => (isComp ? w.source === 'group' : w.source !== 'group') && !kwIsAggregate(w))
+  // talent_gap warnings render in their OWN "Missing talents" callout (kwTalentSuggestionsHTML), not the
+  // mechanic-card stack — so a suggestion never masquerades as a severity card titled by the gap's cast.
+  const ws = [...rep.warnings].filter(w => (isComp ? w.source === 'group' : w.source !== 'group') && !kwIsAggregate(w) && w.category !== 'talent_gap')
                               .sort((a,b) => SEV[a.severity]-SEV[b.severity]);
   setWarn(ws.length);
 
@@ -1943,7 +2059,7 @@ function renderAnalysis() {
   // Overall Analysis — pull-level answer budget, above the cards (big picture first). Route tab only.
   const overall = isComp ? '' : kwOverallHTML(rep);
 
-  host.innerHTML = pullLabel + overall + stack;
+  host.innerHTML = pullLabel + overall + stack + kwTalentSuggestionsHTML(rep);
 
   // wire expand/collapse — state in expandedCards, so it survives the next re-render
   host.querySelectorAll('.kw-card--major .kw-card-head').forEach(head => {
@@ -1966,7 +2082,7 @@ fetch(CFG.dist).then(r => r.json())
   .then(j => { dungeon = KeplerEngine.DungeonExport.parse(j);
     creaturesById = new Map((dungeon.creatures || []).map(c => [c.npc_id, c]));   // join key for the detail card
     kwInjectBaseDamage();   // attach measured damage parsed from the descriptions sidecar (if already loaded)
-    restoreComp(); renderComp(); renderAnalysis(); if (EDIT) editorBoot(); })
+    restoreComp(); restoreTalents(); renderComp(); renderTalents(); renderAnalysis(); if (EDIT) editorBoot(); })
   .catch(e => { const h = document.getElementById('analysis'); if (h) h.innerHTML = `<p class="hint">failed to load dungeon: ${esc(String(e && e.message || e))}</p>`; });
 
 // load the REAL mob positions (MDT-derived), drop the markers, then open the first pull
