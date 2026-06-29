@@ -47,6 +47,30 @@ var KeplerEngine = (() => {
     const types = condition?.creature_types;
     return !types || types.length === 0 || types.includes(creature_type);
   }
+  var CC_STOP_RANK = {
+    stunned: 0,
+    silenced: 0,
+    frozen: 0,
+    // hard hold, keep DPSing
+    banished: 1,
+    // hard hold, but the target goes untargetable (Cyclone/Banish)
+    incapacitated: 2,
+    polymorphed: 2,
+    asleep: 2,
+    sapped: 2,
+    shackled: 2,
+    disoriented: 2,
+    charmed: 2,
+    // break on damage
+    fleeing: 3,
+    horrified: 3,
+    turned: 3
+    // break on damage AND scatter the pack (misplay risk)
+  };
+  var ccStopRank = (mechanic) => CC_STOP_RANK[mechanic] ?? 2;
+  function bestStoppingCc(s, creature_type) {
+    return s.control.filter((c) => c.kind === "cc" && c.mechanic !== null && STOPPING_MECHANICS.has(c.mechanic) && creatureTypeAllowed(c.condition, creature_type)).sort((a, b) => ccStopRank(a.mechanic) - ccStopRank(b.mechanic) || Number(b.is_aoe) - Number(a.is_aoe))[0] ?? null;
+  }
   var MOVEMENT_IMPAIR_MECHANICS = /* @__PURE__ */ new Set(["rooted", "snared"]);
   var CASTER_ROLES = /* @__PURE__ */ new Set(["healer", "ranged_dps"]);
   var AVOIDANCE_POSITIONING = /* @__PURE__ */ new Set(["move_out", "frontal", "line_of_sight", "spread"]);
@@ -2303,7 +2327,7 @@ var KeplerEngine = (() => {
         if (k) add(role, "kick", k.name, s.class, "enemy", k.note);
       }
       if (isCC) {
-        const cc = s.control.find((c) => c.kind === "cc");
+        const cc = bestStoppingCc(s, cast.creature_type);
         if (cc) add(role, "cc", cc.name, s.class, "enemy", cc.note);
       }
     }
