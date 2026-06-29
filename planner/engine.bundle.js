@@ -181,6 +181,9 @@ var KeplerEngine = (() => {
           // right behind the cast that causes it in the timeline (the sort tiebreaker keeps the primary first).
           cast_order: s.cast_order ?? (s.secondary_of != null ? castOrderBySpellId.get(s.secondary_of) ?? null : null),
           dispel_detonates: s.dispel_detonates,
+          // DORMANT editorial card override (which answer axis LEADS the card). The schema doesn't carry it yet,
+          // so this reads as null today; it wires through the moment data adds the field — no behavior change now.
+          primary_answer: s.primary_answer ?? null,
           freedom_partial: s.freedom_partial,
           cast_time_ms: s.cast_time_ms,
           duration_ms: s.duration_ms,
@@ -248,6 +251,8 @@ var KeplerEngine = (() => {
         });
       }
     }
+    const warnings = allWarnings.filter((wn) => !wn.coaching || skill !== "expert");
+    const cards = buildCards(threats, warnings, groupSpecs, answers);
     return {
       dungeon: { dungeon_id: dungeon.dungeon.dungeon_id, name: dungeon.dungeon.name },
       build: { patch_version: dungeon.build_info.patch_version, build_number: dungeon.build_info.build_number },
@@ -278,8 +283,8 @@ var KeplerEngine = (() => {
       completion_effect,
       notes,
       boss_reference,
-      // Skill gate: an expert sees only the essentials; learning + experienced also get the coaching/heads-ups.
-      warnings: allWarnings.filter((wn) => !wn.coaching || skill !== "expert")
+      cards,
+      warnings
     };
   }
   function normalizePull(pull) {
@@ -2269,6 +2274,117 @@ var KeplerEngine = (() => {
   }
   function labelCast(t) {
     return t.count > 1 ? `${t.spell_name} \xD7${t.count} (${t.npc_name})` : `${t.spell_name} (${t.npc_name})`;
+  }
+  var CARD_REMOVABLE = /* @__PURE__ */ new Set(["Magic", "Curse", "Disease", "Poison", "Bleed"]);
+  var CARD_EFFECT_MECHANICS = /* @__PURE__ */ new Set(["snared", "rooted", "stunned", "silenced", "disoriented", "incapacitated", "fleeing", "charmed", "banished"]);
+  var CARD_POS_TECHS = /* @__PURE__ */ new Set(["move_out", "frontal", "line_of_sight", "spread", "stack", "soak", "bait"]);
+  var CARD_AXIS_PRIORITY = ["kick", "cc", "dispel", "freedom", "soothe"];
+  function cardAnswersFor(cast, group) {
+    const out = { tank: [], healer: [], dps: [] };
+    const add = (role, axis, ability, cls, scope, note) => {
+      if (ability) out[role].push({ axis, ability, class: cls, scope, note });
+    };
+    const isFreedom = cast.mechanic === "rooted" || cast.mechanic === "snared";
+    const isDispel = CARD_REMOVABLE.has(cast.dispel_type);
+    const isSoothe = cast.dispel_type === "Enrage";
+    const isKick = cast.is_interruptible && !cast.is_stoppable;
+    const isCC = cast.is_stoppable;
+    for (const s of group) {
+      const role = coarseRole(s.party_role);
+      if (isFreedom) {
+        for (const m of s.movement_freedom) if (m.mechanics.includes(cast.mechanic)) add(role, "freedom", m.name, s.class, m.target === "ally" ? "party" : "self", m.note);
+      }
+      if (isDispel) {
+        for (const rm of s.removals) if (rm.dispel_type === cast.dispel_type) add(role, "dispel", rm.name, s.class, "party", rm.note);
+      }
+      if (isSoothe && s.rollups.soothe) for (const a of s.soothe.abilities) add(role, "soothe", a.name, s.class, "enemy", a.note);
+      if (isKick && s.rollups.has_interrupt) {
+        const k = s.control.find((c) => c.kind === "interrupt");
+        if (k) add(role, "kick", k.name, s.class, "enemy", k.note);
+      }
+      if (isCC) {
+        const cc = s.control.find((c) => c.kind === "cc");
+        if (cc) add(role, "cc", cc.name, s.class, "enemy", cc.note);
+      }
+    }
+    for (const role of ROLE_TAGS) {
+      const seen = /* @__PURE__ */ new Set();
+      out[role] = out[role].filter((a) => seen.has(a.ability) ? false : (seen.add(a.ability), true));
+    }
+    return out;
+  }
+  function cardExpect(cast) {
+    const out = [];
+    if (cast.dot) out.push({ kind: "dot" });
+    if (cast.mechanic && CARD_EFFECT_MECHANICS.has(cast.mechanic)) out.push({ kind: "mechanic", mechanic: cast.mechanic });
+    if (cast.is_aoe) out.push({ kind: "aoe" });
+    if (cast.tank_buster) out.push({ kind: "tank_hit" });
+    for (const d of cast.displacement) out.push({ kind: "displacement", value: d });
+    if (cast.dispel_type === "Enrage") out.push({ kind: "enrage" });
+    if (out.length === 0 && cast.school) out.push({ kind: "school", school: cast.school });
+    return out;
+  }
+  function cardEveryone(cast) {
+    const techs = cast.positioning.filter((t) => CARD_POS_TECHS.has(t));
+    if (techs.length) return { kind: "positioning", techs };
+    if (cast.unavoidable) return { kind: "unavoidable" };
+    if (cast.is_aoe || (cast.party_targets ?? 0) > 0) return { kind: "avoidable" };
+    return null;
+  }
+  function cardPrimary(cast, answers) {
+    const present = /* @__PURE__ */ new Set();
+    for (const role of ROLE_TAGS) for (const a of answers[role]) present.add(a.axis);
+    if (cast.primary_answer) return present.has(cast.primary_answer) ? cast.primary_answer : null;
+    for (const ax of CARD_AXIS_PRIORITY) if (present.has(ax)) return ax;
+    return null;
+  }
+  function cardTags(cast, answers, primary) {
+    const axes = /* @__PURE__ */ new Set();
+    for (const role of ROLE_TAGS) for (const a of answers[role]) axes.add(a.axis);
+    const tags = primary ? [primary] : [];
+    for (const ax of CARD_AXIS_PRIORITY) if (axes.has(ax) && ax !== primary) tags.push(ax);
+    if (cast.dot) tags.push("dot");
+    if (cast.is_aoe) tags.push("aoe");
+    return tags;
+  }
+  function buildCards(threats, warnings, group, answerBudget) {
+    const castByKey = /* @__PURE__ */ new Map();
+    for (const t of threats) castByKey.set(`${t.npc_name}|${t.spell_name}`, t);
+    const seen = /* @__PURE__ */ new Map();
+    for (const w of warnings) {
+      if (w.source === "group") continue;
+      if (w.category === "interrupt" && (w.subjects?.length ?? 0) > 1) continue;
+      const su = w.subjects?.[0];
+      if (!su) continue;
+      const key = `${su.npc_name}|${su.spell_name}`;
+      const cast = castByKey.get(key);
+      if (!cast) continue;
+      const prev = seen.get(key);
+      if (!prev || SEVERITY_RANK[w.severity] < SEVERITY_RANK[prev.severity]) seen.set(key, { cast, severity: w.severity });
+    }
+    for (const ci of answerBudget.interrupts) {
+      const key = `${ci.cast.npc_name}|${ci.cast.spell_name}`;
+      if (seen.has(key)) continue;
+      seen.set(key, { cast: ci.cast, severity: ci.priority ? "caution" : "info" });
+    }
+    const cards = [];
+    for (const { cast, severity } of seen.values()) {
+      const answers = cardAnswersFor(cast, group);
+      const primary_answer = cardPrimary(cast, answers);
+      cards.push({
+        spell_id: cast.spell_id,
+        spell_name: cast.spell_name,
+        npc_id: cast.npc_id,
+        npc_name: cast.npc_name,
+        severity,
+        expect: cardExpect(cast),
+        answers,
+        primary_answer,
+        everyone: cardEveryone(cast),
+        tags: cardTags(cast, answers, primary_answer)
+      });
+    }
+    return cards.sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]);
   }
 
   // node_modules/zod/v3/external.js

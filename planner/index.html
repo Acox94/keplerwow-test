@@ -34,8 +34,14 @@
     font-family:var(--kw-body); font-size:14px; line-height:1.45; -webkit-font-smoothing:antialiased; }
   /* display face on headings, tabs + labels (numbers/labels read as "arcane") */
   h1, h2, h3, .tab-bar .tab, .analysis-label, .totals b, #lvLabel, #cdName, .cd-dname { font-family:var(--kw-display); }
-  #app { display:flex; height:100%; }
-  #map { flex:1 1 auto; height:100%; background:#0b0e13; }
+  /* EXTENDED (default): controls | map | analysis as 3 grid columns. COLLAPSED: map fills the left, controls +
+     analysis stack on the right (the old compact layout). Grid handles both layouts — and the stacking — cleanly. */
+  #app { display:grid; height:100%;
+    grid-template-columns: 340px minmax(0,1fr) 360px;
+    grid-template-areas: "controls map side"; }
+  #app.collapsed { grid-template-columns: minmax(0,1fr) 360px; grid-template-rows: 1fr 1fr;
+    grid-template-areas: "map controls" "map side"; }
+  #map { grid-area:map; min-height:0; min-width:0; background:#0b0e13; }
   /* Leaflet paints CRS.Simple tiles on a dark void; keep it subtle. */
   .leaflet-container { background:#0b0e13; }
   /* zoom control — Leaflet ships white +/− buttons; restyle to the mock's .zoom */
@@ -50,12 +56,23 @@
   /* while painting, kill text/element selection so dragging doesn't highlight the page */
   #map.painting, #map.painting * { user-select:none; -webkit-user-select:none; }
 
-  #side { flex:0 0 340px; max-width:42vw; height:100%; overflow:hidden; display:flex; flex-direction:column;
+  #controls { grid-area:controls; min-height:0; overflow:hidden; display:flex; flex-direction:column;
+    border-right:1px solid var(--line); background:var(--panel); padding:14px; }
+  #side { grid-area:side; min-height:0; overflow:hidden; display:flex; flex-direction:column;
     border-left:1px solid var(--line); background:var(--panel); padding:14px; }
-  .panel-top { flex:1 1 50%; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
-  /* Analysis pinned to the bottom HALF of the panel; shared by Comp + Route (hidden on Developer) */
-  .analysis-pane { flex:0 0 50%; min-height:0; display:flex; flex-direction:column;
-    margin-top:12px; padding-top:12px; border-top:1px solid var(--line); }
+  /* collapsed: controls sits top-right above analysis, so it borders the map on its left + analysis below it */
+  #app.collapsed #controls { border-right:0; border-left:1px solid var(--line); border-bottom:1px solid var(--line); }
+  .panel-top { flex:1 1 auto; min-height:0; display:flex; flex-direction:column; overflow:hidden; }
+  /* Live Analysis: its own full-height right column in extended; bottom-right cell when collapsed */
+  .analysis-pane { flex:1 1 auto; min-height:0; display:flex; flex-direction:column; }
+  #analysis { flex:1 1 auto; min-height:0; overflow-y:auto; }
+  /* the active tab's content scrolls (long pull/comp lists) while the brand + tabs stay put */
+  #controls .tabpanel.active { overflow-y:auto; }
+  /* layout toggle in the brand bar */
+  .layout-toggle { font-family:var(--fd); font-size:10.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--ink-2); background:transparent; border:1px solid var(--line); border-radius:var(--radius-sm,6px);
+    padding:3px 9px; cursor:pointer; transition:color .15s, border-color .15s; }
+  .layout-toggle:hover { color:var(--ink); border-color:var(--accent,#2dd4bf); }
   .analysis-label { font-size:15px; font-weight:700; margin-bottom:8px; text-align:center; position:relative; }   /* match the "Comp builder" h1 */
   .analysis-label .hint { font-weight:400; }
   #lvExpandAll { position:absolute; right:0; top:50%; transform:translateY(-50%); font-size:10.5px; font-weight:600;
@@ -405,12 +422,13 @@
     </div>
     <div class="note">Scroll/pinch = zoom · drag = pan · tap a mob = add to current pull · drag the dots to reshape an arrow · shift-click a note to remove it</div>
   </div>
-  <aside id="side">
+  <aside id="controls">
     <div class="panel-top">
       <div class="brand">
         <span class="brand-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 3 7v10l9 5 9-5V7Zm0 3.2 5.5 3.1v6.4L12 17.8 6.5 14.7V8.3Z"/></svg></span>
         <span class="brand-name">Route<em>Planner</em></span>
         <span class="brand-chip">spike</span>
+        <button id="btnLayout" class="layout-toggle" type="button" title="Toggle layout — compact ⇄ extended">Compact</button>
       </div>
       <div class="field-label">Dungeon</div>
       <select id="dungeonSel"></select>
@@ -444,8 +462,9 @@
         <pre id="payload"></pre>
       </section>
     </div>
-
-    <!-- Analysis: persistent BOTTOM HALF, shared by the Comp + Route tabs (hidden on Developer) -->
+  </aside>
+  <aside id="side">
+    <!-- Live Analysis: its own full-height right column (the map sits to its left via CSS order) -->
     <div class="analysis-pane" id="analysisPane">
       <div class="analysis-label">Live Analysis <span class="tabcount" id="warnCount"></span><button id="lvExpandAll" type="button" style="display:none"></button></div>
       <div id="analysis"></div>
@@ -502,7 +521,10 @@ const map = L.map('map', { crs: L.CRS.Simple, minZoom: -3, maxZoom: 6,
   zoomSnap: 0.25, zoomDelta: 0.5, attributionControl: false });   // deeper zoom-in + finer +/- steps
 const bounds = [[0, 0], [H, W]];
 L.imageOverlay(FLOOR.map, bounds).addTo(map);
-map.fitBounds(bounds);
+// Start centered with a margin of void around the floor, so its edges are clearly visible (not flush to the
+// frame). The margin is a fraction of the floor on each side — tune live with ?pad= (e.g. ?pad=0.1 = 10%).
+const MAP_FIT_PAD = (() => { const v = parseFloat(new URLSearchParams(location.search).get('pad')); return (v >= 0 && v < 0.9) ? v : 0.06; })();
+map.fitBounds(L.latLngBounds(bounds).pad(MAP_FIT_PAD));
 map.setMaxBounds(L.latLngBounds(bounds).pad(0.25));
 // Portrait markers grow a touch as you zoom IN (show off the renders). Anchored to the fit zoom so the
 // default view is unchanged; clamped so they never overlap (zooming in spreads mobs apart faster than this).
@@ -634,6 +656,8 @@ function loadPortrait(el, m) {
 let creaturesById = new Map();   // npc_id -> creature record (built when the dist loads)
 let SPELL_DESC = {};             // spell_id -> verbatim WoW description (sidecar, optional)
 fetch('./spell-descriptions.json').then(r => r.ok ? r.json() : {}).then(m => { SPELL_DESC = m || {}; kwInjectBaseDamage(); if (dungeon) renderAnalysis(); }).catch(() => {});
+let CARD_EFFECTS = {};           // spell_id -> CURATED concise effect distillation (card-effects.json); the card's EFFECT line
+fetch('./card-effects.json').then(r => r.ok ? r.json() : {}).then(m => { CARD_EFFECTS = m || {}; if (dungeon) renderAnalysis(); }).catch(() => {});
 
 // The resolved tooltip carries MEASURED (+0-de-scaled) damage as text ("Inflicts 27,175 Nature damage").
 // We have no structured damage field in the export yet, so the planner parses the biggest "N damage"
@@ -1124,12 +1148,26 @@ document.addEventListener('keydown', (ev) => {
 
 // side-panel tab switcher: Route (pulls) ⇄ Comp & analysis
 function setTab(name) {
-  document.querySelectorAll('#side .tab-bar .tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
-  document.querySelectorAll('#side .tabpanel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+  document.querySelectorAll('#controls .tab-bar .tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('#controls .tabpanel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
   document.getElementById('analysisPane').style.display = (name === 'dev') ? 'none' : ''; // Analysis shows on Comp + Route only
   renderAnalysis(); // re-filter: group warnings on Comp, pull mechanics on Route
 }
-document.querySelectorAll('#side .tab-bar .tab').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+document.querySelectorAll('#controls .tab-bar .tab').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+
+// Layout toggle: EXTENDED (3-column) ⇄ COLLAPSED (compact — controls + analysis stacked on the right, map fills
+// the left). Persisted; Leaflet must re-measure its container after the grid resizes.
+function applyLayout(mode) {
+  const collapsed = mode === 'collapsed';
+  document.getElementById('app').classList.toggle('collapsed', collapsed);
+  const btn = document.getElementById('btnLayout');
+  if (btn) btn.textContent = collapsed ? 'Extend' : 'Compact';
+  try { localStorage.setItem('kw.layout', mode); } catch (e) {}
+  if (typeof map !== 'undefined' && map && map.invalidateSize) setTimeout(() => map.invalidateSize(), 70);
+}
+document.getElementById('btnLayout')?.addEventListener('click', () =>
+  applyLayout(document.getElementById('app').classList.contains('collapsed') ? 'extended' : 'collapsed'));
+applyLayout(localStorage.getItem('kw.layout') || 'extended');
 
 // ---- drawing layer: arrows, notes, freehand paint --------------------------
 // A SEPARATE layer from mobs/pulls. In the real app these become part of the ROUTE
@@ -1611,10 +1649,12 @@ document.getElementById('lvExpandAll')?.addEventListener('click', () => {
 // graduates into the engine and replaces buildWarnings' prose.
 // ---------------------------------------------------------------------------
 const CARDS_V2 = _params.get('cards') === '1';
-const V2_REMOVABLE = new Set(['Magic', 'Curse', 'Disease', 'Poison', 'Bleed']);
+// The card MODEL (effect facts + per-role answers + the headline axis) now lives in the ENGINE
+// (rep.cards — a MechanicCard[]). Everything below is PRESENTATION only: it draws a card and adds the
+// tooltip NUMBERS (DoT length / slow %) the engine deliberately leaves out. These maps are display labels.
 const V2_MECH = { snared: 'slow', rooted: 'root', stunned: 'stun', silenced: 'silence', disoriented: 'disorient', incapacitated: 'incapacitate', fleeing: 'fear', charmed: 'charm', banished: 'banish' };
-const V2_COARSE = (r) => r === 'tank' ? 'tank' : r === 'healer' ? 'healer' : 'dps';
 const V2_AXES = new Set(['freedom', 'dispel', 'soothe', 'kick', 'cc']);
+const V2_POS = { move_out: 'move out of it', spread: 'spread out', stack: 'stack up', soak: 'soak it', frontal: 'dodge the frontal', line_of_sight: 'break line of sight', bait: 'bait it away' };
 // player-facing terminology: most players call a movement slow a "slow", and "snare" gets confused with
 // "root" — so present "slow" everywhere and keep the precise term in a single "Slow = Snare" hover.
 function slowify(s) {
@@ -1626,85 +1666,48 @@ function slowify(s) {
 const SLOW_HOVER = 'Slow = Snare (a movement-impairing slow)';
 // wrap the word "slow" with the teaching hover (dotted underline signals "definition on hover")
 const slowTerm = (html) => html.replace(/\bslow\b/g, `<abbr title="${SLOW_HOVER}" style="text-decoration-style:dotted;text-underline-offset:2px;cursor:help">slow</abbr>`);
-// WHAT TO EXPECT — a concise factual effect line from the cast's structured flags (numbers from the
-// resolved tooltip). NEVER how to answer it.
-function expectV2(cast) {
-  const desc = SPELL_DESC[cast.spell_id] || '';
+// EFFECT line (PRESENTATION) — render the engine's structured `card.expect` tokens to text, adding the
+// tooltip NUMBERS (DoT length, slow %) the engine leaves out (those live in SPELL_DESC, a renderer-side sidecar).
+function fmtExpect(card) {
+  const desc = SPELL_DESC[card.spell_id] || '';
   const p = [];
-  if (cast.dot) { const m = desc.match(/for\s+(\d+)\s*(sec|second|min|minute)/i); p.push('DoT' + (m ? ` ${m[1]}${/min/i.test(m[2]) ? 'm' : 's'}` : '')); }
-  if (cast.mechanic && V2_MECH[cast.mechanic]) {
-    let l = V2_MECH[cast.mechanic];
-    if (cast.mechanic === 'snared') { const sm = desc.match(/movement speed by\s+(\d+)%/i); const st = /each tick|with each tick|stack/i.test(desc); if (sm) l = `${st ? 'stacking ' : ''}slow ${sm[1]}%${st ? '/tick' : ''}`; }
-    p.push(l);
+  for (const e of card.expect) {
+    if (e.kind === 'dot') { const m = desc.match(/for\s+(\d+)\s*(sec|second|min|minute)/i); p.push('DoT' + (m ? ` ${m[1]}${/min/i.test(m[2]) ? 'm' : 's'}` : '')); }
+    else if (e.kind === 'mechanic') {
+      let l = V2_MECH[e.mechanic] || e.mechanic;
+      if (e.mechanic === 'snared') { const sm = desc.match(/movement speed by\s+(\d+)%/i); const st = /each tick|with each tick|stack/i.test(desc); if (sm) l = `${st ? 'stacking ' : ''}slow ${sm[1]}%${st ? '/tick' : ''}`; }
+      p.push(l);
+    }
+    else if (e.kind === 'aoe') p.push('AoE');
+    else if (e.kind === 'tank_hit') p.push('tank hit');
+    else if (e.kind === 'displacement') p.push(e.value === 'knockback' ? 'knockback' : e.value === 'pull' ? 'pull' : 'cast pushback');
+    else if (e.kind === 'enrage') p.push('enrage');
+    else if (e.kind === 'school') p.push(`${e.school} damage`);
   }
-  if (cast.is_aoe) p.push('AoE');
-  if (cast.tank_buster) p.push('tank hit');
-  for (const d of (cast.displacement || [])) p.push(d === 'knockback' ? 'knockback' : d === 'pull' ? 'pull' : 'cast pushback');
-  if (cast.dispel_type === 'Enrage') p.push('enrage');
-  if (!p.length && cast.school) p.push(`${cast.school} damage`);
   return p.join(', ');
 }
-// HOW TO DEAL — per coarse role, the abilities that role brings to answer THIS cast's axes, each with its
-// class (for the tint) + scope (self / party / enemy). The single source of "what's my job here".
-function cardAnswers(cast, specs) {
-  const out = { tank: [], healer: [], dps: [] };
-  const push = (role, axis, ability, cls, scope, note) => { if (ability) out[role].push({ axis, ability, cls, scope, note }); };
-  const isFreedom = cast.mechanic === 'rooted' || cast.mechanic === 'snared';
-  const isDispel = V2_REMOVABLE.has(cast.dispel_type);
-  const isSoothe = cast.dispel_type === 'Enrage';
-  const isKick = cast.is_interruptible && !cast.is_stoppable;
-  const isCC = cast.is_stoppable;
-  for (const s of specs) {
-    const role = V2_COARSE(s.party_role);
-    if (isFreedom) for (const m of (s.movement_freedom || [])) if ((m.mechanics || []).includes(cast.mechanic)) push(role, 'freedom', m.name, s.class, m.target === 'ally' ? 'party' : 'self', m.note);
-    if (isDispel) for (const rm of (s.removals || [])) if (rm.dispel_type === cast.dispel_type) push(role, 'dispel', rm.name, s.class, 'party', rm.note);
-    if (isSoothe && s.rollups && s.rollups.soothe) for (const a of ((s.soothe && s.soothe.abilities) || [])) push(role, 'soothe', a.name, s.class, 'enemy', a.note);
-    if (isKick && s.rollups && s.rollups.has_interrupt) { const k = (s.control || []).find(c => c.kind === 'interrupt'); if (k) push(role, 'kick', k.name, s.class, 'enemy', k.note); }
-    if (isCC) { const cc = (s.control || []).find(c => c.kind === 'cc'); if (cc) push(role, 'cc', cc.name, s.class, 'enemy', cc.note); }
-  }
-  for (const k of ['tank', 'healer', 'dps']) { const seen = new Set(); out[k] = out[k].filter(a => seen.has(a.ability) ? false : (seen.add(a.ability), true)); }
-  return out;
-}
-// the universal "everyone moves" answer (positioning / survive) — only when there IS one
-function everyoneV2(cast) {
-  const POS = { move_out: 'move out of it', spread: 'spread out', stack: 'stack up', soak: 'soak it', frontal: 'dodge the frontal', line_of_sight: 'break line of sight', bait: 'bait it away' };
-  const ps = (cast.positioning || []).map(t => POS[t]).filter(Boolean);
-  if (ps.length) return ps.join(', ');
-  if (cast.unavoidable) return 'unavoidable — heal/mitigate through';
-  if (cast.is_aoe || cast.party_targets) return 'avoidable — sidestep it';
+// the universal "everyone moves" answer (positioning / survive) — render the engine's structured `card.everyone`
+function fmtEveryone(everyone) {
+  if (!everyone) return null;
+  if (everyone.kind === 'positioning') { const ps = (everyone.techs || []).map(t => V2_POS[t]).filter(Boolean); return ps.length ? ps.join(', ') : null; }
+  if (everyone.kind === 'unavoidable') return 'unavoidable — heal/mitigate through';
+  if (everyone.kind === 'avoidable') return 'avoidable — sidestep it';
   return null;
 }
-// PRIMARY answer = the headline job. Default priority PREVENT > REMOVE (kick/cc beat dispel/freedom/soothe),
-// with an editorial per-cast `primary_answer` override (a cast you deliberately let land + dispel, or a
-// frontal you dodge rather than kick → override points at a non-ability answer, so no axis leads).
+// axis render order (PRESENTATION): primary first, then the rest by precedence. The engine already chose the
+// primary (card.primary_answer) + the per-role answers; the renderer only decides the on-screen ordering.
 const V2_PRIORITY = ['kick', 'cc', 'dispel', 'freedom', 'soothe'];
 const V2_AXIS_LABEL = { kick: 'Kick', cc: 'CC', dispel: 'Dispel', freedom: 'Freedom', soothe: 'Soothe' };
-function v2Primary(cast, ans) {
-  const present = new Set();
-  for (const k of ['tank', 'healer', 'dps']) for (const a of ans[k]) present.add(a.axis);
-  if (cast.primary_answer) return present.has(cast.primary_answer) ? cast.primary_answer : null; // override
-  for (const ax of V2_PRIORITY) if (present.has(ax)) return ax;
-  return null;
-}
-function cardTags(cast, ans, primary) {
-  const axes = new Set();
-  for (const k of ['tank', 'healer', 'dps']) for (const a of ans[k]) axes.add(a.axis);
-  const t = primary ? [primary] : [];
-  for (const ax of V2_PRIORITY) if (axes.has(ax) && ax !== primary) t.push(ax);
-  if (cast.dot) t.push('dot');
-  if (cast.is_aoe) t.push('aoe');
-  return t;
-}
-function renderCardV2(c, specs, id, open) {
-  const cast = c.cast, ans = cardAnswers(cast, specs), expect = expectV2(cast), everyone = everyoneV2(cast);
-  const primary = v2Primary(cast, ans), tags = cardTags(cast, ans, primary);
-  const sevCls = KW_SEV_CLASS[c.sev] || 'kw-sev-info';
+function renderCardV2(card, id, open) {
+  const ans = card.answers, primary = card.primary_answer, tags = card.tags;
+  const expect = fmtExpect(card), everyone = fmtEveryone(card.everyone);
+  const sevCls = KW_SEV_CLASS[card.severity] || 'kw-sev-info';
   const mut = 'color:var(--kw-ink-3,#7c8696)';
   // SHORT display name: a "Button (Talent)" name shows just the talent (Jet Stream); the full combo + note
   // ride the hover title. (Today only Wind Rush Totem (Jet Stream) matches; the durable form is a data-side
-  // display_name field when this graduates into the engine.)
+  // display_name field — kept renderer-side for now, see the plan's out-of-scope.)
   const ab = (a) => {
-    const col = CLASS_COLORS[a.cls];
+    const col = CLASS_COLORS[a.class];
     const m = a.ability.match(/\s*\(([^()]+)\)\s*$/);
     const display = m ? m[1] : a.ability;
     const tip = slowify([display !== a.ability ? a.ability : '', a.note || ''].filter(Boolean).join(' — '));
@@ -1719,7 +1722,15 @@ function renderCardV2(c, specs, id, open) {
   // a block axis label (KICK / FREEDOM …) above its per-role rows — the EXPECT label look, as a divider
   const axHead = (label) => `<div style="${mut};text-transform:uppercase;font-size:10px;letter-spacing:.06em;margin:10px 0 3px">${esc(label)}</div>`;
   let body = '';
-  if (expect) body += section('effect', `<span style="color:var(--kw-ink,#e9edf4)">${slowTerm(slowify(esc(expect)))}</span>`, effectLabelStyle);
+  // EFFECT = the CURATED concise distillation (card-effects.json) when present — ' · ' splits into one line
+  // per segment (primary, then secondaries). Falls back to the auto thin-token line for uncurated casts.
+  const curatedEffect = CARD_EFFECTS[card.spell_id];
+  if (curatedEffect) {
+    const lines = String(curatedEffect).split(' · ').map(s => s.trim()).filter(Boolean).map(s => slowTerm(slowify(esc(s)))).join('<br>');
+    body += section('effect', `<span style="color:var(--kw-ink,#e9edf4)">${lines}</span>`, effectLabelStyle);
+  } else if (expect) {
+    body += section('effect', `<span style="color:var(--kw-ink,#e9edf4)">${slowTerm(slowify(esc(expect)))}</span>`, effectLabelStyle);
+  }
   // each ANSWER AXIS is its own labeled group of Tank/Healer/DPS rows (primary first, others by priority).
   // Freedom resolves the same way Kick does — every role sees its own tool, so both read identically.
   const present = new Set();
@@ -1739,12 +1750,12 @@ function renderCardV2(c, specs, id, open) {
   return `<div class="kw-card kw-card--major ${sevCls}${open ? ' kw-card--open' : ''}" data-card="${esc(id)}">
       <div class="kw-card-head" role="button" tabindex="0" aria-expanded="${open ? 'true' : 'false'}" style="flex-direction:column;align-items:stretch;gap:3px">
         <div style="display:flex;align-items:center;gap:8px">
-          <span class="kw-spell" style="flex:1;min-width:0">${esc(c.name)}</span>
-          <span class="kw-sevb" style="font-size:11px">${KW_SEV_LABEL[c.sev] || ''}</span>
+          <span class="kw-spell" style="flex:1;min-width:0">${esc(card.spell_name)}</span>
+          <span class="kw-sevb" style="font-size:11px">${KW_SEV_LABEL[card.severity] || ''}</span>
           <div class="kw-hright">${KW_CHEV}</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
-          <div class="kw-hsub" style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(c.npc)}">${esc(c.npc)}</div>
+          <div class="kw-hsub" style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(card.npc_name)}">${esc(card.npc_name)}</div>
           <div class="kw-tags" style="padding:0;flex:0 0 auto;justify-content:flex-end">${chips}</div>
         </div>
       </div>
@@ -1752,20 +1763,12 @@ function renderCardV2(c, specs, id, open) {
     </div>`;
 }
 function renderCardsV2(rep) {
-  const specMap = new Map((dungeon.specs || []).map(s => [s.spec_id, s]));
-  const specs = compSlots.filter(x => x != null).map(id => specMap.get(id)).filter(Boolean);
-  const seen = new Map();   // one card per cast; keep the most-severe verdict the engine gave it
-  for (const w of rep.warnings) {
-    if (w.source === 'group' || kwIsAggregate(w)) continue;
-    const su = w.subjects && w.subjects[0]; if (!su) continue;
-    const cast = kwCastFor(w); if (!cast) continue;
-    const key = su.npc_name + '|' + su.spell_name, prev = seen.get(key);
-    if (!prev || SEV[w.severity] < SEV[prev.sev]) seen.set(key, { cast, sev: w.severity, name: su.spell_name, npc: su.npc_name });
-  }
-  const cards = [...seen.values()].sort((a, b) => SEV[a.sev] - SEV[b.sev]);
-  const banner = `<div style="font-size:11px;letter-spacing:.05em;color:var(--accent,#2dd4bf);margin:0 0 9px">card model · v2 spike</div>`;
+  // The card MODEL now comes straight from the engine (rep.cards — one MechanicCard per warned cast, already
+  // deduped + sorted most-severe-first). The renderer only draws them.
+  const cards = rep.cards || [];
+  const banner = `<div style="font-size:11px;letter-spacing:.05em;color:var(--accent,#2dd4bf);margin:0 0 9px">card model · v2</div>`;
   // collapsed by default (header + tags only); expand state lives in expandedCards so it survives re-renders
-  const stack = cards.length ? cards.map(c => { const id = c.npc + '|' + c.name; return renderCardV2(c, specs, id, expandedCards.has(id)); }).join('') : '<p class="hint">No pull mechanics flagged — this comp covers this pull.</p>';
+  const stack = cards.length ? cards.map(card => { const id = card.npc_name + '|' + card.spell_name; return renderCardV2(card, id, expandedCards.has(id)); }).join('') : '<p class="hint">No pull mechanics flagged — this comp covers this pull.</p>';
   return { html: banner + `<div class="kw-stack">${stack}</div>`, n: cards.length };
 }
 // shared expand/collapse wiring (header click/keyboard) — used by the v1 stack and the v2 card path
@@ -1790,7 +1793,7 @@ function renderAnalysis() {
   const host = document.getElementById('analysis');
   if (!host) return;
   host.classList.add('kw-analysis-panel');
-  const isComp = (document.querySelector('#side .tab-bar .tab.active')?.dataset.tab) === 'comp';
+  const isComp = (document.querySelector('#controls .tab-bar .tab.active')?.dataset.tab) === 'comp';
   if (!dungeon || !window.KeplerEngine) { host.innerHTML = '<p class="hint">loading engine…</p>'; kwSyncExpandAll(); return; }
   const pull = pulls[active];
   const members = pull ? rollup(pull) : [];
