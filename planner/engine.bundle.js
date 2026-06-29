@@ -2287,7 +2287,7 @@ var KeplerEngine = (() => {
     const isFreedom = cast.mechanic === "rooted" || cast.mechanic === "snared";
     const isDispel = CARD_REMOVABLE.has(cast.dispel_type);
     const isSoothe = cast.dispel_type === "Enrage";
-    const isKick = cast.is_interruptible && !cast.is_stoppable;
+    const isKick = cast.is_interruptible;
     const isCC = cast.is_stoppable;
     for (const s of group) {
       const role = coarseRole(s.party_role);
@@ -2353,7 +2353,7 @@ var KeplerEngine = (() => {
     const seen = /* @__PURE__ */ new Map();
     for (const w of warnings) {
       if (w.source === "group") continue;
-      if (w.category === "interrupt" && (w.subjects?.length ?? 0) > 1) continue;
+      if ((w.category === "interrupt" || w.category === "cc") && (w.subjects?.length ?? 0) > 1) continue;
       const su = w.subjects?.[0];
       if (!su) continue;
       const key = `${su.npc_name}|${su.spell_name}`;
@@ -2366,6 +2366,12 @@ var KeplerEngine = (() => {
       const key = `${ci.cast.npc_name}|${ci.cast.spell_name}`;
       if (seen.has(key)) continue;
       seen.set(key, { cast: ci.cast, severity: ci.priority ? "caution" : "info" });
+    }
+    for (const t of threats) {
+      if (!t.is_stoppable) continue;
+      const key = `${t.npc_name}|${t.spell_name}`;
+      if (seen.has(key)) continue;
+      seen.set(key, { cast: t, severity: "info" });
     }
     const cards = [];
     for (const { cast, severity } of seen.values()) {
