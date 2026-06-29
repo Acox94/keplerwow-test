@@ -541,13 +541,26 @@ L.imageOverlay(FLOOR.map, bounds).addTo(map);
 // Start centered with a margin of void around the floor, so its edges are clearly visible (not flush to the
 // frame). The margin is a fraction of the floor on each side — tune live with ?pad= (e.g. ?pad=0.1 = 10%).
 const MAP_FIT_PAD = (() => { const v = parseFloat(new URLSearchParams(location.search).get('pad')); return (v >= 0 && v < 0.9) ? v : 0.06; })();
-map.fitBounds(L.latLngBounds(bounds).pad(MAP_FIT_PAD));
 map.setMaxBounds(L.latLngBounds(bounds).pad(0.25));
+// Fit the floor centered, with the edge margin. RE-RUN on container resize — a window resize OR the
+// Compact/Extend toggle's invalidateSize both fire 'resize' — so the map stays centered at ANY size. Skip
+// when the user has zoomed IN, so a resize doesn't yank a deliberate zoom. (recenterMap also sets FIT_ZOOM,
+// the marker-scale anchor, below.)
+let FIT_ZOOM = null;
+function recenterMap() { map.fitBounds(L.latLngBounds(bounds).pad(MAP_FIT_PAD), { animate: false }); FIT_ZOOM = map.getZoom(); }
+recenterMap();
+// A ResizeObserver catches EVERY container size change — window resize, the Compact/Extend toggle, AND the
+// initial layout settling (the grid applying after the map inits) — which a plain window-resize listener
+// misses. Debounced; the zoom guard preserves a deliberate zoom-in (only re-center from the default view).
+let _rcT;
+new ResizeObserver(() => {
+  if (FIT_ZOOM != null && Math.abs(map.getZoom() - FIT_ZOOM) < 0.25) { clearTimeout(_rcT); _rcT = setTimeout(() => { map.invalidateSize(); recenterMap(); }, 60); }
+}).observe(document.getElementById('map'));
 // Portrait markers grow a touch as you zoom IN (show off the renders). Anchored to the fit zoom so the
 // default view is unchanged; clamped so they never overlap (zooming in spreads mobs apart faster than this).
 // Leaflet ignores a CSS transform on the inner .mk, so we resize the icon BOX (width/height + the centering
 // margins) directly — the .mk child fills it (background cover) and stays centred on its latLng.
-const FIT_ZOOM = map.getZoom();
+// FIT_ZOOM is declared + (re)set by recenterMap above — the marker-scale anchor.
 function applyMarkerScale() {
   // Asymmetric: faster ramp + higher cap zooming IN (~2.5x middle ground — show off portraits); zoom-OUT unchanged.
   // REVERT POINT — previous symmetric setting: Math.max(0.82, Math.min(2.0, 1 + (map.getZoom() - FIT_ZOOM) * 0.18))
