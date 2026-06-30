@@ -75,12 +75,30 @@ async function rebuild(slug) {
   await writeFile(join(here, `${slug}.json`), built);
 }
 
+// ?cal=1 "S to save" — bake the live whole-map fit into the stored positions of a MANUAL floor.
+// The client sends the post-fit fractions per iid; we patch only those mobs' x/y, leaving every other
+// floor untouched. Non-ASCII is re-escaped so the diff stays minimal (the file's \uXXXX em-dashes).
+async function saveMobPositions(body) {
+  const { slug, positions } = body;
+  if (!slug || !Array.isArray(positions) || !positions.length) throw new Error('save-positions: need slug + positions[]');
+  const p = join(here, `${slug}.mobs.json`);
+  const raw = await readFile(p, 'utf8');
+  const j = JSON.parse(raw);
+  const byIid = new Map(positions.map((q) => [q.iid, q]));
+  let n = 0;
+  for (const m of j.mobs) { const q = byIid.get(m.iid); if (q) { m.x = q.x; m.y = q.y; n++; } }
+  const esc = (s) => s.replace(/[^\x00-\x7f]/g, (c) => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+  await writeFile(p, esc(JSON.stringify(j, null, 2)) + (raw.endsWith('\n') ? '\n' : ''));
+  return n;
+}
+
 createServer(async (req, res) => {
   try {
     const url = decodeURIComponent((req.url ?? '/').split('?')[0]);
 
     if (req.method === 'POST' && url === '/api/flags') { const w = await applyFlags(await readBody(req)); sendJson(res, 200, { ok: true, wrote: w }); return; }
     if (req.method === 'POST' && url === '/api/rebuild') { const b = await readBody(req); await rebuild(b.slug); sendJson(res, 200, { ok: true }); return; }
+    if (req.method === 'POST' && url === '/api/save-mob-positions') { const n = await saveMobPositions(await readBody(req)); sendJson(res, 200, { ok: true, updated: n }); return; }
 
     // JSON directory listing — lets the portrait framer auto-load a folder of renders.
     if (url.startsWith('/api/list/')) {
@@ -96,7 +114,10 @@ createServer(async (req, res) => {
     const file = join(here, rel);
     if (!file.startsWith(here)) { res.writeHead(403).end('forbidden'); return; }
     const body = await readFile(file);
-    res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
+    // no-store: this is a live authoring server — a baked mobs.json / edited index.html must show on the
+    // next reload, never a heuristically-cached copy (the browser caches a 200 with no validators, which
+    // made baked floor positions look "not saved" until a hard-refresh).
+    res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream', 'cache-control': 'no-store' });
     res.end(body);
   } catch (e) {
     if (req.method === 'POST') { sendJson(res, 500, { ok: false, error: String(e && e.message || e) }); return; }

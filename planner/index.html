@@ -618,10 +618,11 @@ const DUNGEONS = {
   'altar-of-fangs': { name:'Altar of Fangs', sub:'painted UiMap art (wow.export) · mob positions from combat-log capture · full run · floors 1–2 (floor 3 pending /kcal)',
     dist:'./altar-of-fangs.json', mobs:'./altar-of-fangs.mobs.json', normalized:true,
     // Multi-floor: each painted UiMap (1024×768) seats its OWN sublevel's mobs (mobs.json carries
-    // `sublevel`). Per-floor FIT — ?cal=1 calibrated. Floor 3 (2590) omitted until its /kcal lands.
+    // `sublevel`). Manual placement → identity fit (the per-floor `fit` is unused at render).
     floors:[
       { sublevel:1, label:'Floor 1', map:'./altar-of-fangs-2588.png', W:1024, H:768, fit:{ sx:1, sy:0.834, dx:-11, dy:-46 } },
       { sublevel:2, label:'Floor 2', map:'./altar-of-fangs-2589.png', W:1024, H:768, fit:{ sx:1, sy:1, dx:-25, dy:-5 } },  // calibrated: art fills the frame (sy 1, no compression) + a small left/up nudge to seat both packs
+      { sublevel:3, label:'Floor 3', map:'./altar-of-fangs-2590.png', W:1024, H:768, fit:{ sx:1, sy:1, dx:0, dy:0 } },  // /kcal'd on 2590 from the +11 clear — x/y projected from world coords; audit in ?edit=1&f=2
     ] },
 };
 const _params = new URLSearchParams(location.search);
@@ -704,6 +705,7 @@ window._spike = { map, at, L, W, H };   // dev handle for calibration/diagnostic
 // py = -y*2.2857 — MDT's 840×560 canvas → the 1920×1280 native texture). npc_id is MDT's MIDNIGHT
 // id, which joins the engine's curated creatures (the WotLK ids the placeholder used carry no spells).
 let MOBS = [];               // populated from pit-of-saron.mobs.json on load
+let MANUAL = false;          // true when the mobs.json is hand-placed (identity fit) — gates ?cal=1 "S to save"
 let FORCES_TOTAL = 0;        // enemy-forces denominator (MDT dungeonTotalCount.normal = 643)
 // iid -> forces weight for EVERY mob in the dungeon (all floors), so the Enemy-forces meter can sum a
 // route that spans floors — each floor is its own page (?f=), so only the current floor's MOBS are live;
@@ -2431,7 +2433,8 @@ if (EDIT) {
 } else {
   fetch(CFG.mobs).then(r => r.json())
     .then(j => {
-      if (j._placement === 'manual') useIdentityFit();   // hand-placed file → render at stored fractions
+      MANUAL = j._placement === 'manual'; if (MANUAL) useIdentityFit();   // hand-placed file → render at stored fractions
+      if (window.__calShow) window.__calShow();   // ?cal=1 hint depends on MANUAL, now known
       // Only THIS floor's mobs (each sublevel has its own painted UiMap + 0..1 frame); drop any
       // uncalibrated rows (x null — e.g. a floor with no /kcal yet). Flat dungeons take everything.
       const rows = (FLOOR.sublevel == null ? j.mobs : j.mobs.filter(m => m.sublevel === FLOOR.sublevel))
@@ -2447,16 +2450,43 @@ if (EDIT) {
 }
 
 // ---- ?cal=1 : live calibration of the FIT affine ------------------------------------
-// Arrows = nudge (Shift = ×5), [ ] = scale X, ; ' = scale Y. The current fit prints top-left;
-// bake the final numbers into the dungeon's CFG.fit so it loads aligned.
+// Arrows = nudge (Shift = ×5), [ ] = scale X, ; ' = scale Y — moves/scales the WHOLE floor's mobs at once.
+// The current fit prints top-left. For a NON-manual dungeon, bake the numbers into CFG.fit. For a MANUAL
+// (log-placed) floor, press S to bake the live fit straight into the stored positions + write the file
+// (the floor loads at identity, so CFG.fit wouldn't stick — S persists it where it belongs).
 if (_params.get('cal')) {
   const lbl = document.createElement('div');
-  lbl.style.cssText = 'position:absolute;left:10px;top:48px;z-index:800;background:#000a;color:#0ff;padding:4px 8px;border-radius:6px;font:12px ui-monospace,monospace';
+  lbl.style.cssText = 'position:absolute;left:10px;top:48px;z-index:800;background:#000a;color:#0ff;padding:4px 8px;border-radius:6px;font:12px ui-monospace,monospace;white-space:pre';
   document.getElementById('map').appendChild(lbl);
-  const show = () => lbl.textContent = `fit: sx ${FIT.sx.toFixed(3)} · sy ${FIT.sy.toFixed(3)} · dx ${FIT.dx} · dy ${FIT.dy}`;
+  // hint reads MANUAL at call time — it's set asynchronously by the mob fetch, which calls window.__calShow on load
+  const show = (extra) => {
+    const hint = MANUAL ? '↑↓←→ move · [ ] scale-x · ; ’ scale-y · S = bake+save'
+                        : '↑↓←→ move · [ ] scale-x · ; ’ scale-y · bake into CFG.fit';
+    lbl.textContent = `fit: sx ${FIT.sx.toFixed(3)} · sy ${FIT.sy.toFixed(3)} · dx ${FIT.dx} · dy ${FIT.dy}\n` + (extra != null ? extra : hint);
+  };
+  window.__calShow = show;
   show();
   document.addEventListener('keydown', (ev) => {
     if (document.activeElement && document.activeElement.isContentEditable) return;
+    if (ev.key === 's' || ev.key === 'S') {   // bake the live fit into the floor's stored fractions + persist
+      ev.preventDefault();
+      if (!MANUAL) { show('S-save is for manual-placement floors only'); return; }
+      const positions = [];
+      for (const iid in markers) {            // bake: new fraction = the post-fit pixel / PNG size (pivot-agnostic)
+        const m = markers[iid].mob;
+        m._u = +(fitX(m._u) / W).toFixed(5); m._v = +(fitY(m._v) / H).toFixed(5);
+        positions.push({ iid, x: m._u, y: m._v });
+      }
+      FIT.sx = 1; FIT.sy = 1; FIT.dx = 0; FIT.dy = 0;   // transform now lives in the data → back to identity
+      applyFit(); show('saving…');
+      fetch('/api/save-mob-positions', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ slug: DKEY, positions }) })
+        .then(async (r) => ({ ok: r.ok, d: await r.json().catch(() => ({})) }))   // check HTTP status, not just JSON
+        .then(({ ok, d }) => show(ok && d.updated != null
+          ? `✓ baked + saved ${d.updated} mob(s) on ${FLOOR.label}`
+          : `✗ save failed (${d.error ? d.error.slice(0, 60) : 'no endpoint'}) — restart serve.mjs`))
+        .catch((e) => show('✗ save failed: ' + (e && e.message || e)));
+      return;
+    }
     const s = ev.shiftKey ? 5 : 1, ds = 0.005; let hit = true;
     switch (ev.key) {
       case 'ArrowLeft': FIT.dx -= s; break; case 'ArrowRight': FIT.dx += s; break;
