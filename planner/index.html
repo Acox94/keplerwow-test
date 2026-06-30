@@ -286,8 +286,9 @@
   .kw-spell { font-family:var(--kw-display); font-weight:700; font-size:15px; line-height:1.15; }
   .kw-sevb { font-family:var(--kw-display); font-weight:700; font-size:9.5px; letter-spacing:0.13em; color:var(--kw-sev-2); white-space:nowrap; }
   /* placeholder dispel/answer icon beside the solution label — a square ~the height of the solution text (real icon TBD) */
-  .kw-sol-icon { display:inline-block; width:13px; height:13px; border:1.5px solid var(--kw-sev-2); border-radius:3px; flex:0 0 auto; transform:translateY(-1px); }
-  .kw-sol-icon-img { width:17px; height:17px; flex:0 0 auto; object-fit:contain; vertical-align:middle; transform:translateY(-1px); }
+  .kw-sol-icon { display:inline-block; width:13px; height:13px; border:1.5px solid var(--kw-sev-2); border-radius:3px; flex:0 0 auto; }
+  /* no translateY nudge: the inline-flex wrapper's align-items:center centres the icon on the label's text centreline */
+  .kw-sol-icon-img { width:17px; height:17px; flex:0 0 auto; object-fit:contain; vertical-align:middle; }
   /* spell cooldown after the name — the SAME display face as the name (Rajdhani), just lighter + muted +
      smaller (no italic, no box) so it reads as a quiet secondary detail that matches the title's font */
   .kw-cd { font-family:var(--kw-display); font-weight:600; font-size:13px; color:var(--kw-ink-3); }
