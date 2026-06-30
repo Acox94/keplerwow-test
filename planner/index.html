@@ -2000,26 +2000,57 @@ function slowify(s) {
 }
 const SLOW_HOVER = 'Slow = Snare (a movement-impairing slow)';
 // wrap the word "slow" with the teaching hover (dotted underline signals "definition on hover")
-const slowTerm = (html) => html.replace(/\bslow\b/g, `<abbr title="${SLOW_HOVER}" style="text-decoration-style:dotted;text-underline-offset:2px;cursor:help">slow</abbr>`);
-// EFFECT line (PRESENTATION) — render the engine's structured `card.expect` tokens to text, adding the
-// tooltip NUMBERS (DoT length, slow %) the engine leaves out (those live in SPELL_DESC, a renderer-side sidecar).
-function fmtExpect(card) {
-  const desc = SPELL_DESC[card.spell_id] || '';
-  const p = [];
-  for (const e of card.expect) {
-    if (e.kind === 'dot') { const m = desc.match(/for\s+(\d+)\s*(sec|second|min|minute)/i); p.push('DoT' + (m ? ` ${m[1]}${/min/i.test(m[2]) ? 'm' : 's'}` : '')); }
-    else if (e.kind === 'mechanic') {
-      let l = V2_MECH[e.mechanic] || e.mechanic;
-      if (e.mechanic === 'snared') { const sm = desc.match(/movement speed by\s+(\d+)%/i); const st = /each tick|with each tick|stack/i.test(desc); if (sm) l = `${st ? 'stacking ' : ''}slow ${sm[1]}%${st ? '/tick' : ''}`; }
-      p.push(l);
+const slowTerm = (html) => html.replace(/\bslow\b/gi, (m) => `<abbr title="${SLOW_HOVER}" style="text-decoration-style:dotted;text-underline-offset:2px;cursor:help">${m}</abbr>`);
+// Title Case for the Damage/Effect row values — capitalises content words, keeps grammatical/minor words (for,
+// the, of, by…) lowercase (never the first word), and PRESERVES units/percentages (6s, -30%) + acronyms (DoT,
+// AoE). Applied at render so curated card-effects.json strings ("Physical hit") and auto rows read uniformly.
+const KW_MINOR = new Set(['a', 'an', 'the', 'and', 'or', 'nor', 'but', 'for', 'of', 'to', 'in', 'on', 'at', 'by', 'with', 'from', 'as', 'per', 'into', 'onto', 'over', 'vs', 'via']);
+function kwTitleCase(s) {
+  if (!s) return s;
+  return s.split(' ').map((w, i) => {
+    if (!w || /\d/.test(w) || /[a-z][A-Z]/.test(w) || /^[A-Z]{2,}$/.test(w)) return w; // units / % / acronyms (DoT, AoE) preserved
+    const bare = w.toLowerCase().replace(/[^a-z]/g, '');
+    if (i > 0 && KW_MINOR.has(bare)) return w.toLowerCase();
+    return w.split('/').map((part) => part.replace(/[a-zA-Z]/, (c) => c.toUpperCase())).join('/'); // capitalise each side of a slash (Slow/Tick)
+  }).join(' ');
+}
+// AUTO Damage/Effect rows for an UNCURATED cast (card-effects.json still wins when present). Kept CONCISE — the
+// verbatim tooltip is the icon HOVER, not the rows. Damage = school + kind (Hit / DoT / AoE). Effect = ONLY the
+// SECONDARY effects (slows, stat-mods, hard CC, stacks), parsed tersely from the resolved tooltip; the direct-
+// damage clause and flavour are dropped, so a pure-damage cast shows NO Effect row (e.g. Fetid Spit -> Nature Hit).
+function kwDamageKind(rec) {
+  if (!rec || !rec.school) return '';
+  const kinds = [];
+  if (rec.is_aoe) kinds.push('AoE');
+  if (rec.dot) kinds.push('DoT');
+  if (!kinds.length) kinds.push('Hit');
+  return `${String(rec.school).replace(/,\s*/g, '/')} ${kinds.join(' ')}`;
+}
+const KW_HARD_CC = { stunned: 'stun', rooted: 'root', silenced: 'silence', fleeing: 'fear', disoriented: 'disorient', incapacitated: 'incap', horrified: 'horror', sleeping: 'sleep', frozen: 'freeze', banished: 'banish', charmed: 'charm' };
+function kwSecondaryEffects(card, desc) {
+  const t = [];
+  for (const e of card.expect) if (e.kind === 'mechanic' && KW_HARD_CC[e.mechanic]) t.push(KW_HARD_CC[e.mechanic]); // hard CC from the engine flags
+  if (desc && !/\$/.test(desc)) {
+    const d = desc.replace(/\s+/g, ' ');
+    const dur = (s) => s ? ' ' + s.replace(/\s*sec(?:ond)?s?/i, 's').replace(/\s*min(?:ute)?s?/i, 'm').trim() : '';
+    let m;
+    if ((m = d.match(/(?:reduc|decreas)\w*[^.]*?movement speed by (\d+)%(?:[^.]*?(with each tick|for \d+\s*sec(?:ond)?s?))?/i)))
+      t.push(`-${m[1]}% move` + (/tick/i.test(m[2] || '') ? '/tick' : dur((m[2] || '').replace(/^for /i, ''))));
+    if ((m = d.match(/reduc\w*[^.]*?haste by (\d+)%(?:[^.]*?for (\d+\s*sec(?:ond)?s?))?/i))) t.push(`-${m[1]}% haste` + dur(m[2]));
+    if ((m = d.match(/(?:increas|grant)\w*[^.]*?attack speed by (\d+)%(?:[^.]*?for (\d+\s*sec(?:ond)?s?))?/i))) t.push(`+${m[1]}% attack speed` + dur(m[2]));
+    if ((m = d.match(/damage done by (\d+)%/i))) t.push(`-${m[1]}% damage done`);
+    if ((m = d.match(/increas\w*[^.]*?damage taken by (\d+)%(?:[^.]*?for (\d+\s*sec(?:ond)?s?))?/i))) t.push(`+${m[1]}% damage taken` + dur(m[2]));
+    if (/ignores armor/i.test(d)) t.push('ignores armor');
+    if (/healing to be absorbed|heal(?:ing)? absorb/i.test(d)) t.push('heal absorb');
+    if (card.expect.some((e) => e.kind === 'enrage') && !t.some((x) => /attack speed|haste|damage/.test(x))) t.push('enrage'); // enrage we couldn't quantify
+    if (/\bstacks\b/i.test(d)) { if (t.length) t[t.length - 1] += ' (stacks)'; else t.push('stacks'); }
+  } else {
+    for (const e of card.expect) { // no resolved tooltip — fall back to the bare structured flags so it's not empty
+      if (e.kind === 'enrage') t.push('enrage');
+      else if (e.kind === 'displacement') t.push(e.value === 'knockback' ? 'knockback' : e.value === 'pull' ? 'pull' : 'cast pushback');
     }
-    else if (e.kind === 'aoe') p.push('AoE');
-    else if (e.kind === 'tank_hit') p.push('tank hit');
-    else if (e.kind === 'displacement') p.push(e.value === 'knockback' ? 'knockback' : e.value === 'pull' ? 'pull' : 'cast pushback');
-    else if (e.kind === 'enrage') p.push('enrage');
-    else if (e.kind === 'school') p.push(`${e.school} damage`);
   }
-  return p.join(', ');
+  return [...new Set(t)].join(' · ');
 }
 // the universal "everyone moves" answer (positioning / survive) — render the engine's structured `card.everyone`
 function fmtEveryone(everyone) {
@@ -2037,7 +2068,7 @@ const V2_AXIS_LABEL = { kick: 'Kick', cc: 'CC', displace: 'Knock / Grip', dispel
 const V2_SOLUTION_LABEL = { kick: 'Interrupt', cc: 'Crowd Control', displace: 'Knock / Grip', dispel: 'Dispel', freedom: 'Freedom', soothe: 'Soothe' };
 function renderCardV2(card, id, open) {
   const ans = card.answers, primary = card.primary_answer, tags = card.tags;
-  const expect = fmtExpect(card), everyone = fmtEveryone(card.everyone);
+  const everyone = fmtEveryone(card.everyone);
   const sevCls = KW_SEV_CLASS[card.severity] || 'kw-sev-info';
   const mut = 'color:var(--kw-ink-3,#7c8696)';
   // SHORT display name: a "Button (Talent)" name shows just the talent (Jet Stream); the full combo + note
@@ -2084,14 +2115,18 @@ function renderCardV2(card, id, open) {
     + `<span class="kw-spicon-fb">${esc((card.spell_name || '?').slice(0, 1))}</span>`
     + (fdid ? `<img src="icons/${fdid}.png" alt="" onerror="this.remove()">` : '')
     + `</div>`;
-  const dfRow = (label, txt) => `<div class="kw-df"><span class="kw-df-l">${label}</span><span class="kw-df-v">${slowTerm(slowify(esc(txt)))}</span></div>`;
+  const dfRow = (label, txt) => `<div class="kw-df"><span class="kw-df-l">${label}</span><span class="kw-df-v">${slowTerm(slowify(esc(kwTitleCase(txt))))}</span></div>`;
   const curatedEffect = CARD_EFFECTS[card.spell_id];
   let fxRows = '';
   if (curatedEffect) {
     const segs = String(curatedEffect).split(' · ').map(s => s.trim()).filter(Boolean);
     fxRows = segs.map((s, i) => dfRow(i === 0 ? 'Damage' : 'Effect', s)).join('');
-  } else if (expect) {
-    fxRows = dfRow('Effect', expect);
+  } else {
+    // AUTO-DERIVE (no curation): Damage = school + kind; Effect = concise secondary effects only (see helpers).
+    const dmg = kwDamageKind(rec);
+    const fx = kwSecondaryEffects(card, SPELL_DESC[card.spell_id]);
+    if (dmg) fxRows += dfRow('Damage', dmg);
+    if (fx) fxRows += dfRow('Effect', fx);
   }
   body += `<div class="kw-fx-row">${iconBox}<div class="kw-fx-lines">${fxRows}</div></div>`;
   // each ANSWER AXIS is its own labeled group of Tank/Healer/DPS rows (primary first, others by priority).
