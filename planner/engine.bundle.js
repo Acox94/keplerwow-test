@@ -271,7 +271,7 @@ var KeplerEngine = (() => {
     }
     for (const w of talentGap.warnings) allWarnings.push(w);
     const warnings = allWarnings.filter((wn) => !wn.coaching || skill !== "expert");
-    const cards = buildCards(threats, warnings, groupSpecs, answers);
+    const cards = buildCards(threats, cardSeedsFrom(warnings, threats), groupSpecs, answers);
     return {
       dungeon: { dungeon_id: dungeon.dungeon.dungeon_id, name: dungeon.dungeon.name },
       build: { patch_version: dungeon.build_info.patch_version, build_number: dungeon.build_info.build_number },
@@ -2301,6 +2301,23 @@ var KeplerEngine = (() => {
     }
     return folded.map((x) => ({ ...x, ...classifyWarning(x) })).sort((a, b) => SEVERITY_RANK[a.severity] - SEVERITY_RANK[b.severity]);
   }
+  function cardSeedsFrom(warnings, threats) {
+    const castByKey = /* @__PURE__ */ new Map();
+    for (const t of threats) castByKey.set(`${t.npc_name}|${t.spell_name}`, t);
+    const seeds = /* @__PURE__ */ new Map();
+    for (const w of warnings) {
+      if (w.source === "group") continue;
+      if ((w.category === "interrupt" || w.category === "cc") && (w.subjects?.length ?? 0) > 1) continue;
+      const su = w.subjects?.[0];
+      if (!su) continue;
+      const cast = castByKey.get(`${su.npc_name}|${su.spell_name}`);
+      if (!cast) continue;
+      const key = `${cast.npc_name}|${cast.spell_name}`;
+      const prev = seeds.get(key);
+      if (!prev || SEVERITY_RANK[w.severity] < SEVERITY_RANK[prev.severity]) seeds.set(key, { cast, severity: w.severity });
+    }
+    return seeds;
+  }
   var RESPONSIBLE = {
     interrupt: ["dps"],
     cc: ["dps"],
@@ -2518,21 +2535,9 @@ var KeplerEngine = (() => {
     if (cast.is_aoe) tags.push("aoe");
     return tags;
   }
-  function buildCards(threats, warnings, group, answerBudget) {
-    const castByKey = /* @__PURE__ */ new Map();
-    for (const t of threats) castByKey.set(`${t.npc_name}|${t.spell_name}`, t);
+  function buildCards(threats, castCards, group, answerBudget) {
     const seen = /* @__PURE__ */ new Map();
-    for (const w of warnings) {
-      if (w.source === "group") continue;
-      if ((w.category === "interrupt" || w.category === "cc") && (w.subjects?.length ?? 0) > 1) continue;
-      const su = w.subjects?.[0];
-      if (!su) continue;
-      const key = `${su.npc_name}|${su.spell_name}`;
-      const cast = castByKey.get(key);
-      if (!cast) continue;
-      const prev = seen.get(key);
-      if (!prev || SEVERITY_RANK[w.severity] < SEVERITY_RANK[prev.severity]) seen.set(key, { cast, severity: w.severity });
-    }
+    for (const [key, { cast, severity }] of castCards) seen.set(key, { cast, severity });
     for (const ci of answerBudget.interrupts) {
       const key = `${ci.cast.npc_name}|${ci.cast.spell_name}`;
       if (seen.has(key)) continue;
