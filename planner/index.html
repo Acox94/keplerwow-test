@@ -229,24 +229,28 @@
   .comp-row label { width:52px; color:var(--muted); font-size:12px; }
   .comp-row select { flex:1; background:#0d1117; color:var(--ink); border:1px solid var(--line);
     border-radius:6px; padding:5px 6px; font:inherit; }
-  /* talent picker — choice nodes ("Bash OR Roar") render as a dropdown; independent talents as checkboxes */
-  #tab-comp #talent-wrap h1, #tab-comp #talent-wrap .sub { text-align:center; }
-  #talent-rows { max-width:270px; margin:6px auto 0; }
-  .talent-spec { margin:12px 0 2px; }
-  .talent-spec-head { font-family:var(--fd); font-weight:700; font-size:12px; letter-spacing:.04em; margin:0 0 5px; text-align:center; }
-  .talent-choice { display:flex; align-items:center; gap:7px; margin:5px 0; }
-  .talent-choice .talent-or { width:22px; font-size:9.5px; letter-spacing:.08em; color:var(--muted); text-transform:uppercase; text-align:right; flex:none; }
-  .talent-choice select { flex:1; background:#0d1117; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:4px 6px; font:inherit; font-size:12px; }
-  .talent-toggle { display:flex; align-items:center; gap:7px; margin:4px 0 4px 22px; font-size:12px; color:var(--ink); cursor:pointer; }
-  .talent-toggle input { accent-color:#33937F; width:14px; height:14px; flex:none; }
-  /* the independent talents collapse behind a +/- so the catch-22 choices lead (they stay credited while hidden) */
-  .talent-more { display:flex; align-items:center; gap:6px; margin:5px 0 2px 22px; padding:0; background:none; border:none;
-    color:var(--muted); font-family:var(--fd); font-size:11px; letter-spacing:.04em; text-transform:uppercase; cursor:pointer; }
-  .talent-more:hover { color:var(--ink); }
-  .talent-more:hover .talent-more-ic { border-color:var(--ink-2); color:var(--ink); }
-  .talent-more-ic { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; flex:none;
-    border:1px solid var(--line); border-radius:4px; font-size:13px; line-height:1; color:var(--ink-2); }
-  .talent-toggles[hidden] { display:none; }
+  /* talent picker = a per-spec ACCORDION in its own tab (collapsed by default). A spec's catch-22 choices render
+     as radio-style "pick one" rows (BOTH options visible, the taken one filled in the spec's class colour);
+     independent talents are checkboxes below a quiet divider. */
+  #tab-talents h1, #tab-talents .sub { text-align:center; }
+  #talent-rows { max-width:272px; margin:8px auto 0; }
+  .talent-spec { border-bottom:1px solid var(--line); }
+  .talent-spec:last-child { border-bottom:0; }
+  .talent-acc-head { display:flex; align-items:center; gap:8px; width:100%; background:none; border:0; padding:9px 2px; cursor:pointer; text-align:left; }
+  .talent-dot { width:8px; height:8px; border-radius:50%; flex:none; }
+  .talent-acc-name { flex:1; min-width:0; font-family:var(--fd); font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .talent-acc-head .kw-chev { width:16px; height:16px; color:var(--ink-3); flex:none; transition:transform .2s, color .2s; }
+  .talent-spec.open .talent-acc-head .kw-chev { transform:rotate(180deg); color:var(--ink-2); }
+  .talent-acc-body { padding:0 2px 11px 16px; }
+  .talent-pick { display:flex; flex-direction:column; gap:4px; margin:0 0 8px; }
+  .talent-opt { display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:transparent; border:1px solid var(--line); border-radius:6px; padding:6px 9px; font:inherit; font-size:12px; color:var(--muted); cursor:pointer; }
+  .talent-opt:hover { color:var(--ink); }
+  .talent-opt.on { color:var(--ink); }
+  .talent-radio { width:11px; height:11px; border-radius:50%; border:1.5px solid var(--ink-3); flex:none; box-sizing:border-box; }
+  .talent-tdiv { font-family:var(--fd); font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); margin:9px 0 5px; }
+  .talent-acc-body .talent-toggle { display:flex; align-items:center; gap:7px; margin:5px 0; font-size:12px; color:var(--ink); cursor:pointer; }
+  .talent-acc-body .talent-toggle input { accent-color:#33937F; width:14px; height:14px; flex:none; }
+  .talent-empty { color:var(--muted); font-size:12px; text-align:center; padding:14px 6px; line-height:1.4; }
   /* "Missing talents" callout in the Live Analysis pane (rendered from rep.talent_suggestions) */
   .kw-tg { margin-top:12px; border-top:1px solid var(--line); padding-top:9px; }
   .kw-tg-head { font-family:var(--fd); font-weight:700; font-size:12px; letter-spacing:.04em; margin-bottom:6px; }
@@ -489,6 +493,7 @@
       <select id="dungeonSel"></select>
       <div class="tab-bar">
         <button class="tab active" data-tab="comp">Comp</button>
+        <button class="tab" data-tab="talents">Talents</button>
         <button class="tab" data-tab="route">Route</button>
         <button class="tab" data-tab="dev">Developer</button>
       </div>
@@ -497,11 +502,12 @@
         <h1 style="margin-top:4px">Comp builder</h1>
         <p class="sub">5 role slots → the engine's <code>group</code></p>
         <div id="comp-rows"></div>
-        <div id="talent-wrap" style="display:none">
-          <h1 style="margin-top:18px">Talent Selection</h1>
-          <p class="sub">pick what you took — the cards credit only these</p>
-          <div id="talent-rows"></div>
-        </div>
+      </section>
+
+      <section class="tabpanel" id="tab-talents">
+        <h1 style="margin-top:4px">Talent Selection</h1>
+        <p class="sub">pick what you took — the cards credit only these</p>
+        <div id="talent-rows"></div>
       </section>
 
       <section class="tabpanel" id="tab-route">
@@ -1484,8 +1490,8 @@ function buildTalentsArg() {
   return Object.keys(out).length ? out : undefined;
 }
 function renderTalents() {
-  const wrap = document.getElementById('talent-wrap'), host = document.getElementById('talent-rows');
-  if (!wrap || !host) return;
+  const host = document.getElementById('talent-rows');
+  if (!host) return;
   const seen = new Set(); const groups = [];
   for (const id of compSlots) {
     if (id == null || seen.has(id)) continue; seen.add(id);
@@ -1493,38 +1499,42 @@ function renderTalents() {
     if (!t || !(t.controls || []).length) continue;
     ensureTalentSel(id, t); groups.push([id, t]);
   }
-  if (!groups.length) { wrap.style.display = 'none'; host.innerHTML = ''; return; }
-  wrap.style.display = '';
+  if (!groups.length) { host.innerHTML = `<p class="talent-empty">Pick your group on the <b>Comp</b> tab, then choose each spec's talents here.</p>`; return; }
+  // one collapsible row per spec: a class dot + name + chevron; expanding shows the catch-22 choices (radio-style
+  // pick rows, both options visible) then the independent talents as checkboxes. Collapsed by default.
   host.innerHTML = groups.map(([id, t]) => {
     const sel = new Set(talentSel[id] || []);
     const col = CLASS_COLORS[t.class] || 'var(--ink)';
-    // CHOICES (catch-22s) always lead; independent TOGGLES collapse behind a +/- so the lesser talents hide by default
-    const choiceRows = t.controls.map((c, ci) => {
-      if (c.type !== 'choice') return '';
-      const cur = c.options.find(o => sel.has(o.spell_id)) || c.options[0];
-      return `<div class="talent-choice"><span class="talent-or">or</span><select data-spec="${id}" data-ctl="${ci}">${
-        c.options.map(o => `<option value="${o.spell_id}"${o.spell_id === cur.spell_id ? ' selected' : ''}>${esc(o.name)}</option>`).join('')
-      }</select></div>`;
-    }).join('');
-    const toggles = t.controls.filter(c => c.type === 'toggle');
-    const toggleRows = toggles.map(c => `<label class="talent-toggle"><input type="checkbox" data-spec="${id}" data-spell="${c.spell_id}"${sel.has(c.spell_id) ? ' checked' : ''}>${esc(c.name)}</label>`).join('');
     const open = talentExpanded.has(id);
-    const more = toggles.length
-      ? `<button type="button" class="talent-more" data-spec="${id}"><span class="talent-more-ic">${open ? '−' : '+'}</span>${open ? 'hide' : toggles.length + ' more'}</button><div class="talent-toggles"${open ? '' : ' hidden'}>${toggleRows}</div>`
-      : '';
-    return `<div class="talent-spec"><div class="talent-spec-head" style="color:${col}">${esc(t.class)} ${esc(t.spec_name)}</div>${choiceRows}${more}</div>`;
+    const head = `<button type="button" class="talent-acc-head" data-spec="${id}" aria-expanded="${open}"><span class="talent-dot" style="background:${col}"></span><span class="talent-acc-name" style="color:${col}">${esc(t.class)} ${esc(t.spec_name)}</span>${KW_CHEV}</button>`;
+    let body = '';
+    if (open) {
+      const picks = t.controls.map((c, ci) => {
+        if (c.type !== 'choice') return '';
+        return `<div class="talent-pick">${c.options.map(o => {
+          const on = sel.has(o.spell_id);
+          return `<button type="button" class="talent-opt${on ? ' on' : ''}" data-spec="${id}" data-ctl="${ci}" data-spell="${o.spell_id}"${on ? ` style="border-color:${col}"` : ''}><span class="talent-radio"${on ? ` style="background:${col};border-color:${col}"` : ''}></span>${esc(o.name)}</button>`;
+        }).join('')}</div>`;
+      }).join('');
+      const toggles = t.controls.filter(c => c.type === 'toggle');
+      const tog = toggles.length
+        ? `<div class="talent-tdiv">also</div>` + toggles.map(c => `<label class="talent-toggle"><input type="checkbox" data-spec="${id}" data-spell="${c.spell_id}"${sel.has(c.spell_id) ? ' checked' : ''}>${esc(c.name)}</label>`).join('')
+        : '';
+      body = `<div class="talent-acc-body">${picks}${tog}</div>`;
+    }
+    return `<div class="talent-spec${open ? ' open' : ''}">${head}${body}</div>`;
   }).join('');
-  host.querySelectorAll('.talent-more').forEach(b => b.onclick = () => {
+  host.querySelectorAll('.talent-acc-head').forEach(b => b.onclick = () => {
     const id = Number(b.dataset.spec);
     if (talentExpanded.has(id)) talentExpanded.delete(id); else talentExpanded.add(id);
     renderTalents();
   });
-  host.querySelectorAll('select[data-ctl]').forEach(el => el.onchange = () => {
-    const id = Number(el.dataset.spec), t = TALENT_CHOICES[String(id)], ctl = t.controls[Number(el.dataset.ctl)];
+  host.querySelectorAll('.talent-opt').forEach(b => b.onclick = () => {
+    const id = Number(b.dataset.spec), t = TALENT_CHOICES[String(id)], ctl = t.controls[Number(b.dataset.ctl)];
     const set = new Set(talentSel[id] || []);
     for (const o of ctl.options) set.delete(o.spell_id);   // a choice node holds exactly one option
-    set.add(Number(el.value));
-    talentSel[id] = [...set]; saveTalents(); renderAnalysis();
+    set.add(Number(b.dataset.spell));
+    talentSel[id] = [...set]; saveTalents(); renderTalents(); renderAnalysis();
   });
   host.querySelectorAll('input[type=checkbox][data-spell]').forEach(cb => cb.onchange = () => {
     const id = Number(cb.dataset.spec), set = new Set(talentSel[id] || []);
@@ -2044,7 +2054,8 @@ function renderAnalysis() {
   const host = document.getElementById('analysis');
   if (!host) return;
   host.classList.add('kw-analysis-panel');
-  const isComp = (document.querySelector('#controls .tab-bar .tab.active')?.dataset.tab) === 'comp';
+  const _activeTab = document.querySelector('#controls .tab-bar .tab.active')?.dataset.tab;
+  const isComp = _activeTab === 'comp' || _activeTab === 'talents'; // Talents tab shows the same group/composition + missing-talent feedback
   if (!dungeon || !window.KeplerEngine) { host.innerHTML = '<p class="hint">loading engine…</p>'; kwSyncExpandAll(); return; }
   const pull = pulls[active];
   const members = pull ? rollup(pull) : [];
