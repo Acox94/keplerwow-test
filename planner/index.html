@@ -1937,9 +1937,10 @@ function renderCardV2(card, id, open) {
   for (const ax of V2_PRIORITY) if (present.has(ax) && ax !== primary) axes.push(ax);
   for (const axis of axes) {
     body += axHead(V2_AXIS_LABEL[axis] || axis);
-    // a dispel/soothe answer is shown in its dispel-TYPE colour (not the answerer's class colour)
-    const axisColor = axis === 'dispel' ? (DISPEL_TYPE_COLOR[rec && rec.dispel_type] || null)
-      : axis === 'soothe' ? DISPEL_TYPE_COLOR.Enrage : null;
+    // a DISPEL answer is shown in its dispel-TYPE colour (the type varies + helps ID what to dispel). SOOTHE is
+    // NOT: there's only one type (Enrage), so the enrage colour adds no info and would hide the class — keep its
+    // ability name CLASS-coloured so you can still tell who soothes. (The soothe headline + edge stay enrage-red.)
+    const axisColor = axis === 'dispel' ? (DISPEL_TYPE_COLOR[rec && rec.dispel_type] || null) : null;
     for (const k of ['tank', 'healer', 'dps']) {
       const list = ans[k].filter(a => a.axis === axis); if (!list.length) continue;
       const r = KW_ROLE[k];
