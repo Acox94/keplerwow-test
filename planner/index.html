@@ -780,18 +780,25 @@ function restoreRoute() {   // rebuild saved pulls (dropping any iid not on this
   } else { newPull(); }
 }
 
-// Enemy forces summed across the OTHER floors' saved routes (the current floor is summed live from `pulls`).
-// Each floor is its own page, so a floor we're not on isn't in memory — read its saved route from
-// localStorage and price each iid through FORCES_BY_IID (built from the full, all-floors mobs.json).
-function otherFloorForces() {
-  let sum = 0;
+// The OTHER floors' contribution to the route totals — pulls, mobs AND forces (the current floor is
+// summed live from `pulls`). Each floor is its own ?f= page, so a floor we're not on lives only in
+// localStorage; read its saved route and count NON-EMPTY pulls (an empty placeholder pull, e.g. one a
+// visited-but-unused floor auto-creates, isn't a real pull) + their mobs, pricing each iid through
+// FORCES_BY_IID. So Pulls/Mobs/Forces are all dungeon-wide, not per-floor.
+function otherFloorTotals() {
+  let forces = 0, pulls = 0, mobs = 0;
   for (const fl of FLOORS) {
     if ((fl.sublevel ?? 'all') === (FLOOR.sublevel ?? 'all')) continue;   // current floor counted live
     let s = null; try { s = JSON.parse(localStorage.getItem(`kepler-planner:route:${DKEY}:f${fl.sublevel ?? 'all'}`) || 'null'); } catch {}
     if (!s || !Array.isArray(s.pulls)) continue;
-    for (const arr of s.pulls) for (const iid of (arr || [])) sum += FORCES_BY_IID.get(iid) || 0;
+    for (const arr of s.pulls) {
+      const a = arr || [];
+      if (!a.length) continue;                                  // skip empty placeholder pulls
+      pulls++; mobs += a.length;
+      for (const iid of a) forces += FORCES_BY_IID.get(iid) || 0;
+    }
   }
-  return sum;
+  return { forces, pulls, mobs };
 }
 
 function pullOf(iid) { return pulls.findIndex(p => p.mobs.has(iid)); }
@@ -1320,16 +1327,19 @@ function render() {
   // cumulative total across the route + REAL enemy forces. Pulls/Mobs are THIS floor's plan; enemy forces
   // is dungeon-wide (denominator is the whole dungeon), so sum this floor's live pulls + every other floor's
   // saved route — switching floors no longer resets the meter.
-  const total = pulls.reduce((n, p) => n + p.mobs.size, 0);
+  const mobsHere = pulls.reduce((n, p) => n + p.mobs.size, 0);
+  const pullsHere = pulls.reduce((n, p) => n + (p.mobs.size ? 1 : 0), 0);   // non-empty pulls on this floor
   const forcesHere = pulls.reduce((n, p) =>
     n + [...p.mobs].reduce((s, iid) => s + (markers[iid]?.mob.forces || 0), 0), 0);
-  const forces = forcesHere + otherFloorForces();
+  const ot = otherFloorTotals();                                            // other floors' pulls/mobs/forces
+  const nPulls = pullsHere + ot.pulls, nMobs = mobsHere + ot.mobs, forces = forcesHere + ot.forces;
   const pct = FORCES_TOTAL ? Math.round(forces / FORCES_TOTAL * 100) : 0;
+  const onFloor = FLOORS.length > 1 ? (h) => ` (${h} on this floor)` : () => '';
   document.getElementById('totals').innerHTML =
     `<div class="stat-row">`
-    + `<span class="stat"><b>${pulls.length}</b><span class="stat-label">Pull${pulls.length === 1 ? '' : 's'}</span></span>`
-    + `<span class="stat"><b>${total}</b><span class="stat-label">Mob${total === 1 ? '' : 's'}</span></span></div>`
-    + `<div class="forces-row" title="${forces} / ${FORCES_TOTAL} enemy forces across all floors${FLOORS.length > 1 ? ` (${forcesHere} on this floor)` : ''}">`
+    + `<span class="stat" title="pulls across all floors${onFloor(pullsHere)}"><b>${nPulls}</b><span class="stat-label">Pull${nPulls === 1 ? '' : 's'}</span></span>`
+    + `<span class="stat" title="mobs across all floors${onFloor(mobsHere)}"><b>${nMobs}</b><span class="stat-label">Mob${nMobs === 1 ? '' : 's'}</span></span></div>`
+    + `<div class="forces-row" title="${forces} / ${FORCES_TOTAL} enemy forces across all floors${onFloor(forcesHere)}">`
     + `<span class="forces-label">Enemy forces</span>`
     + `<div class="forces-bar"><div class="forces-fill" style="width:${pct}%"></div></div>`
     + `<span class="forces-pct">${pct}%</span></div>`;
