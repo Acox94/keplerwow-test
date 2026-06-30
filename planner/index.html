@@ -342,6 +342,13 @@
   .kw-pull-label { text-align:center; font-family:var(--kw-display); font-weight:600; font-size:12px;
     letter-spacing:0.1em; color:var(--kw-ink-3); text-transform:uppercase; margin:2px 0 11px; }
   .kw-stack { display:flex; flex-direction:column; gap:9px; }
+  /* drag-to-reorder: NORMAL cursor on hover; the 4-way MOVE cursor shows only while a card is PRESSED (clicked)
+     or actively dragged — the re-order hint appears on interaction, not idle hover. The dragged card fades. */
+  .kw-stack .kw-card[draggable="true"]:active,
+  .kw-stack .kw-card[draggable="true"]:active .kw-card-head,
+  .kw-stack .kw-card.kw-dragging,
+  .kw-stack .kw-card.kw-dragging .kw-card-head { cursor:move; }
+  .kw-stack .kw-card.kw-dragging { opacity:.45; }
   /* card */
   .kw-card { background:var(--kw-surface); border:1px solid var(--kw-line); border-left:3px solid var(--kw-sev);
     border-radius:9px; overflow:hidden; }
@@ -743,6 +750,20 @@ const saveTalents = () => { try { localStorage.setItem(TALENT_KEY, JSON.stringif
 function restoreTalents() { try { const v = JSON.parse(localStorage.getItem(TALENT_KEY) || 'null'); if (v && typeof v === 'object') talentSel = Object.fromEntries(Object.entries(v).map(([k, a]) => [k, Array.isArray(a) ? a.map(Number) : []])); } catch {} }
 const saveRoute = () => { try { localStorage.setItem(ROUTE_KEY, JSON.stringify({ pulls: pulls.map(p => [...p.mobs]), active })); } catch {} };
 function restoreComp() { try { const v = JSON.parse(localStorage.getItem(COMP_KEY) || 'null'); if (Array.isArray(v) && v.length === compSlots.length) compSlots = v.map(x => x == null ? null : Number(x)); } catch {} }
+// Custom Live-Analysis card order — players drag the cards to reorder; the order persists GLOBALLY (a card's id
+// is `npc_name|spell_name`) so it follows that mechanic wherever it appears, like the saved comp/route.
+const CARD_ORDER_KEY = 'kepler-planner:card-order';
+let cardOrder = [];   // ordered list of card ids (npc_name|spell_name)
+const saveCardOrder = () => { try { localStorage.setItem(CARD_ORDER_KEY, JSON.stringify(cardOrder)); } catch {} };
+function restoreCardOrder() { try { const v = JSON.parse(localStorage.getItem(CARD_ORDER_KEY) || 'null'); if (Array.isArray(v)) cardOrder = v.filter((x) => typeof x === 'string'); } catch {} }
+// stable-sort cards to the saved order: known ids by their saved index, unknown ones keep the engine order
+function orderCards(cards) {
+  if (!cardOrder.length) return cards;
+  const rank = new Map(cardOrder.map((id, i) => [id, i])), key = (c) => c.npc_name + '|' + c.spell_name;
+  return cards.map((c, i) => ({ c, i }))
+    .sort((a, b) => (rank.has(key(a.c)) ? rank.get(key(a.c)) : 1e9) - (rank.has(key(b.c)) ? rank.get(key(b.c)) : 1e9) || a.i - b.i)
+    .map((x) => x.c);
+}
 function restoreRoute() {   // rebuild saved pulls (dropping any iid not on this floor), else a fresh pull
   let s = null; try { s = JSON.parse(localStorage.getItem(ROUTE_KEY) || 'null'); } catch {}
   if (s && Array.isArray(s.pulls) && s.pulls.some(a => a && a.length)) {
@@ -1963,7 +1984,7 @@ const V2_AXES = new Set(['freedom', 'dispel', 'soothe', 'kick', 'cc']);
 const V2_BLUE_TAGS = new Set(['dispel', 'freedom', 'dot']); // these three chips share #0796ff (owner request)
 const V2_POS = { move_out: 'move out of it', spread: 'spread out', stack: 'stack up', soak: 'soak it', frontal: 'dodge the frontal', line_of_sight: 'break line of sight', bait: 'bait it away' };
 // the spell-icon box is tinted by the cast's PRIMARY resolution axis (null = neutral line color)
-const V2_RES_COLOR = { kick: '#27d3c0', cc: '#8b7ff0', displace: '#d27f4a', dispel: '#5b9bd5', freedom: '#57c785', soothe: '#e8b400', heal_absorb: '#57c785', tank_buster: '#dfb563', dodge: '#e8b400' };
+const V2_RES_COLOR = { kick: '#f2cd13', cc: '#8b7ff0', displace: '#d27f4a', dispel: '#5b9bd5', freedom: '#57c785', soothe: '#e8b400', heal_absorb: '#57c785', tank_buster: '#dfb563', dodge: '#e8b400' };
 // A DISPEL/SOOTHE card keys on the dispel TYPE, not a generic "dispel" colour: the type drives the headline,
 // the icon box, the card's left edge AND the answer text. Curse = "decurse"; Enrage = the soothe answer.
 const DISPEL_TYPE_COLOR = { Magic: '#007cf6', Curse: '#ae2eea', Poison: '#91d700', Disease: '#e37313', Bleed: '#fe0517', Enrage: '#e60217' };
@@ -2110,7 +2131,7 @@ function renderCardV2(card, id, open) {
   const resColor = primaryTypeColor || V2_RES_COLOR[primary] || 'var(--kw-line,#2a2e3d)';
   // LEFT EDGE: dispel/soothe use the dispel-type colour; the role/execution mechanic axes (heal_absorb /
   // tank_buster / dodge) take their label colour too, so the edge matches the headline. Other axes keep severity.
-  const edgeColor = primaryTypeColor || (['heal_absorb', 'tank_buster', 'dodge'].includes(primary) ? V2_RES_COLOR[primary] : null);
+  const edgeColor = primaryTypeColor || (['heal_absorb', 'tank_buster', 'dodge', 'kick'].includes(primary) ? V2_RES_COLOR[primary] : null);
   const cms = rec ? rec.cast_time_ms : 0;
   const meta = [rec && rec.school, cms > 0 ? `${cms % 1000 === 0 ? cms / 1000 : (cms / 1000).toFixed(1)}s cast` : (rec ? 'instant' : ''), rec && rec.priority].filter(Boolean).join(' · ');
   const tipDesc = (SPELL_DESC[card.spell_id] || '').replace(/\r\n/g, '\n').replace(/\n{2,}/g, '\n').trim();
@@ -2155,12 +2176,8 @@ function renderCardV2(card, id, open) {
   const cdMs = rec && rec.recast_cooldown_ms;
   const cdTxt = cdMs ? ` <span class="kw-cd">(${Math.round(cdMs / 1000)}s)</span>` : '';
   const solLabel = primary ? (V2_SOLUTION_LABEL[primary] || primary) : (KW_SEV_LABEL[card.severity] || '');
-  // colour the headline by the dispel TYPE (dispel/soothe), else the RESOLUTION (matches the icon box). EXCEPTION:
-  // an Interrupt (kick) keeps the SEVERITY colour so its label matches its severity-coloured left edge.
-  const solColor = primaryTypeColor
-    || (primary === 'kick' ? 'var(--kw-sev)'
-    : primary ? (V2_RES_COLOR[primary] || '#0796ff')
-    : 'var(--kw-sev-2)');
+  // colour the headline by the dispel TYPE (dispel/soothe), else the RESOLUTION (matches the icon box + edge).
+  const solColor = primaryTypeColor || (primary ? (V2_RES_COLOR[primary] || '#0796ff') : 'var(--kw-sev-2)');
   // dispel-icons/<key>.png — dispel answers key on the dispel TYPE (magic/curse/poison/disease/bleed),
   // others on the resolution (interrupt/cc/freedom/enrage/displace). Missing file -> the placeholder square.
   const solKey = !primary ? null
@@ -2192,7 +2209,7 @@ function renderCardV2(card, id, open) {
 function renderCardsV2(rep) {
   // The card MODEL now comes straight from the engine (rep.cards — one MechanicCard per warned cast, already
   // deduped + sorted most-severe-first). The renderer only draws them.
-  const cards = rep.cards || [];
+  const cards = orderCards(rep.cards || []);   // apply the player's saved drag order (engine order is the default)
   const banner = `<div style="font-size:11px;letter-spacing:.05em;color:var(--accent,#2dd4bf);margin:0 0 9px">card model · v2</div>`;
   // collapsed by default (header + tags only); expand state lives in expandedCards so it survives re-renders
   const stack = cards.length ? cards.map(card => { const id = card.npc_name + '|' + card.spell_name; return renderCardV2(card, id, expandedCards.has(id)); }).join('') : '<p class="hint">No pull mechanics flagged — this comp covers this pull.</p>';
@@ -2212,6 +2229,37 @@ function kwWireExpand(host) {
     head.onclick = toggle;
     head.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
   });
+}
+
+// drag-to-reorder the Live-Analysis cards (native HTML5 DnD). A click still expands; only a drag gesture moves a
+// card. On drop, the new on-screen order is merged to the FRONT of the global `cardOrder` and cached.
+function kwWireDrag(host) {
+  const stack = host.querySelector('.kw-stack'); if (!stack) return;
+  stack.querySelectorAll('.kw-card[data-card]').forEach((card) => {
+    card.setAttribute('draggable', 'true');
+    card.addEventListener('dragstart', (e) => { card.classList.add('kw-dragging'); if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move'; });
+    card.addEventListener('dragend', () => {
+      card.classList.remove('kw-dragging');
+      const visible = [...stack.querySelectorAll('.kw-card[data-card]')].map((c) => c.dataset.card);
+      cardOrder = [...visible, ...cardOrder.filter((id) => !visible.includes(id))]; // keep off-screen ids after
+      saveCardOrder();
+    });
+  });
+  stack.addEventListener('dragover', (e) => {
+    const dragging = stack.querySelector('.kw-dragging'); if (!dragging) return;
+    e.preventDefault();
+    const after = kwDragAfter(stack, e.clientY);
+    if (after == null) stack.appendChild(dragging); else stack.insertBefore(dragging, after);
+  });
+}
+// the card the cursor sits ABOVE the midline of — insert before it (null => append at the end)
+function kwDragAfter(stack, y) {
+  let best = null, bestOffset = -Infinity;
+  for (const el of stack.querySelectorAll('.kw-card:not(.kw-dragging)')) {
+    const box = el.getBoundingClientRect(), offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > bestOffset) { bestOffset = offset; best = el; }
+  }
+  return best;
 }
 
 // "Missing talents" — the payoff of the picker: talents the comp HASN'T specced that would close a gap
@@ -2248,7 +2296,7 @@ function renderAnalysis() {
   try { rep = KeplerEngine.analyzePull(dungeon, members, group, { skill:'experienced', priority_rate_ratio: KW_PRIORITY_RATE_RATIO, lethal_hp_threshold: KW_LETHAL_HP, key_level: KW_KEY_LEVEL, talents: buildTalentsArg() }); }
   catch (e) { host.innerHTML = `<p class="hint">engine error: ${esc(String(e && e.message || e))}</p>`; kwSyncExpandAll(); return; }
   // v2 card-model spike (?cards=1) — structured per-cast cards, beside the current path (Route tab only).
-  if (CARDS_V2 && !isComp) { const v = renderCardsV2(rep); host.innerHTML = v.html + kwTalentSuggestionsHTML(rep); setWarn(v.n); kwWireExpand(host); kwSyncExpandAll(); return; }
+  if (CARDS_V2 && !isComp) { const v = renderCardsV2(rep); host.innerHTML = v.html + kwTalentSuggestionsHTML(rep); setWarn(v.n); kwWireExpand(host); kwWireDrag(host); kwSyncExpandAll(); return; }
   // Comp tab shows GROUP/composition warnings; Route tab shows the pull's boss/trash mechanics.
   // The pull-level interrupt-budget aggregate is hoisted into the Overall Analysis section, so
   // drop it from the per-spell card stack (it's not about the one cast its subjects[0] names).
@@ -2306,7 +2354,7 @@ fetch(CFG.dist).then(r => r.json())
   .then(j => { dungeon = KeplerEngine.DungeonExport.parse(j);
     creaturesById = new Map((dungeon.creatures || []).map(c => [c.npc_id, c]));   // join key for the detail card
     kwInjectBaseDamage();   // attach measured damage parsed from the descriptions sidecar (if already loaded)
-    restoreComp(); restoreTalents(); renderComp(); renderTalents(); renderAnalysis(); if (EDIT) editorBoot(); })
+    restoreComp(); restoreTalents(); restoreCardOrder(); renderComp(); renderTalents(); renderAnalysis(); if (EDIT) editorBoot(); })
   .catch(e => { const h = document.getElementById('analysis'); if (h) h.innerHTML = `<p class="hint">failed to load dungeon: ${esc(String(e && e.message || e))}</p>`; });
 
 // load the REAL mob positions (MDT-derived), drop the markers, then open the first pull
