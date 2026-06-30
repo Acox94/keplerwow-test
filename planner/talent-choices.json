@@ -790,20 +790,6 @@
         },
         {
           "type": "choice",
-          "node": 76042,
-          "options": [
-            {
-              "spell_id": 108199,
-              "name": "Gorefiend's Grasp"
-            },
-            {
-              "spell_id": 1263569,
-              "name": "Abomination Limb"
-            }
-          ]
-        },
-        {
-          "type": "choice",
           "node": 76074,
           "options": [
             {
@@ -848,20 +834,6 @@
             {
               "spell_id": 276079,
               "name": "Death's Reach"
-            }
-          ]
-        },
-        {
-          "type": "choice",
-          "node": 76042,
-          "options": [
-            {
-              "spell_id": 108199,
-              "name": "Gorefiend's Grasp"
-            },
-            {
-              "spell_id": 1263569,
-              "name": "Abomination Limb"
             }
           ]
         },

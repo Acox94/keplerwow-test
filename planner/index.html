@@ -221,14 +221,47 @@
      viewed — hover (desktop), .open (tap/click toggle for mobile), or while editing */
   .note-wrap:hover .dnote, .note-wrap.open .dnote, .dnote.editing { display:inline-block; }
   .dnote.editing { outline:2px solid #ffd166; cursor:text; background:#1a212c; }
-  /* comp picker + live engine analysis */
-  .comp-row { display:flex; align-items:center; gap:8px; margin:4px 0; }
-  /* center the Comp builder — heading + sub + the role-slot rows as a centered block */
-  #tab-comp h1, #tab-comp .sub { text-align:center; }
-  #comp-rows { max-width:270px; margin:8px auto 0; }
-  .comp-row label { width:52px; color:var(--muted); font-size:12px; }
-  .comp-row select { flex:1; background:#0d1117; color:var(--ink); border:1px solid var(--line);
-    border-radius:6px; padding:5px 6px; font:inherit; }
+  /* comp builder — role seats + class-coloured spec dropdowns, one unified roster (realigned to the role +
+     class colour systems). The tile (the seat) is tinted by ROLE — the Live Analysis row colours, so a seat
+     matches its analysis row; the dropdown value/dot carry the chosen spec's CLASS colour. The dropdown clones
+     the dungeon selector. Header mirrors the Talents panel. */
+  #tab-comp { font-family:var(--fd); }
+  .comp-head { margin:2px 0 14px; }
+  .comp-eyebrow { font-family:var(--fd); font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+  .comp-subhead { font-size:12px; color:var(--ink-3); margin-top:5px; line-height:1.35; max-width:240px; }
+  .comp-roster { background:#141b29; border:1px solid rgba(140,160,200,0.10); border-radius:11px; padding:6px; }
+  .comp-slot { display:flex; align-items:center; gap:10px; padding:7px 6px; }
+  .comp-slot + .comp-slot { border-top:1px solid rgba(140,160,200,0.06); }
+  /* role tile — the seat, tinted by role */
+  .comp-tile { width:28px; height:28px; border-radius:7px; display:inline-flex; align-items:center; justify-content:center; flex:none;
+    background:color-mix(in srgb, var(--rc) 13%, transparent); border:1px solid color-mix(in srgb, var(--rc) 30%, var(--line)); }
+  .comp-tile svg { width:15px; height:15px; color:var(--rc); }
+  .comp-role { font-family:var(--fd); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); min-width:46px; flex:none; }
+  /* custom dropdown — clones the dungeon selector; value + dot carry the chosen spec's CLASS colour (--cc) */
+  .dd { position:relative; flex:1; min-width:0; }
+  .dd-trigger { width:100%; display:flex; align-items:center; gap:9px; background:#0f1622; border:1px solid rgba(140,160,200,0.10);
+    border-radius:8px; padding:9px 10px 9px 11px; cursor:pointer; font-family:inherit; text-align:left; transition:border-color .14s, background .14s; }
+  .dd-trigger:hover { border-color:rgba(140,160,200,0.16); }
+  .dd.open .dd-trigger { border-color:rgba(39,211,192,0.35); background:#111a28; }
+  .dd-dot { width:8px; height:8px; border-radius:50%; background:var(--cc); box-shadow:0 0 7px -1px var(--cc); flex:none; }
+  .dd-value { flex:1; font-size:13px; font-weight:600; color:var(--cc); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dd-chev { width:14px; height:14px; color:var(--muted); flex:none; transition:transform .18s ease; }
+  .dd.open .dd-chev { transform:rotate(180deg); }
+  .dd-menu { position:absolute; top:calc(100% + 5px); left:0; right:0; background:#121a28; border:1px solid rgba(140,160,200,0.16);
+    border-radius:9px; padding:5px; box-shadow:0 14px 34px -10px rgba(0,0,0,0.7); z-index:50; max-height:240px; overflow-y:auto; display:none; }
+  .dd.open .dd-menu { display:block; }
+  .dd-opt { display:flex; align-items:center; gap:9px; padding:8px 9px; border-radius:6px; cursor:pointer; transition:background .1s; }
+  .dd-opt:hover { background:rgba(255,255,255,0.03); }
+  .dd-opt.sel { background:var(--res-soft); }
+  .dd-opt-dot { width:8px; height:8px; border-radius:50%; flex:none; }
+  .dd-opt-name { flex:1; font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dd-check { width:13px; height:13px; color:var(--res); flex:none; opacity:0; }
+  .dd-opt.sel .dd-check { opacity:1; }
+  .dd-menu::-webkit-scrollbar { width:8px; }
+  .dd-menu::-webkit-scrollbar-thumb { background:rgba(140,160,200,0.18); border-radius:8px; border:2px solid #121a28; }
+  /* the "— None —" / empty seat reads muted, not class-coloured */
+  .dd-opt--none .dd-opt-name { color:var(--ink-3); font-weight:500; }
+  .dd-opt--none .dd-opt-dot { background:transparent; border:1px solid var(--ink-3); }
   /* talent picker — realigned to the Live Analysis card language: one CARD per spec (left class-colour bar +
      glowing dot + "Class · Spec" + a count badge + chevron), collapsed by default. Choices are boxed "nodes"
      (both options shown, the taken one a TEAL signal); utility talents are teal chips under a quiet subhead. */
@@ -522,9 +555,11 @@
       </div>
 
       <section class="tabpanel active" id="tab-comp">
-        <h1 style="margin-top:4px">Comp builder</h1>
-        <p class="sub">5 role slots → the engine's <code>group</code></p>
-        <div id="comp-rows"></div>
+        <div class="comp-head">
+          <div class="comp-eyebrow">Comp</div>
+          <div class="comp-subhead">Set your group — the route's cards plan around these.</div>
+        </div>
+        <div class="comp-roster" id="comp-rows"></div>
       </section>
 
       <section class="tabpanel" id="tab-talents">
@@ -1476,12 +1511,21 @@ let compSlots = [null, null, null, null, null];
 let talentSel = {};   // spec_id -> [selected talent spell_ids]; absent spec = its default (all toggles on, choices = first option)
 let talentExpanded = new Set();   // spec_ids whose independent-talent toggles are expanded (default collapsed)
 const COMP_SLOTS = [
-  { label:'Tank',   ok: s => s.party_role === 'tank' },
-  { label:'Healer', ok: s => s.party_role === 'healer' },
-  { label:'DPS 1',  ok: s => s.role === 'DPS' },
-  { label:'DPS 2',  ok: s => s.role === 'DPS' },
-  { label:'DPS 3',  ok: s => s.role === 'DPS' },
+  { label:'Tank',   kind:'tank', ok: s => s.party_role === 'tank' },
+  { label:'Healer', kind:'heal', ok: s => s.party_role === 'healer' },
+  { label:'DPS 1',  kind:'dps',  ok: s => s.role === 'DPS' },
+  { label:'DPS 2',  kind:'dps',  ok: s => s.role === 'DPS' },
+  { label:'DPS 3',  kind:'dps',  ok: s => s.role === 'DPS' },
 ];
+// role seat: tile colour (the Live Analysis row colour) + glyph, per slot kind
+const COMP_ROLE_RC = { tank:'var(--tank)', heal:'var(--heal)', dps:'var(--dps)' };
+const COMP_ROLE_ICON = {
+  tank: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+  heal: '<path d="M12 5v14M5 12h14"/>',
+  dps:  '<polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/>',
+};
+const COMP_CHEV  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+const COMP_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 
 function renderComp() {
   if (!dungeon) return;
@@ -1489,13 +1533,59 @@ function renderComp() {
   host.innerHTML = COMP_SLOTS.map((slot, i) => {
     const opts = dungeon.specs.filter(slot.ok).sort((a,b) => `${a.class} ${a.spec_name}`.localeCompare(`${b.class} ${b.spec_name}`));
     const chosen = compSlots[i];
-    return `<div class="comp-row"><label>${slot.label}</label>
-      <select data-slot="${i}"><option value="">—</option>${opts.map(s => `<option value="${s.spec_id}"${s.spec_id===chosen?' selected':''}>${esc(s.class)} ${esc(s.spec_name)}</option>`).join('')}</select></div>`;
+    const sel = opts.find(s => s.spec_id === chosen) || null;
+    const rc = COMP_ROLE_RC[slot.kind] || 'var(--ink)';
+    const cc = sel ? (CLASS_COLORS[sel.class] || 'var(--ink)') : 'var(--ink-3)';
+    // Comp builder hides the class name on every seat — just the spec ("Unholy", not "Death Knight Unholy").
+    // Class identity still reads via the dot + the spec's class colour; the role tile names the seat.
+    const label = (s) => esc(s.spec_name);
+    const valueLabel = sel ? label(sel) : '— Pick a spec —';
+    const menu = [
+      `<div class="dd-opt dd-opt--none${chosen == null ? ' sel' : ''}" data-slot="${i}" data-spec="">
+         <span class="dd-opt-dot"></span><span class="dd-opt-name">— None —</span><span class="dd-check">${COMP_CHECK}</span></div>`,
+      ...opts.map(s => {
+        const col = CLASS_COLORS[s.class] || 'var(--ink)';
+        return `<div class="dd-opt${s.spec_id === chosen ? ' sel' : ''}" data-slot="${i}" data-spec="${s.spec_id}">
+          <span class="dd-opt-dot" style="background:${col}"></span>
+          <span class="dd-opt-name" style="color:${col}">${label(s)}</span>
+          <span class="dd-check">${COMP_CHECK}</span></div>`;
+      }),
+    ].join('');
+    return `<div class="comp-slot">
+      <span class="comp-tile" style="--rc:${rc}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${COMP_ROLE_ICON[slot.kind] || ''}</svg>
+      </span>
+      <span class="comp-role">${slot.label}</span>
+      <div class="dd" data-slot="${i}" style="--cc:${cc}">
+        <button type="button" class="dd-trigger">
+          <span class="dd-dot"></span>
+          <span class="dd-value">${valueLabel}</span>
+          <span class="dd-chev">${COMP_CHEV}</span>
+        </button>
+        <div class="dd-menu">${menu}</div>
+      </div>
+    </div>`;
   }).join('');
-  host.querySelectorAll('select').forEach(sel => sel.onchange = () => {
-    compSlots[Number(sel.dataset.slot)] = sel.value ? Number(sel.value) : null; saveComp(); renderTalents(); renderAnalysis();
+  // dropdown behaviour: one open at a time, pick updates the comp + re-renders (recolours the value)
+  const closeAll = (except) => host.querySelectorAll('.dd.open').forEach(d => { if (d !== except) d.classList.remove('open'); });
+  host.querySelectorAll('.dd').forEach(dd => {
+    dd.querySelector('.dd-trigger').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const wasOpen = dd.classList.contains('open');
+      closeAll(dd);
+      dd.classList.toggle('open', !wasOpen);
+    });
+    dd.querySelectorAll('.dd-opt').forEach(opt => {
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        compSlots[Number(opt.dataset.slot)] = opt.dataset.spec ? Number(opt.dataset.spec) : null;
+        saveComp(); renderComp(); renderTalents(); renderAnalysis();
+      });
+    });
   });
 }
+// click anywhere else closes any open comp dropdown (registered once; triggers stopPropagation)
+document.addEventListener('click', () => document.querySelectorAll('#comp-rows .dd.open').forEach(d => d.classList.remove('open')));
 
 // ---- talent picker: per-comp-spec controls (choice = dropdown, independent = checkbox) -----------
 // The DB2-derived talent-choices.json lists each spec's CARD-RELEVANT talents. Knowing what the player

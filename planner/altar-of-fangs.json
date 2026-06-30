@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68301,
-    "extracted_at": "2026-06-29T07:24:41.254Z",
+    "extracted_at": "2026-06-30T05:44:18.784Z",
     "patch_version": "12.1.0",
     "source_versions": {
       "curated": {
@@ -5002,16 +5002,6 @@
           "source": "baseline",
           "spell_id": 49576,
           "verified": true
-        },
-        {
-          "cast_time_ms": 0,
-          "condition": null,
-          "confidence": "editorial",
-          "name": "Gorefiend's Grasp",
-          "note": "Pulls enemies to a target — interrupts their casts (AoE).",
-          "source": "talent",
-          "spell_id": 108199,
-          "verified": true
         }
       ],
       "externals": [
@@ -5234,16 +5224,6 @@
           "note": "Pulls the caster to you — interrupts its cast (stacks, does not scatter).",
           "source": "baseline",
           "spell_id": 49576,
-          "verified": true
-        },
-        {
-          "cast_time_ms": 0,
-          "condition": null,
-          "confidence": "editorial",
-          "name": "Gorefiend's Grasp",
-          "note": "Pulls enemies to a target — interrupts their casts (AoE).",
-          "source": "talent",
-          "spell_id": 108199,
           "verified": true
         }
       ],
