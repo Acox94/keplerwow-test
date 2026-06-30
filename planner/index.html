@@ -239,6 +239,14 @@
   .talent-choice select { flex:1; background:#0d1117; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:4px 6px; font:inherit; font-size:12px; }
   .talent-toggle { display:flex; align-items:center; gap:7px; margin:4px 0 4px 22px; font-size:12px; color:var(--ink); cursor:pointer; }
   .talent-toggle input { accent-color:#33937F; width:14px; height:14px; flex:none; }
+  /* the independent talents collapse behind a +/- so the catch-22 choices lead (they stay credited while hidden) */
+  .talent-more { display:flex; align-items:center; gap:6px; margin:5px 0 2px 22px; padding:0; background:none; border:none;
+    color:var(--muted); font-family:var(--fd); font-size:11px; letter-spacing:.04em; text-transform:uppercase; cursor:pointer; }
+  .talent-more:hover { color:var(--ink); }
+  .talent-more:hover .talent-more-ic { border-color:var(--ink-2); color:var(--ink); }
+  .talent-more-ic { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; flex:none;
+    border:1px solid var(--line); border-radius:4px; font-size:13px; line-height:1; color:var(--ink-2); }
+  .talent-toggles[hidden] { display:none; }
   /* "Missing talents" callout in the Live Analysis pane (rendered from rep.talent_suggestions) */
   .kw-tg { margin-top:12px; border-top:1px solid var(--line); padding-top:9px; }
   .kw-tg-head { font-family:var(--fd); font-weight:700; font-size:12px; letter-spacing:.04em; margin-bottom:6px; }
@@ -1425,6 +1433,7 @@ const escU = (s) => esc(s).replace(/__([^_]+)__/g, (_, n) => {
 let dungeon = null;
 let compSlots = [null, null, null, null, null];
 let talentSel = {};   // spec_id -> [selected talent spell_ids]; absent spec = its default (all toggles on, choices = first option)
+let talentExpanded = new Set();   // spec_ids whose independent-talent toggles are expanded (default collapsed)
 const COMP_SLOTS = [
   { label:'Tank',   ok: s => s.party_role === 'tank' },
   { label:'Healer', ok: s => s.party_role === 'healer' },
@@ -1489,17 +1498,27 @@ function renderTalents() {
   host.innerHTML = groups.map(([id, t]) => {
     const sel = new Set(talentSel[id] || []);
     const col = CLASS_COLORS[t.class] || 'var(--ink)';
-    const rows = t.controls.map((c, ci) => {
-      if (c.type === 'choice') {
-        const cur = c.options.find(o => sel.has(o.spell_id)) || c.options[0];
-        return `<div class="talent-choice"><span class="talent-or">or</span><select data-spec="${id}" data-ctl="${ci}">${
-          c.options.map(o => `<option value="${o.spell_id}"${o.spell_id === cur.spell_id ? ' selected' : ''}>${esc(o.name)}</option>`).join('')
-        }</select></div>`;
-      }
-      return `<label class="talent-toggle"><input type="checkbox" data-spec="${id}" data-spell="${c.spell_id}"${sel.has(c.spell_id) ? ' checked' : ''}>${esc(c.name)}</label>`;
+    // CHOICES (catch-22s) always lead; independent TOGGLES collapse behind a +/- so the lesser talents hide by default
+    const choiceRows = t.controls.map((c, ci) => {
+      if (c.type !== 'choice') return '';
+      const cur = c.options.find(o => sel.has(o.spell_id)) || c.options[0];
+      return `<div class="talent-choice"><span class="talent-or">or</span><select data-spec="${id}" data-ctl="${ci}">${
+        c.options.map(o => `<option value="${o.spell_id}"${o.spell_id === cur.spell_id ? ' selected' : ''}>${esc(o.name)}</option>`).join('')
+      }</select></div>`;
     }).join('');
-    return `<div class="talent-spec"><div class="talent-spec-head" style="color:${col}">${esc(t.class)} ${esc(t.spec_name)}</div>${rows}</div>`;
+    const toggles = t.controls.filter(c => c.type === 'toggle');
+    const toggleRows = toggles.map(c => `<label class="talent-toggle"><input type="checkbox" data-spec="${id}" data-spell="${c.spell_id}"${sel.has(c.spell_id) ? ' checked' : ''}>${esc(c.name)}</label>`).join('');
+    const open = talentExpanded.has(id);
+    const more = toggles.length
+      ? `<button type="button" class="talent-more" data-spec="${id}"><span class="talent-more-ic">${open ? '−' : '+'}</span>${open ? 'hide' : toggles.length + ' more'}</button><div class="talent-toggles"${open ? '' : ' hidden'}>${toggleRows}</div>`
+      : '';
+    return `<div class="talent-spec"><div class="talent-spec-head" style="color:${col}">${esc(t.class)} ${esc(t.spec_name)}</div>${choiceRows}${more}</div>`;
   }).join('');
+  host.querySelectorAll('.talent-more').forEach(b => b.onclick = () => {
+    const id = Number(b.dataset.spec);
+    if (talentExpanded.has(id)) talentExpanded.delete(id); else talentExpanded.add(id);
+    renderTalents();
+  });
   host.querySelectorAll('select[data-ctl]').forEach(el => el.onchange = () => {
     const id = Number(el.dataset.spec), t = TALENT_CHOICES[String(id)], ctl = t.controls[Number(el.dataset.ctl)];
     const set = new Set(talentSel[id] || []);
