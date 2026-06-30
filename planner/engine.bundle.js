@@ -2534,6 +2534,8 @@ var KeplerEngine = (() => {
     if (cast.primary_answer) return present.has(cast.primary_answer) ? cast.primary_answer : null;
     if (present.has("soothe")) return "soothe";
     for (const ax of CARD_AXIS_PRIORITY) if (present.has(ax)) return ax;
+    const ev = cardEveryone(cast);
+    if (ev && (ev.kind === "positioning" || ev.kind === "avoidable")) return "dodge";
     return null;
   }
   function cardTags(cast, answers, primary) {
