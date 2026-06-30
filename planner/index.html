@@ -2194,7 +2194,7 @@ function renderCardV2(card, id, open) {
   return `<div class="kw-card kw-card--major ${sevCls}${open ? ' kw-card--open' : ''}" data-card="${esc(id)}"${edgeColor ? ` style="border-left-color:${edgeColor}"` : ''}>
       <div class="kw-card-head" role="button" tabindex="0" aria-expanded="${open ? 'true' : 'false'}" style="flex-direction:column;align-items:stretch;gap:3px">
         <div style="display:flex;align-items:center;gap:8px">
-          <span class="kw-spell" style="flex:1;min-width:0">${esc(card.spell_name)}${cdTxt}</span>
+          <span class="kw-spell" style="flex:1;min-width:0"><span style="text-shadow:0 0 6px color-mix(in srgb, ${solColor} 80%, transparent)">${esc(card.spell_name)}</span>${cdTxt}</span>
           <span style="display:inline-flex;align-items:center;gap:4px"><span class="kw-sevb" style="font-size:14px;color:${solColor}">${esc(solLabel)}</span>${solIcon}</span>
           <div class="kw-hright">${KW_CHEV}</div>
         </div>
