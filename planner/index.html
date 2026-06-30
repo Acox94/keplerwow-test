@@ -801,6 +801,19 @@ function otherFloorTotals() {
   return { forces, pulls, mobs };
 }
 
+// How many pulls precede THIS floor's, so pull cards number continuously across floors instead of
+// resetting to "Pull 1" on each — floor 2's first pull reads "Pull <floor-1 count + 1>". Counts the
+// non-empty pulls saved on the floors ordered before this one (FLOORS order = floor 1, 2, 3 …).
+function pullNumberOffset() {
+  let n = 0;
+  for (const fl of FLOORS) {
+    if ((fl.sublevel ?? 'all') === (FLOOR.sublevel ?? 'all')) break;   // stop once we reach the current floor
+    let s = null; try { s = JSON.parse(localStorage.getItem(`kepler-planner:route:${DKEY}:f${fl.sublevel ?? 'all'}`) || 'null'); } catch {}
+    if (s && Array.isArray(s.pulls)) n += s.pulls.filter(a => a && a.length).length;
+  }
+  return n;
+}
+
 function pullOf(iid) { return pulls.findIndex(p => p.mobs.has(iid)); }
 
 function newPull() { pulls.push({ mobs: new Set() }); active = pulls.length - 1; render(); saveRoute(); }
@@ -1310,8 +1323,9 @@ function render() {
     // LIVE ROUTE dimming: current pull bright, earlier faded, later/unselected very dim
     el.style.opacity = liveMode ? (pi===liveIdx ? '1' : (pi>=0 && pi<liveIdx) ? '0.5' : '0.16') : '';
   }
-  // pull list (Pull 1 -> 2 -> 3 ...)
+  // pull list — numbered continuously across floors (Pull 1 → 2 … on floor 1, then 6 → 7 on floor 2)
   const pullsEl = document.getElementById('pulls');
+  const pullOff = pullNumberOffset();   // pulls on the floors before this one
   pullsEl.innerHTML = pulls.map((p, i) => {
     const color = COLORS[i % COLORS.length];
     const roll = rollup(p);
@@ -1319,7 +1333,7 @@ function render() {
       ? roll.map(r => `${r.count}× ${nameFor(r.npc_id)}`).join(', ')
       : '<span class="empty">tap mobs on the map…</span>';
     return `<div class="pull ${i===active?'active':''}" style="border-left-color:${color}" data-i="${i}">
-      <h3><span>Pull ${i+1}</span><span class="hint">${[...p.mobs].length} mob(s)</span></h3>
+      <h3><span>Pull ${pullOff + i + 1}</span><span class="hint">${[...p.mobs].length} mob(s)</span></h3>
       <div class="mobs">${mobs}</div></div>`;
   }).join('') || '<p class="hint">No pulls yet — “+ New pull”, then tap mobs.</p>';
   pullsEl.querySelectorAll('.pull').forEach(d => d.onclick = () => { active = +d.dataset.i; render(); });
