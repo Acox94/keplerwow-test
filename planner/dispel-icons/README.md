@@ -12,10 +12,18 @@ falls back to the blank placeholder square, so naming is the only thing that mat
 **Other answers** key on the resolution:
 - `interrupt.png` (Kick) · `cc.png` (Crowd Control) · `freedom.png` · `enrage.png` (Soothe) · `displace.png` (Knock / Grip)
 
-## What's here now (rename these)
-The 12 cropped source icons are dropped in as `dispel-01.png`..`dispel-12.png`
-(best-guess of what each depicts — rename to the keys above):
+## Adding a new answer icon (`fit-icon.py`)
 
-01 red blood drop · 02 red demon skull · 03 green cross · 04 blue swirl
-05 purple swirl · 06 orange skull · 07 orange warning triangle · 08 green leaf-drop
-09 sword · 10 red angry mask · 11 silver ring · 12 gold shield
+A NEW icon (interrupt / cc / freedom / displace) comes as a single high-res PNG.
+Run it through `fit-icon.py` to match the set's format — crop to the art, scale to
+~85% of a square canvas, centre, transparent background:
+
+    python fit-icon.py <source.png> interrupt.png
+
+The set sits at content ≈ 85% of a 72×72 canvas (the renderer scales it with
+`object-fit:contain` at 17px, so what keeps icons consistent is that fill ratio,
+not the pixel size). Pass `[size] [fill]` to override.
+
+## Status
+- ✅ `magic` · `curse` · `poison` · `disease` · `bleed` · `enrage` (soothe) · `interrupt` (kick)
+- ⏳ still needed: `cc.png` · `freedom.png` · `displace.png` — run each source through `fit-icon.py`
