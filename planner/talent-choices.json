@@ -1,5 +1,5 @@
 {
-  "_note": "DB2-DERIVED talent picker source (gen-talent-choices). spec_id → card-relevant talent controls: a CHOICE (TraitNode Type==2, pick one — default options[0]) renders as a dropdown; a TOGGLE (independent talent, default ON) renders as a checkbox. Baseline/pet abilities are never here. Re-run after promote:specs.",
+  "_note": "DB2-DERIVED talent picker source (gen-talent-choices). spec_id → talent controls: a CHOICE (TraitNode Type==2 holding ≥1 card-relevant talent) renders as a dropdown listing ALL the node options incl. the non-card sibling (default = options[0], the card-relevant one); a TOGGLE (card talent on no choice node, default ON) renders as a checkbox. Baseline/pet abilities are never here. Re-run after promote:specs.",
   "_build": "12.1.0.68301",
   "specs": {
     "62": {
@@ -21,6 +21,48 @@
           ]
         },
         {
+          "type": "choice",
+          "node": 62087,
+          "options": [
+            {
+              "spell_id": 157997,
+              "name": "Ice Nova"
+            },
+            {
+              "spell_id": 386763,
+              "name": "Freezing Cold"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 62088,
+          "options": [
+            {
+              "spell_id": 383121,
+              "name": "Mass Polymorph"
+            },
+            {
+              "spell_id": 113724,
+              "name": "Ring of Frost"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 62105,
+          "options": [
+            {
+              "spell_id": 212653,
+              "name": "Shimmer"
+            },
+            {
+              "spell_id": 1244340,
+              "name": "Improved Blink"
+            }
+          ]
+        },
+        {
           "type": "toggle",
           "spell_id": 110959,
           "name": "Greater Invisibility"
@@ -32,23 +74,8 @@
         },
         {
           "type": "toggle",
-          "spell_id": 157997,
-          "name": "Ice Nova"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 383121,
-          "name": "Mass Polymorph"
-        },
-        {
-          "type": "toggle",
           "spell_id": 475,
           "name": "Remove Curse"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 212653,
-          "name": "Shimmer"
         },
         {
           "type": "toggle",
@@ -76,6 +103,48 @@
           ]
         },
         {
+          "type": "choice",
+          "node": 62087,
+          "options": [
+            {
+              "spell_id": 157997,
+              "name": "Ice Nova"
+            },
+            {
+              "spell_id": 386763,
+              "name": "Freezing Cold"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 62088,
+          "options": [
+            {
+              "spell_id": 383121,
+              "name": "Mass Polymorph"
+            },
+            {
+              "spell_id": 113724,
+              "name": "Ring of Frost"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 62105,
+          "options": [
+            {
+              "spell_id": 212653,
+              "name": "Shimmer"
+            },
+            {
+              "spell_id": 1244340,
+              "name": "Improved Blink"
+            }
+          ]
+        },
+        {
           "type": "toggle",
           "spell_id": 86949,
           "name": "Cauterize"
@@ -92,23 +161,8 @@
         },
         {
           "type": "toggle",
-          "spell_id": 157997,
-          "name": "Ice Nova"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 383121,
-          "name": "Mass Polymorph"
-        },
-        {
-          "type": "toggle",
           "spell_id": 475,
           "name": "Remove Curse"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 212653,
-          "name": "Shimmer"
         },
         {
           "type": "toggle",
@@ -136,6 +190,48 @@
           ]
         },
         {
+          "type": "choice",
+          "node": 62087,
+          "options": [
+            {
+              "spell_id": 157997,
+              "name": "Ice Nova"
+            },
+            {
+              "spell_id": 386763,
+              "name": "Freezing Cold"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 62088,
+          "options": [
+            {
+              "spell_id": 383121,
+              "name": "Mass Polymorph"
+            },
+            {
+              "spell_id": 113724,
+              "name": "Ring of Frost"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 62105,
+          "options": [
+            {
+              "spell_id": 212653,
+              "name": "Shimmer"
+            },
+            {
+              "spell_id": 1244340,
+              "name": "Improved Blink"
+            }
+          ]
+        },
+        {
           "type": "toggle",
           "spell_id": 110959,
           "name": "Greater Invisibility"
@@ -147,23 +243,8 @@
         },
         {
           "type": "toggle",
-          "spell_id": 157997,
-          "name": "Ice Nova"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 383121,
-          "name": "Mass Polymorph"
-        },
-        {
-          "type": "toggle",
           "spell_id": 475,
           "name": "Remove Curse"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 212653,
-          "name": "Shimmer"
         },
         {
           "type": "toggle",
@@ -188,14 +269,23 @@
       "spec_name": "Protection",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 31935,
-          "name": "Avenger's Shield"
+          "type": "choice",
+          "node": 90062,
+          "options": [
+            {
+              "spell_id": 204018,
+              "name": "Blessing of Spellwarding"
+            },
+            {
+              "spell_id": 393114,
+              "name": "Improved Ardent Defender"
+            }
+          ]
         },
         {
           "type": "toggle",
-          "spell_id": 204018,
-          "name": "Blessing of Spellwarding"
+          "spell_id": 31935,
+          "name": "Avenger's Shield"
         },
         {
           "type": "toggle",
@@ -230,14 +320,23 @@
       "spec_name": "Arms",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 118038,
-          "name": "Die by the Sword"
+          "type": "choice",
+          "node": 108705,
+          "options": [
+            {
+              "spell_id": 5246,
+              "name": "Intimidating Shout"
+            },
+            {
+              "spell_id": 12323,
+              "name": "Piercing Howl"
+            }
+          ]
         },
         {
           "type": "toggle",
-          "spell_id": 5246,
-          "name": "Intimidating Shout"
+          "spell_id": 118038,
+          "name": "Die by the Sword"
         },
         {
           "type": "toggle",
@@ -261,9 +360,18 @@
       "spec_name": "Fury",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 5246,
-          "name": "Intimidating Shout"
+          "type": "choice",
+          "node": 108705,
+          "options": [
+            {
+              "spell_id": 5246,
+              "name": "Intimidating Shout"
+            },
+            {
+              "spell_id": 12323,
+              "name": "Piercing Howl"
+            }
+          ]
         },
         {
           "type": "toggle",
@@ -287,14 +395,23 @@
       "spec_name": "Protection",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 386071,
-          "name": "Disrupting Shout"
+          "type": "choice",
+          "node": 108705,
+          "options": [
+            {
+              "spell_id": 5246,
+              "name": "Intimidating Shout"
+            },
+            {
+              "spell_id": 12323,
+              "name": "Piercing Howl"
+            }
+          ]
         },
         {
           "type": "toggle",
-          "spell_id": 5246,
-          "name": "Intimidating Shout"
+          "spell_id": 386071,
+          "name": "Disrupting Shout"
         },
         {
           "type": "toggle",
@@ -333,6 +450,20 @@
         },
         {
           "type": "choice",
+          "node": 82207,
+          "options": [
+            {
+              "spell_id": 102359,
+              "name": "Mass Entanglement"
+            },
+            {
+              "spell_id": 102793,
+              "name": "Ursol's Vortex"
+            }
+          ]
+        },
+        {
+          "type": "choice",
           "node": 82229,
           "options": [
             {
@@ -349,11 +480,6 @@
           "type": "toggle",
           "spell_id": 2637,
           "name": "Hibernate"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 102359,
-          "name": "Mass Entanglement"
         },
         {
           "type": "toggle",
@@ -392,6 +518,20 @@
         },
         {
           "type": "choice",
+          "node": 82207,
+          "options": [
+            {
+              "spell_id": 102359,
+              "name": "Mass Entanglement"
+            },
+            {
+              "spell_id": 102793,
+              "name": "Ursol's Vortex"
+            }
+          ]
+        },
+        {
+          "type": "choice",
           "node": 82229,
           "options": [
             {
@@ -408,11 +548,6 @@
           "type": "toggle",
           "spell_id": 2637,
           "name": "Hibernate"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 102359,
-          "name": "Mass Entanglement"
         },
         {
           "type": "toggle",
@@ -451,6 +586,20 @@
         },
         {
           "type": "choice",
+          "node": 82207,
+          "options": [
+            {
+              "spell_id": 102359,
+              "name": "Mass Entanglement"
+            },
+            {
+              "spell_id": 102793,
+              "name": "Ursol's Vortex"
+            }
+          ]
+        },
+        {
+          "type": "choice",
           "node": 82229,
           "options": [
             {
@@ -467,11 +616,6 @@
           "type": "toggle",
           "spell_id": 2637,
           "name": "Hibernate"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 102359,
-          "name": "Mass Entanglement"
         },
         {
           "type": "toggle",
@@ -515,6 +659,20 @@
         },
         {
           "type": "choice",
+          "node": 82207,
+          "options": [
+            {
+              "spell_id": 102359,
+              "name": "Mass Entanglement"
+            },
+            {
+              "spell_id": 102793,
+              "name": "Ursol's Vortex"
+            }
+          ]
+        },
+        {
+          "type": "choice",
           "node": 82229,
           "options": [
             {
@@ -539,11 +697,6 @@
         },
         {
           "type": "toggle",
-          "spell_id": 102359,
-          "name": "Mass Entanglement"
-        },
-        {
-          "type": "toggle",
           "spell_id": 132469,
           "name": "Typhoon"
         }
@@ -554,9 +707,46 @@
       "spec_name": "Blood",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 221562,
-          "name": "Asphyxiate"
+          "type": "choice",
+          "node": 76064,
+          "options": [
+            {
+              "spell_id": 221562,
+              "name": "Asphyxiate"
+            },
+            {
+              "spell_id": 276079,
+              "name": "Death's Reach"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 76042,
+          "options": [
+            {
+              "spell_id": 108199,
+              "name": "Gorefiend's Grasp"
+            },
+            {
+              "spell_id": 1263569,
+              "name": "Abomination Limb"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 76074,
+          "options": [
+            {
+              "spell_id": 212552,
+              "name": "Wraith Walk"
+            },
+            {
+              "spell_id": 391546,
+              "name": "March of Darkness"
+            }
+          ]
         },
         {
           "type": "toggle",
@@ -567,11 +757,6 @@
           "type": "toggle",
           "spell_id": 111673,
           "name": "Control Undead"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 108199,
-          "name": "Gorefiend's Grasp"
         },
         {
           "type": "toggle",
@@ -582,11 +767,6 @@
           "type": "toggle",
           "spell_id": 114556,
           "name": "Purgatory"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 212552,
-          "name": "Wraith Walk"
         }
       ]
     },
@@ -595,9 +775,46 @@
       "spec_name": "Frost",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 221562,
-          "name": "Asphyxiate"
+          "type": "choice",
+          "node": 76064,
+          "options": [
+            {
+              "spell_id": 221562,
+              "name": "Asphyxiate"
+            },
+            {
+              "spell_id": 276079,
+              "name": "Death's Reach"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 76042,
+          "options": [
+            {
+              "spell_id": 108199,
+              "name": "Gorefiend's Grasp"
+            },
+            {
+              "spell_id": 1263569,
+              "name": "Abomination Limb"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 76074,
+          "options": [
+            {
+              "spell_id": 212552,
+              "name": "Wraith Walk"
+            },
+            {
+              "spell_id": 391546,
+              "name": "March of Darkness"
+            }
+          ]
         },
         {
           "type": "toggle",
@@ -611,18 +828,8 @@
         },
         {
           "type": "toggle",
-          "spell_id": 108199,
-          "name": "Gorefiend's Grasp"
-        },
-        {
-          "type": "toggle",
           "spell_id": 47528,
           "name": "Mind Freeze"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 212552,
-          "name": "Wraith Walk"
         }
       ]
     },
@@ -631,9 +838,46 @@
       "spec_name": "Unholy",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 221562,
-          "name": "Asphyxiate"
+          "type": "choice",
+          "node": 76064,
+          "options": [
+            {
+              "spell_id": 221562,
+              "name": "Asphyxiate"
+            },
+            {
+              "spell_id": 276079,
+              "name": "Death's Reach"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 76042,
+          "options": [
+            {
+              "spell_id": 108199,
+              "name": "Gorefiend's Grasp"
+            },
+            {
+              "spell_id": 1263569,
+              "name": "Abomination Limb"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 76074,
+          "options": [
+            {
+              "spell_id": 212552,
+              "name": "Wraith Walk"
+            },
+            {
+              "spell_id": 391546,
+              "name": "March of Darkness"
+            }
+          ]
         },
         {
           "type": "toggle",
@@ -647,18 +891,8 @@
         },
         {
           "type": "toggle",
-          "spell_id": 108199,
-          "name": "Gorefiend's Grasp"
-        },
-        {
-          "type": "toggle",
           "spell_id": 47528,
           "name": "Mind Freeze"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 212552,
-          "name": "Wraith Walk"
         }
       ]
     },
@@ -667,14 +901,23 @@
       "spec_name": "Beast Mastery",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 147362,
-          "name": "Counter Shot"
+          "type": "choice",
+          "node": 102393,
+          "options": [
+            {
+              "spell_id": 1513,
+              "name": "Scare Beast"
+            },
+            {
+              "spell_id": 187698,
+              "name": "Tar Trap"
+            }
+          ]
         },
         {
           "type": "toggle",
-          "spell_id": 1513,
-          "name": "Scare Beast"
+          "spell_id": 147362,
+          "name": "Counter Shot"
         },
         {
           "type": "toggle",
@@ -688,14 +931,23 @@
       "spec_name": "Marksmanship",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 147362,
-          "name": "Counter Shot"
+          "type": "choice",
+          "node": 102393,
+          "options": [
+            {
+              "spell_id": 1513,
+              "name": "Scare Beast"
+            },
+            {
+              "spell_id": 187698,
+              "name": "Tar Trap"
+            }
+          ]
         },
         {
           "type": "toggle",
-          "spell_id": 1513,
-          "name": "Scare Beast"
+          "spell_id": 147362,
+          "name": "Counter Shot"
         },
         {
           "type": "toggle",
@@ -709,14 +961,23 @@
       "spec_name": "Survival",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 187707,
-          "name": "Muzzle"
+          "type": "choice",
+          "node": 102393,
+          "options": [
+            {
+              "spell_id": 1513,
+              "name": "Scare Beast"
+            },
+            {
+              "spell_id": 187698,
+              "name": "Tar Trap"
+            }
+          ]
         },
         {
           "type": "toggle",
-          "spell_id": 1513,
-          "name": "Scare Beast"
+          "spell_id": 187707,
+          "name": "Muzzle"
         },
         {
           "type": "toggle",
@@ -845,14 +1106,32 @@
       "spec_name": "Assassination",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 31230,
-          "name": "Cheat Death"
+          "type": "choice",
+          "node": 90742,
+          "options": [
+            {
+              "spell_id": 31230,
+              "name": "Cheat Death"
+            },
+            {
+              "spell_id": 79008,
+              "name": "Elusiveness"
+            }
+          ]
         },
         {
-          "type": "toggle",
-          "spell_id": 1776,
-          "name": "Gouge"
+          "type": "choice",
+          "node": 90741,
+          "options": [
+            {
+              "spell_id": 1776,
+              "name": "Gouge"
+            },
+            {
+              "spell_id": 200733,
+              "name": "Airborne Irritant"
+            }
+          ]
         }
       ]
     },
@@ -861,14 +1140,32 @@
       "spec_name": "Outlaw",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 31230,
-          "name": "Cheat Death"
+          "type": "choice",
+          "node": 90742,
+          "options": [
+            {
+              "spell_id": 31230,
+              "name": "Cheat Death"
+            },
+            {
+              "spell_id": 79008,
+              "name": "Elusiveness"
+            }
+          ]
         },
         {
-          "type": "toggle",
-          "spell_id": 1776,
-          "name": "Gouge"
+          "type": "choice",
+          "node": 90741,
+          "options": [
+            {
+              "spell_id": 1776,
+              "name": "Gouge"
+            },
+            {
+              "spell_id": 200733,
+              "name": "Airborne Irritant"
+            }
+          ]
         }
       ]
     },
@@ -877,14 +1174,32 @@
       "spec_name": "Subtlety",
       "controls": [
         {
-          "type": "toggle",
-          "spell_id": 31230,
-          "name": "Cheat Death"
+          "type": "choice",
+          "node": 90742,
+          "options": [
+            {
+              "spell_id": 31230,
+              "name": "Cheat Death"
+            },
+            {
+              "spell_id": 79008,
+              "name": "Elusiveness"
+            }
+          ]
         },
         {
-          "type": "toggle",
-          "spell_id": 1776,
-          "name": "Gouge"
+          "type": "choice",
+          "node": 90741,
+          "options": [
+            {
+              "spell_id": 1776,
+              "name": "Gouge"
+            },
+            {
+              "spell_id": 200733,
+              "name": "Airborne Irritant"
+            }
+          ]
         }
       ]
     },
@@ -907,6 +1222,34 @@
           ]
         },
         {
+          "type": "choice",
+          "node": 102945,
+          "options": [
+            {
+              "spell_id": 58875,
+              "name": "Spirit Walk"
+            },
+            {
+              "spell_id": 192063,
+              "name": "Gust of Wind"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 102930,
+          "options": [
+            {
+              "spell_id": 192077,
+              "name": "Wind Rush Totem (Jet Stream)"
+            },
+            {
+              "spell_id": 51485,
+              "name": "Earthgrab Totem"
+            }
+          ]
+        },
+        {
           "type": "toggle",
           "spell_id": 108271,
           "name": "Astral Shift"
@@ -925,16 +1268,6 @@
           "type": "toggle",
           "spell_id": 51514,
           "name": "Hex"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 58875,
-          "name": "Spirit Walk"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 192077,
-          "name": "Wind Rush Totem (Jet Stream)"
         },
         {
           "type": "toggle",
@@ -962,6 +1295,34 @@
           ]
         },
         {
+          "type": "choice",
+          "node": 102945,
+          "options": [
+            {
+              "spell_id": 58875,
+              "name": "Spirit Walk"
+            },
+            {
+              "spell_id": 192063,
+              "name": "Gust of Wind"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 102930,
+          "options": [
+            {
+              "spell_id": 192077,
+              "name": "Wind Rush Totem (Jet Stream)"
+            },
+            {
+              "spell_id": 51485,
+              "name": "Earthgrab Totem"
+            }
+          ]
+        },
+        {
           "type": "toggle",
           "spell_id": 108271,
           "name": "Astral Shift"
@@ -980,16 +1341,6 @@
           "type": "toggle",
           "spell_id": 51514,
           "name": "Hex"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 58875,
-          "name": "Spirit Walk"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 192077,
-          "name": "Wind Rush Totem (Jet Stream)"
         },
         {
           "type": "toggle",
@@ -1017,6 +1368,34 @@
           ]
         },
         {
+          "type": "choice",
+          "node": 102945,
+          "options": [
+            {
+              "spell_id": 58875,
+              "name": "Spirit Walk"
+            },
+            {
+              "spell_id": 192063,
+              "name": "Gust of Wind"
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "node": 102930,
+          "options": [
+            {
+              "spell_id": 192077,
+              "name": "Wind Rush Totem (Jet Stream)"
+            },
+            {
+              "spell_id": 51485,
+              "name": "Earthgrab Totem"
+            }
+          ]
+        },
+        {
           "type": "toggle",
           "spell_id": 108271,
           "name": "Astral Shift"
@@ -1035,16 +1414,6 @@
           "type": "toggle",
           "spell_id": 77130,
           "name": "Purify Spirit"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 58875,
-          "name": "Spirit Walk"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 192077,
-          "name": "Wind Rush Totem (Jet Stream)"
         },
         {
           "type": "toggle",
@@ -1184,6 +1553,20 @@
       "spec_name": "Windwalker",
       "controls": [
         {
+          "type": "choice",
+          "node": 101207,
+          "options": [
+            {
+              "spell_id": 152175,
+              "name": "Whirling Dragon Punch"
+            },
+            {
+              "spell_id": 392983,
+              "name": "Strike of the Windlord"
+            }
+          ]
+        },
+        {
           "type": "toggle",
           "spell_id": 218164,
           "name": "Detox"
@@ -1197,11 +1580,6 @@
           "type": "toggle",
           "spell_id": 116841,
           "name": "Tiger's Lust"
-        },
-        {
-          "type": "toggle",
-          "spell_id": 152175,
-          "name": "Whirling Dragon Punch"
         }
       ]
     },
