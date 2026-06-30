@@ -2460,7 +2460,7 @@ var KeplerEngine = (() => {
   var CARD_REMOVABLE = /* @__PURE__ */ new Set(["Magic", "Curse", "Disease", "Poison", "Bleed"]);
   var CARD_EFFECT_MECHANICS = /* @__PURE__ */ new Set(["snared", "rooted", "stunned", "silenced", "disoriented", "incapacitated", "fleeing", "charmed", "banished"]);
   var CARD_POS_TECHS = /* @__PURE__ */ new Set(["move_out", "frontal", "line_of_sight", "spread", "stack", "soak", "bait"]);
-  var CARD_AXIS_PRIORITY = ["kick", "cc", "displace", "dispel", "freedom", "soothe", "heal_absorb"];
+  var CARD_AXIS_PRIORITY = ["kick", "cc", "displace", "dispel", "freedom", "soothe", "heal_absorb", "tank_buster"];
   function cardAnswersFor(cast, group) {
     const out = { tank: [], healer: [], dps: [] };
     const add = (role, axis, ability, cls, scope, note) => {
@@ -2497,6 +2497,12 @@ var KeplerEngine = (() => {
     if (/heal[-\s]?absorb/i.test(cast.coaching_note ?? "")) {
       const healer = group.find((s) => s.party_role === "healer");
       add("healer", "heal_absorb", "Out-heal the absorb", healer?.class ?? "", "party", "Pump healing to break the absorb before the next heal lands \u2014 a held heal is wasted.");
+    }
+    if (cast.tank_buster) {
+      const tank = group.find((s) => s.party_role === "tank");
+      const self = (tank?.externals ?? []).filter((e) => e.target === "self" && !e.passive && schoolCovers(e.condition?.schools, cast.school)).sort((a, b) => MECH_RANK[a.mechanism] - MECH_RANK[b.mechanism]);
+      if (self[0] && tank) add("tank", "tank_buster", self[0].name, tank.class, "self", "Pop it for the hit \u2014 this cast targets the tank for heavy damage.");
+      else add("tank", "tank_buster", "Pop a major defensive", "", "self", "Tank-targeted heavy hit \u2014 mitigate it with a major defensive CD.");
     }
     for (const role of ROLE_TAGS) {
       const seen = /* @__PURE__ */ new Set();

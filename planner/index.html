@@ -1963,7 +1963,7 @@ const V2_AXES = new Set(['freedom', 'dispel', 'soothe', 'kick', 'cc']);
 const V2_BLUE_TAGS = new Set(['dispel', 'freedom', 'dot']); // these three chips share #0796ff (owner request)
 const V2_POS = { move_out: 'move out of it', spread: 'spread out', stack: 'stack up', soak: 'soak it', frontal: 'dodge the frontal', line_of_sight: 'break line of sight', bait: 'bait it away' };
 // the spell-icon box is tinted by the cast's PRIMARY resolution axis (null = neutral line color)
-const V2_RES_COLOR = { kick: '#27d3c0', cc: '#8b7ff0', displace: '#d27f4a', dispel: '#5b9bd5', freedom: '#57c785', soothe: '#e8b400', heal_absorb: '#57c785' };
+const V2_RES_COLOR = { kick: '#27d3c0', cc: '#8b7ff0', displace: '#d27f4a', dispel: '#5b9bd5', freedom: '#57c785', soothe: '#e8b400', heal_absorb: '#57c785', tank_buster: '#dfb563' };
 // A DISPEL/SOOTHE card keys on the dispel TYPE, not a generic "dispel" colour: the type drives the headline,
 // the icon box, the card's left edge AND the answer text. Curse = "decurse"; Enrage = the soothe answer.
 const DISPEL_TYPE_COLOR = { Magic: '#007cf6', Curse: '#ae2eea', Poison: '#91d700', Disease: '#e37313', Bleed: '#fe0517', Enrage: '#e60217' };
@@ -2062,10 +2062,10 @@ function fmtEveryone(everyone) {
 }
 // axis render order (PRESENTATION): primary first, then the rest by precedence. The engine already chose the
 // primary (card.primary_answer) + the per-role answers; the renderer only decides the on-screen ordering.
-const V2_PRIORITY = ['kick', 'cc', 'displace', 'dispel', 'freedom', 'soothe', 'heal_absorb'];
-const V2_AXIS_LABEL = { kick: 'Kick', cc: 'CC', displace: 'Knock / Grip', dispel: 'Dispel', freedom: 'Freedom', soothe: 'Soothe', heal_absorb: 'Heal Absorb' };
+const V2_PRIORITY = ['kick', 'cc', 'displace', 'dispel', 'freedom', 'soothe', 'heal_absorb', 'tank_buster'];
+const V2_AXIS_LABEL = { kick: 'Kick', cc: 'CC', displace: 'Knock / Grip', dispel: 'Dispel', freedom: 'Freedom', soothe: 'Soothe', heal_absorb: 'Heal Absorb', tank_buster: 'Tank Buster' };
 // the headline "solution description" (the primary answer, shown where the severity word used to be)
-const V2_SOLUTION_LABEL = { kick: 'Interrupt', cc: 'Crowd Control', displace: 'Knock / Grip', dispel: 'Dispel', freedom: 'Freedom', soothe: 'Soothe', heal_absorb: 'Heal Absorb' };
+const V2_SOLUTION_LABEL = { kick: 'Interrupt', cc: 'Crowd Control', displace: 'Knock / Grip', dispel: 'Dispel', freedom: 'Freedom', soothe: 'Soothe', heal_absorb: 'Heal Absorb', tank_buster: 'Tank Buster' };
 function renderCardV2(card, id, open) {
   const ans = card.answers, primary = card.primary_answer, tags = card.tags;
   const everyone = fmtEveryone(card.everyone);
@@ -2161,6 +2161,7 @@ function renderCardV2(card, id, open) {
     : primary === 'kick' ? 'interrupt'
     : primary === 'soothe' ? 'enrage'
     : primary === 'heal_absorb' ? 'heal'
+    : primary === 'tank_buster' ? 'tank'
     : primary; // cc / freedom / displace
   const solIcon = solKey
     ? `<img class="kw-sol-icon-img" src="dispel-icons/${solKey}.png" alt="" onerror="this.outerHTML='<span class=&quot;kw-sol-icon&quot; style=&quot;border-color:${solColor}&quot;></span>'">`
