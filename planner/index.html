@@ -748,6 +748,7 @@ const markers = {};           // iid -> { marker, el, mob }
 // page with its own mobs/iids). iids are stable (baked in the mobs json), so a saved route re-binds.
 const COMP_KEY = 'kepler-planner:comp';
 const TALENT_KEY = 'kepler-planner:talents';   // GLOBAL too — your spec's build follows you across dungeons
+const TAB_KEY = 'kepler-planner:tab';          // GLOBAL — the active side-panel tab, so a floor swap (a full ?f= reload) keeps it
 const ROUTE_KEY = `kepler-planner:route:${DKEY}:f${FLOOR.sublevel ?? 'all'}`;
 const saveComp = () => { try { localStorage.setItem(COMP_KEY, JSON.stringify(compSlots)); } catch {} };
 const saveTalents = () => { try { localStorage.setItem(TALENT_KEY, JSON.stringify(talentSel)); } catch {} };
@@ -1369,9 +1370,12 @@ function setTab(name) {
   document.querySelectorAll('#controls .tab-bar .tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('#controls .tabpanel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
   document.getElementById('analysisPane').style.display = (name === 'dev') ? 'none' : ''; // Analysis shows on Comp + Route only
+  try { localStorage.setItem(TAB_KEY, name); } catch {}   // persist so a floor swap (page reload) lands on the same tab
   renderAnalysis(); // re-filter: group warnings on Comp, pull mechanics on Route
 }
 document.querySelectorAll('#controls .tab-bar .tab').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+// restore the last-used tab — swapping FLOORS reloads the page (?f=), which would otherwise reset to Comp
+try { const t = localStorage.getItem(TAB_KEY); if (t && document.getElementById('tab-' + t)) setTab(t); } catch {}
 // Talents: expand / collapse all spec cards at once
 document.getElementById('talentExpandAll')?.addEventListener('click', () => {
   const ids = [...new Set(compSlots.filter(x => x != null))].filter(id => TALENT_CHOICES[String(id)]);
