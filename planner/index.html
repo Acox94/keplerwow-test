@@ -229,28 +229,50 @@
   .comp-row label { width:52px; color:var(--muted); font-size:12px; }
   .comp-row select { flex:1; background:#0d1117; color:var(--ink); border:1px solid var(--line);
     border-radius:6px; padding:5px 6px; font:inherit; }
-  /* talent picker = a per-spec ACCORDION in its own tab (collapsed by default). A spec's catch-22 choices render
-     as radio-style "pick one" rows (BOTH options visible, the taken one filled in the spec's class colour);
-     independent talents are checkboxes below a quiet divider. */
-  #tab-talents h1, #tab-talents .sub { text-align:center; }
-  #talent-rows { max-width:272px; margin:8px auto 0; }
-  .talent-spec { border-bottom:1px solid var(--line); }
-  .talent-spec:last-child { border-bottom:0; }
-  .talent-acc-head { display:flex; align-items:center; gap:8px; width:100%; background:none; border:0; padding:9px 2px; cursor:pointer; text-align:left; }
-  .talent-dot { width:8px; height:8px; border-radius:50%; flex:none; }
-  .talent-acc-name { flex:1; min-width:0; font-family:var(--fd); font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .talent-acc-head .kw-chev { width:16px; height:16px; color:var(--ink-3); flex:none; transition:transform .2s, color .2s; }
-  .talent-spec.open .talent-acc-head .kw-chev { transform:rotate(180deg); color:var(--ink-2); }
-  .talent-acc-body { padding:0 2px 11px 16px; }
-  .talent-pick { display:flex; flex-direction:column; gap:4px; margin:0 0 8px; }
-  .talent-opt { display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:transparent; border:1px solid var(--line); border-radius:6px; padding:6px 9px; font:inherit; font-size:12px; color:var(--muted); cursor:pointer; }
-  .talent-opt:hover { color:var(--ink); }
-  .talent-opt.on { color:var(--ink); }
-  .talent-radio { width:11px; height:11px; border-radius:50%; border:1.5px solid var(--ink-3); flex:none; box-sizing:border-box; }
-  .talent-tdiv { font-family:var(--fd); font-size:10px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); margin:9px 0 5px; }
-  .talent-acc-body .talent-toggle { display:flex; align-items:center; gap:7px; margin:5px 0; font-size:12px; color:var(--ink); cursor:pointer; }
-  .talent-acc-body .talent-toggle input { accent-color:#33937F; width:14px; height:14px; flex:none; }
-  .talent-empty { color:var(--muted); font-size:12px; text-align:center; padding:14px 6px; line-height:1.4; }
+  /* talent picker — realigned to the Live Analysis card language: one CARD per spec (left class-colour bar +
+     glowing dot + "Class · Spec" + a count badge + chevron), collapsed by default. Choices are boxed "nodes"
+     (both options shown, the taken one a TEAL signal); utility talents are teal chips under a quiet subhead. */
+  .talent-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin:2px 0 14px; }
+  .talent-eyebrow { font-family:var(--fd); font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+  .talent-subhead { font-size:12px; color:var(--ink-3); margin-top:5px; line-height:1.35; max-width:220px; }
+  .talent-expand-all { flex:none; margin-top:1px; font-family:var(--fd); font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); background:none; border:none; cursor:pointer; padding:2px 0; transition:color .15s; }
+  .talent-expand-all:hover { color:#27d3c0; }
+  .talent-card { position:relative; background:#141b29; border:1px solid rgba(140,160,200,0.10); border-radius:11px; margin-bottom:9px; overflow:hidden; transition:border-color .15s, background .15s; }
+  .talent-card:hover { border-color:rgba(140,160,200,0.16); }
+  .talent-card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--c); opacity:.9; }
+  .talent-card.open { background:#182032; }
+  .talent-chead { display:flex; align-items:center; gap:9px; width:100%; background:none; border:0; text-align:left; padding:12px 12px 12px 14px; cursor:pointer; }
+  .talent-cdot { width:8px; height:8px; border-radius:50%; background:var(--c); box-shadow:0 0 8px -1px var(--c); flex:none; }
+  .talent-cname { flex:1; min-width:0; font-family:var(--fd); font-size:14px; font-weight:700; letter-spacing:.01em; color:var(--c); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .talent-count { font-family:var(--fd); font-size:11px; font-weight:700; color:var(--muted); background:#0f1622; border:1px solid rgba(140,160,200,0.10); border-radius:999px; min-width:20px; height:19px; padding:0 6px; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+  .talent-count.has { color:#27d3c0; border-color:rgba(39,211,192,0.35); background:rgba(39,211,192,0.12); }
+  .talent-chead .kw-chev { width:14px; height:14px; color:var(--muted); flex:none; transition:transform .2s ease; }
+  .talent-card.open .talent-chead .kw-chev { transform:rotate(180deg); }
+  .talent-cbody { display:none; padding:2px 12px 14px 14px; }
+  .talent-card.open .talent-cbody { display:block; }
+  .talent-nodes { display:flex; flex-direction:column; gap:7px; }
+  .talent-node { background:#0f1622; border:1px solid rgba(140,160,200,0.10); border-radius:9px; overflow:hidden; }
+  .talent-opt { display:flex; align-items:center; gap:9px; width:100%; text-align:left; background:none; border:0; padding:9px 11px; cursor:pointer; position:relative; transition:background .12s; }
+  .talent-opt + .talent-opt { border-top:1px solid rgba(140,160,200,0.10); }
+  .talent-opt:hover { background:rgba(255,255,255,0.02); }
+  .talent-radio { width:14px; height:14px; border-radius:50%; border:1.5px solid #59647a; flex:none; position:relative; box-sizing:border-box; }
+  .talent-optlabel { font-size:13px; font-weight:500; color:var(--muted); }
+  .talent-opt.sel { background:rgba(39,211,192,0.12); }
+  .talent-opt.sel::before { content:""; position:absolute; left:0; top:0; bottom:0; width:2px; background:#27d3c0; }
+  .talent-opt.sel .talent-radio { border-color:#27d3c0; }
+  .talent-opt.sel .talent-radio::after { content:""; position:absolute; inset:2.5px; border-radius:50%; background:#27d3c0; }
+  .talent-opt.sel .talent-optlabel { color:var(--ink); font-weight:600; }
+  .talent-sub { font-family:var(--fd); font-size:10px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#59647a; margin:14px 0 8px; }
+  .talent-chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .talent-chip { display:inline-flex; align-items:center; gap:6px; font-family:var(--fd); font-size:12px; font-weight:600; color:var(--muted); background:#0f1622; border:1px solid rgba(140,160,200,0.10); border-radius:7px; padding:6px 10px 6px 9px; cursor:pointer; transition:all .13s; }
+  .talent-chip:hover { border-color:rgba(140,160,200,0.16); color:var(--ink); }
+  .talent-tick { width:13px; height:13px; border-radius:4px; border:1.5px solid #59647a; display:inline-flex; align-items:center; justify-content:center; flex:none; transition:all .13s; }
+  .talent-tick svg { width:9px; height:9px; opacity:0; transition:opacity .1s; }
+  .talent-chip.on { color:var(--ink); background:rgba(39,211,192,0.12); border-color:rgba(39,211,192,0.35); }
+  .talent-chip.on .talent-tick { background:#27d3c0; border-color:#27d3c0; }
+  .talent-chip.on .talent-tick svg { opacity:1; color:#08120f; }
+  .talent-empty { font-size:12px; color:#59647a; padding:4px 2px 2px; line-height:1.4; }
+  .talent-empty b { color:var(--muted); font-weight:600; }
   /* "Missing talents" callout in the Live Analysis pane (rendered from rep.talent_suggestions) */
   .kw-tg { margin-top:12px; border-top:1px solid var(--line); padding-top:9px; }
   .kw-tg-head { font-family:var(--fd); font-weight:700; font-size:12px; letter-spacing:.04em; margin-bottom:6px; }
@@ -505,8 +527,13 @@
       </section>
 
       <section class="tabpanel" id="tab-talents">
-        <h1 style="margin-top:4px">Talent Selection</h1>
-        <p class="sub">pick what you took — the cards credit only these</p>
+        <div class="talent-head">
+          <div>
+            <div class="talent-eyebrow">Talents</div>
+            <div class="talent-subhead">Pick what you took — cards credit only these.</div>
+          </div>
+          <button type="button" class="talent-expand-all" id="talentExpandAll">Expand all</button>
+        </div>
         <div id="talent-rows"></div>
       </section>
 
@@ -1240,6 +1267,13 @@ function setTab(name) {
   renderAnalysis(); // re-filter: group warnings on Comp, pull mechanics on Route
 }
 document.querySelectorAll('#controls .tab-bar .tab').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+// Talents: expand / collapse all spec cards at once
+document.getElementById('talentExpandAll')?.addEventListener('click', () => {
+  const ids = [...new Set(compSlots.filter(x => x != null))].filter(id => TALENT_CHOICES[String(id)]);
+  const allOpen = ids.length > 0 && ids.every(id => talentExpanded.has(id));
+  if (allOpen) ids.forEach(id => talentExpanded.delete(id)); else ids.forEach(id => talentExpanded.add(id));
+  renderTalents();
+});
 
 // Layout toggle: EXTENDED (3-column) ⇄ COLLAPSED (compact — controls + analysis stacked on the right, map fills
 // the left). Persisted; Leaflet must re-measure its container after the grid resizes.
@@ -1489,6 +1523,7 @@ function buildTalentsArg() {
   }
   return Object.keys(out).length ? out : undefined;
 }
+const TALENT_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 function renderTalents() {
   const host = document.getElementById('talent-rows');
   if (!host) return;
@@ -1496,51 +1531,62 @@ function renderTalents() {
   for (const id of compSlots) {
     if (id == null || seen.has(id)) continue; seen.add(id);
     const t = TALENT_CHOICES[String(id)];
-    if (!t || !(t.controls || []).length) continue;
+    if (!t) continue;
     ensureTalentSel(id, t); groups.push([id, t]);
   }
   if (!groups.length) { host.innerHTML = `<p class="talent-empty">Pick your group on the <b>Comp</b> tab, then choose each spec's talents here.</p>`; return; }
-  // one collapsible row per spec: a class dot + name + chevron; expanding shows the catch-22 choices (radio-style
-  // pick rows, both options visible) then the independent talents as checkboxes. Collapsed by default.
+  // one CARD per spec (left class-colour bar + dot + "Class · Spec" + count badge + chevron), collapsed by default.
+  // Expanding shows the catch-22 choices as boxed nodes (teal selection) then the utility talents as teal chips.
   host.innerHTML = groups.map(([id, t]) => {
     const sel = new Set(talentSel[id] || []);
     const col = CLASS_COLORS[t.class] || 'var(--ink)';
     const open = talentExpanded.has(id);
-    const head = `<button type="button" class="talent-acc-head" data-spec="${id}" aria-expanded="${open}"><span class="talent-dot" style="background:${col}"></span><span class="talent-acc-name" style="color:${col}">${esc(t.class)} ${esc(t.spec_name)}</span>${KW_CHEV}</button>`;
-    let body = '';
-    if (open) {
-      const picks = t.controls.map((c, ci) => {
-        if (c.type !== 'choice') return '';
-        return `<div class="talent-pick">${c.options.map(o => {
+    const choices = (t.controls || []).filter(c => c.type === 'choice');
+    const toggles = (t.controls || []).filter(c => c.type === 'toggle');
+    const count = choices.length + toggles.filter(c => sel.has(c.spell_id)).length;   // chosen nodes + on chips
+    const head = `<div class="talent-chead" data-spec="${id}"><span class="talent-cdot"></span><span class="talent-cname">${esc(t.class)} · ${esc(t.spec_name)}</span><span class="talent-count${count > 0 ? ' has' : ''}">${count}</span>${KW_CHEV}</div>`;
+    let inner;
+    if (!choices.length && !toggles.length) {
+      inner = `<div class="talent-empty">No talents the advisor uses for this spec.</div>`;
+    } else {
+      const nodes = choices.length ? `<div class="talent-nodes">${choices.map(c => {
+        const ci = t.controls.indexOf(c);
+        return `<div class="talent-node">${c.options.map(o => {
           const on = sel.has(o.spell_id);
-          return `<button type="button" class="talent-opt${on ? ' on' : ''}" data-spec="${id}" data-ctl="${ci}" data-spell="${o.spell_id}"${on ? ` style="border-color:${col}"` : ''}><span class="talent-radio"${on ? ` style="background:${col};border-color:${col}"` : ''}></span>${esc(o.name)}</button>`;
+          return `<div class="talent-opt${on ? ' sel' : ''}" data-spec="${id}" data-ctl="${ci}" data-spell="${o.spell_id}"><span class="talent-radio"></span><span class="talent-optlabel">${esc(o.name)}</span></div>`;
         }).join('')}</div>`;
-      }).join('');
-      const toggles = t.controls.filter(c => c.type === 'toggle');
-      const tog = toggles.length
-        ? `<div class="talent-tdiv">also</div>` + toggles.map(c => `<label class="talent-toggle"><input type="checkbox" data-spec="${id}" data-spell="${c.spell_id}"${sel.has(c.spell_id) ? ' checked' : ''}>${esc(c.name)}</label>`).join('')
-        : '';
-      body = `<div class="talent-acc-body">${picks}${tog}</div>`;
+      }).join('')}</div>` : '';
+      const chips = toggles.length ? `<div class="talent-sub">Utility &amp; flex</div><div class="talent-chips">${toggles.map(c => {
+        const on = sel.has(c.spell_id);
+        return `<button type="button" class="talent-chip${on ? ' on' : ''}" data-spec="${id}" data-spell="${c.spell_id}"><span class="talent-tick">${TALENT_CHECK}</span>${esc(c.name)}</button>`;
+      }).join('')}</div>` : '';
+      inner = nodes + chips;
     }
-    return `<div class="talent-spec${open ? ' open' : ''}">${head}${body}</div>`;
+    return `<div class="talent-card${open ? ' open' : ''}" style="--c:${col}">${head}<div class="talent-cbody">${inner}</div></div>`;
   }).join('');
-  host.querySelectorAll('.talent-acc-head').forEach(b => b.onclick = () => {
-    const id = Number(b.dataset.spec);
+  host.querySelectorAll('.talent-chead').forEach(h => h.onclick = () => {
+    const id = Number(h.dataset.spec);
     if (talentExpanded.has(id)) talentExpanded.delete(id); else talentExpanded.add(id);
     renderTalents();
   });
-  host.querySelectorAll('.talent-opt').forEach(b => b.onclick = () => {
-    const id = Number(b.dataset.spec), t = TALENT_CHOICES[String(id)], ctl = t.controls[Number(b.dataset.ctl)];
+  host.querySelectorAll('.talent-opt').forEach(o => o.onclick = () => {
+    const id = Number(o.dataset.spec), t = TALENT_CHOICES[String(id)], ctl = t.controls[Number(o.dataset.ctl)];
     const set = new Set(talentSel[id] || []);
-    for (const o of ctl.options) set.delete(o.spell_id);   // a choice node holds exactly one option
-    set.add(Number(b.dataset.spell));
+    for (const x of ctl.options) set.delete(x.spell_id);   // a choice node holds exactly one option
+    set.add(Number(o.dataset.spell));
     talentSel[id] = [...set]; saveTalents(); renderTalents(); renderAnalysis();
   });
-  host.querySelectorAll('input[type=checkbox][data-spell]').forEach(cb => cb.onchange = () => {
-    const id = Number(cb.dataset.spec), set = new Set(talentSel[id] || []);
-    if (cb.checked) set.add(Number(cb.dataset.spell)); else set.delete(Number(cb.dataset.spell));
-    talentSel[id] = [...set]; saveTalents(); renderAnalysis();
+  host.querySelectorAll('.talent-chip').forEach(b => b.onclick = () => {
+    const id = Number(b.dataset.spec), spell = Number(b.dataset.spell), set = new Set(talentSel[id] || []);
+    if (set.has(spell)) set.delete(spell); else set.add(spell);
+    talentSel[id] = [...set]; saveTalents(); renderTalents(); renderAnalysis();
   });
+  syncTalentExpandAll();
+}
+function syncTalentExpandAll() {
+  const btn = document.getElementById('talentExpandAll'); if (!btn) return;
+  const cards = [...document.querySelectorAll('#talent-rows .talent-card')];
+  btn.textContent = (cards.length && cards.every(c => c.classList.contains('open'))) ? 'Collapse all' : 'Expand all';
 }
 
 const SEV = { critical:0, warning:1, caution:2, info:3 };
