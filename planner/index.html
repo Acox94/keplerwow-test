@@ -541,7 +541,7 @@ const DUNGEONS = {
     ] },
 };
 const _params = new URLSearchParams(location.search);
-const DKEY = DUNGEONS[_params.get('d')] ? _params.get('d') : 'pit-of-saron';
+const DKEY = DUNGEONS[_params.get('d')] ? _params.get('d') : 'altar-of-fangs';   // bare URL lands on the showcase dungeon; the dropdown switches
 const CFG = DUNGEONS[DKEY];
 // Floor model: multi-floor dungeons carry CFG.floors; flat ones synthesize one floor that takes
 // every mob (sublevel:null). ?f=<index> selects the floor.
@@ -1788,7 +1788,7 @@ document.getElementById('lvExpandAll')?.addEventListener('click', () => {
 // BESIDE the current cards; zero engine changes. If it lands, this assembler
 // graduates into the engine and replaces buildWarnings' prose.
 // ---------------------------------------------------------------------------
-const CARDS_V2 = _params.get('cards') === '1';
+const CARDS_V2 = _params.get('cards') !== '0';   // v2 cards are the DEFAULT now; ?cards=0 opts back to the v1 path
 // The card MODEL (effect facts + per-role answers + the headline axis) now lives in the ENGINE
 // (rep.cards — a MechanicCard[]). Everything below is PRESENTATION only: it draws a card and adds the
 // tooltip NUMBERS (DoT length / slow %) the engine deliberately leaves out. These maps are display labels.
