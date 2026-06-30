@@ -25,5 +25,5 @@ The set sits at content ≈ 85% of a 72×72 canvas (the renderer scales it with
 not the pixel size). Pass `[size] [fill]` to override.
 
 ## Status
-- ✅ `magic` · `curse` · `poison` · `disease` · `bleed` · `enrage` (soothe) · `interrupt` (kick)
-- ⏳ still needed: `cc.png` · `freedom.png` · `displace.png` — run each source through `fit-icon.py`
+- ✅ all answer icons in place: `magic` · `curse` · `poison` · `disease` · `bleed` · `enrage` (soothe) ·
+  `interrupt` (kick) · `cc` · `freedom` · `displace` (knock/grip)
