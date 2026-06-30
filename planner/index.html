@@ -1877,8 +1877,8 @@ function renderCardV2(card, id, open) {
   // SHORT display name: a "Button (Talent)" name shows just the talent (Jet Stream); the full combo + note
   // ride the hover title. (Today only Wind Rush Totem (Jet Stream) matches; the durable form is a data-side
   // display_name field — kept renderer-side for now, see the plan's out-of-scope.)
-  const ab = (a, overrideCol) => {
-    const col = overrideCol || CLASS_COLORS[a.class];
+  const ab = (a) => {
+    const col = CLASS_COLORS[a.class];
     const m = a.ability.match(/\s*\(([^()]+)\)\s*$/);
     const display = m ? m[1] : a.ability;
     const tip = slowify([display !== a.ability ? a.ability : '', a.note || ''].filter(Boolean).join(' — '));
@@ -1937,14 +1937,12 @@ function renderCardV2(card, id, open) {
   for (const ax of V2_PRIORITY) if (present.has(ax) && ax !== primary) axes.push(ax);
   for (const axis of axes) {
     body += axHead(V2_AXIS_LABEL[axis] || axis);
-    // a DISPEL answer is shown in its dispel-TYPE colour (the type varies + helps ID what to dispel). SOOTHE is
-    // NOT: there's only one type (Enrage), so the enrage colour adds no info and would hide the class — keep its
-    // ability name CLASS-coloured so you can still tell who soothes. (The soothe headline + edge stay enrage-red.)
-    const axisColor = axis === 'dispel' ? (DISPEL_TYPE_COLOR[rec && rec.dispel_type] || null) : null;
+    // every answer's ability name is CLASS-coloured so you can tell who brings it — the dispel-TYPE colour lives on
+    // the headline / icon / edge only, not the answer rows.
     for (const k of ['tank', 'healer', 'dps']) {
       const list = ans[k].filter(a => a.axis === axis); if (!list.length) continue;
       const r = KW_ROLE[k];
-      body += `<div class="kw-role ${r.cls}" style="margin-left:9px">${r.ic}<span class="kw-role-label">${k === 'healer' ? 'Heal' : r.label}</span><p>${list.map(a => ab(a, axisColor)).join(` <span style="${mut}">·</span> `)}</p></div>`;
+      body += `<div class="kw-role ${r.cls}" style="margin-left:9px">${r.ic}<span class="kw-role-label">${k === 'healer' ? 'Heal' : r.label}</span><p>${list.map(ab).join(` <span style="${mut}">·</span> `)}</p></div>`;
     }
   }
   if (everyone) body += section('everyone', esc(everyone));
