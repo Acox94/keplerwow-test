@@ -705,6 +705,10 @@ window._spike = { map, at, L, W, H };   // dev handle for calibration/diagnostic
 // id, which joins the engine's curated creatures (the WotLK ids the placeholder used carry no spells).
 let MOBS = [];               // populated from pit-of-saron.mobs.json on load
 let FORCES_TOTAL = 0;        // enemy-forces denominator (MDT dungeonTotalCount.normal = 643)
+// iid -> forces weight for EVERY mob in the dungeon (all floors), so the Enemy-forces meter can sum a
+// route that spans floors — each floor is its own page (?f=), so only the current floor's MOBS are live;
+// the other floors' pulls live in localStorage and we price their iids through this map.
+let FORCES_BY_IID = new Map();
 const portrait = (did) => `https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${did}.jpg`;
 
 // Calibration nudge (texture px). The MDT projection is VERIFIED correct against MDT's own source
@@ -771,6 +775,20 @@ function restoreRoute() {   // rebuild saved pulls (dropping any iid not on this
     active = Number.isInteger(s.active) && s.active >= 0 && s.active < pulls.length ? s.active : pulls.length - 1;
     render(); renderHulls(); renderAnalysis();
   } else { newPull(); }
+}
+
+// Enemy forces summed across the OTHER floors' saved routes (the current floor is summed live from `pulls`).
+// Each floor is its own page, so a floor we're not on isn't in memory — read its saved route from
+// localStorage and price each iid through FORCES_BY_IID (built from the full, all-floors mobs.json).
+function otherFloorForces() {
+  let sum = 0;
+  for (const fl of FLOORS) {
+    if ((fl.sublevel ?? 'all') === (FLOOR.sublevel ?? 'all')) continue;   // current floor counted live
+    let s = null; try { s = JSON.parse(localStorage.getItem(`kepler-planner:route:${DKEY}:f${fl.sublevel ?? 'all'}`) || 'null'); } catch {}
+    if (!s || !Array.isArray(s.pulls)) continue;
+    for (const arr of s.pulls) for (const iid of (arr || [])) sum += FORCES_BY_IID.get(iid) || 0;
+  }
+  return sum;
 }
 
 function pullOf(iid) { return pulls.findIndex(p => p.mobs.has(iid)); }
@@ -1210,8 +1228,13 @@ function convexHull(points) {                   // Andrew's monotone chain
 }
 // hull of disk-samples around each mob ≈ Minkowski sum with a circle → a rounded, padded boundary (1/2/N mobs)
 function pullOutline(mobPts, pad) {
-  const K=32, s=[];   // samples per mob — higher = finer arcs at sharp corners (smoother)
-  for (const p of mobPts) for (let k=0;k<K;k++){ const a=2*Math.PI*k/K; s.push(L.point(p.x+Math.cos(a)*pad, p.y+Math.sin(a)*pad)); }
+  const K=64;   // samples per mob — higher = finer arcs at sharp corners (smoother)
+  // Sample padding-disks only around the OUTER (convex-hull) mobs. Summing a disk around EVERY mob makes each
+  // one bulge the boundary, so mobs along a straight edge scallop it into small bumps; the hull of centres gives
+  // clean straight edges + rounded corners, and every mob still sits inside the pad.
+  const verts = mobPts.length > 2 ? convexHull(mobPts) : mobPts;
+  const s=[];
+  for (const p of verts) for (let k=0;k<K;k++){ const a=2*Math.PI*k/K; s.push(L.point(p.x+Math.cos(a)*pad, p.y+Math.sin(a)*pad)); }
   return convexHull(s);
 }
 // Chaikin corner-cutting → smooths the angular hull into a soft closed curve
@@ -1225,16 +1248,38 @@ function chaikin(pts, iters) {
   }
   return pts;
 }
+// a CLOSED Catmull-Rom spline through `p`, emitted as cubic-bézier SVG commands (sub-pixel) → a true smooth curve
+function kwSplinePath(p) {
+  const n = p.length; if (n < 3) return n ? `M${p[0].x.toFixed(2)} ${p[0].y.toFixed(2)}z` : '';
+  const f = (v) => v.toFixed(2);
+  let d = `M${f(p[0].x)} ${f(p[0].y)}`;
+  for (let i = 0; i < n; i++) {
+    const a = p[(i-1+n)%n], b = p[i], c = p[(i+1)%n], e = p[(i+2)%n];
+    d += `C${f(b.x + (c.x-a.x)/6)} ${f(b.y + (c.y-a.y)/6)} ${f(c.x - (e.x-b.x)/6)} ${f(c.y - (e.y-b.y)/6)} ${f(c.x)} ${f(c.y)}`;
+  }
+  return d + 'z';
+}
 function renderHulls() {
   hullLayer.clearLayers();
+  const o = map.getPixelOrigin();
   pulls.forEach((p,i)=>{
     const mobPts=[...p.mobs].map(iid=>markers[iid]?.mob).filter(Boolean).map(m=>map.latLngToLayerPoint(at(m.x,m.y)));
     if (!mobPts.length) return;
-    const ring = chaikin(pullOutline(mobPts, HULL_PAD), 3).map(pt=>map.layerPointToLatLng(pt));
+    const ring = chaikin(pullOutline(mobPts, HULL_PAD), 4).map(pt=>map.layerPointToLatLng(pt));
     const color = COLORS[i % COLORS.length];
     const lv = liveMode ? (i===liveIdx ? 1 : i<liveIdx ? 0.4 : 0) : 1;   // LIVE: current bright, earlier faded, later hidden
-    L.polygon(ring, { color, weight:2.5, opacity:0.95*lv, fillColor:color, fillOpacity:0.1*lv,
+    const poly = L.polygon(ring, { color, weight:2.5, opacity:0.95*lv, fillColor:color, fillOpacity:0.2*lv,
       interactive:false, lineJoin:'round', smoothFactor:0 }).addTo(hullLayer);
+    // Render as a TRUE smooth spline (closed Catmull-Rom → cubic-bézier, sub-pixel) instead of Leaflet's many-
+    // segment, integer-rounded polyline — so it never facets at any zoom. Control points are evenly downsampled
+    // from the (already even) ring; the bézier interpolates smoothly between them.
+    if (lv > 0 && poly._path) {
+      const z = map.getZoom();
+      const proj = ring.map(ll => map.project(ll, z).subtract(o));
+      const N = Math.min(proj.length, 80), ctrl = [];
+      for (let k = 0; k < N; k++) ctrl.push(proj[Math.floor(k * proj.length / N)]);
+      poly._path.setAttribute('d', kwSplinePath(ctrl));
+    }
   });
 }
 map.on('zoomend', renderHulls);   // markers are screen-space, so re-pad the hull when the zoom changes
@@ -1269,16 +1314,19 @@ function render() {
   }).join('') || '<p class="hint">No pulls yet — “+ New pull”, then tap mobs.</p>';
   pullsEl.querySelectorAll('.pull').forEach(d => d.onclick = () => { active = +d.dataset.i; render(); });
 
-  // cumulative total across the route + REAL enemy forces (Σ selected mobs' count / dungeon total)
+  // cumulative total across the route + REAL enemy forces. Pulls/Mobs are THIS floor's plan; enemy forces
+  // is dungeon-wide (denominator is the whole dungeon), so sum this floor's live pulls + every other floor's
+  // saved route — switching floors no longer resets the meter.
   const total = pulls.reduce((n, p) => n + p.mobs.size, 0);
-  const forces = pulls.reduce((n, p) =>
+  const forcesHere = pulls.reduce((n, p) =>
     n + [...p.mobs].reduce((s, iid) => s + (markers[iid]?.mob.forces || 0), 0), 0);
+  const forces = forcesHere + otherFloorForces();
   const pct = FORCES_TOTAL ? Math.round(forces / FORCES_TOTAL * 100) : 0;
   document.getElementById('totals').innerHTML =
     `<div class="stat-row">`
     + `<span class="stat"><b>${pulls.length}</b><span class="stat-label">Pull${pulls.length === 1 ? '' : 's'}</span></span>`
     + `<span class="stat"><b>${total}</b><span class="stat-label">Mob${total === 1 ? '' : 's'}</span></span></div>`
-    + `<div class="forces-row" title="${forces} / ${FORCES_TOTAL} enemy forces">`
+    + `<div class="forces-row" title="${forces} / ${FORCES_TOTAL} enemy forces across all floors${FLOORS.length > 1 ? ` (${forcesHere} on this floor)` : ''}">`
     + `<span class="forces-label">Enemy forces</span>`
     + `<div class="forces-bar"><div class="forces-fill" style="width:${pct}%"></div></div>`
     + `<span class="forces-pct">${pct}%</span></div>`;
@@ -2210,7 +2258,7 @@ function renderCardsV2(rep) {
   // The card MODEL now comes straight from the engine (rep.cards — one MechanicCard per warned cast, already
   // deduped + sorted most-severe-first). The renderer only draws them.
   const cards = orderCards(rep.cards || []);   // apply the player's saved drag order (engine order is the default)
-  const banner = `<div style="font-size:11px;letter-spacing:.05em;color:var(--accent,#2dd4bf);margin:0 0 9px">card model · v2</div>`;
+  const banner = `<div style="font-size:11px;letter-spacing:.05em;color:var(--accent,#2dd4bf);margin:0 0 9px">Drag to re-order cards</div>`;
   // collapsed by default (header + tags only); expand state lives in expandedCards so it survives re-renders
   const stack = cards.length ? cards.map(card => { const id = card.npc_name + '|' + card.spell_name; return renderCardV2(card, id, expandedCards.has(id)); }).join('') : '<p class="hint">No pull mechanics flagged — this comp covers this pull.</p>';
   return { html: banner + `<div class="kw-stack">${stack}</div>`, n: cards.length };
@@ -2388,7 +2436,9 @@ if (EDIT) {
         PIVOT.u = rows.reduce((s, m) => s + m.x, 0) / rows.length;
         PIVOT.v = rows.reduce((s, m) => s + m.y, 0) / rows.length;
       }
-      MOBS = rows.map(m => ({ ...m, _u: m.x, _v: m.y, x: fitX(m.x), y: fitY(m.y) })); FORCES_TOTAL = j.forces_total || 0; buildMarkers(); window._spike.markers = markers; restoreRoute(); })
+      MOBS = rows.map(m => ({ ...m, _u: m.x, _v: m.y, x: fitX(m.x), y: fitY(m.y) })); FORCES_TOTAL = j.forces_total || 0;
+      FORCES_BY_IID = new Map((j.mobs || []).map(m => [m.iid, m.forces || 0]));   // ALL floors, for the cross-floor sum
+      buildMarkers(); window._spike.markers = markers; restoreRoute(); })
     .catch(e => { document.querySelector('.note').textContent = 'failed to load mob positions: ' + (e && e.message || e); newPull(); });
 }
 
