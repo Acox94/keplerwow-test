@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68301,
-    "extracted_at": "2026-06-30T05:44:18.784Z",
+    "extracted_at": "2026-06-30T08:44:00.205Z",
     "patch_version": "12.1.0",
     "source_versions": {
       "curated": {
@@ -1333,7 +1333,7 @@
           "is_channeled": true,
           "is_interruptible": false,
           "is_lethal": false,
-          "is_stoppable": true,
+          "is_stoppable": false,
           "mechanic": null,
           "name": "Blood Sacrifice",
           "notes": null,
@@ -1372,7 +1372,7 @@
           "is_channeled": false,
           "is_interruptible": false,
           "is_lethal": false,
-          "is_stoppable": true,
+          "is_stoppable": false,
           "mechanic": null,
           "name": "Dismember",
           "notes": null,

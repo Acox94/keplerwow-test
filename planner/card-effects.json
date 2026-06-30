@@ -1,5 +1,5 @@
 {
   "_comment": "Curated concise effect distillations, keyed by spell_id. One line per cast; ' · ' separates segments (each rendered on its own line). Distill to PRIMARY + SECONDARY effects only — school + effect type (e.g. 'Physical hit', 'Nature DoT') + secondaries (heal absorb, stacking slow, vuln). Do NOT put target count / targeting in the line: it can't be derived reliably from the description and a vague '2+ players' reads lazy — targeting will be its own additive curated note later. Reference text = the resolved description (spell-descriptions.json). The card prefers this over the auto thin-token effect; uncurated casts fall back to the tokens. Graduates into the build editorial later.",
   "1294567": "Nature DoT · 10% stacking slow/tick",
-  "1306517": "Physical hit · heal absorb"
+  "1306517": "Physical hit"
 }

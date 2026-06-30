@@ -2460,7 +2460,7 @@ var KeplerEngine = (() => {
   var CARD_REMOVABLE = /* @__PURE__ */ new Set(["Magic", "Curse", "Disease", "Poison", "Bleed"]);
   var CARD_EFFECT_MECHANICS = /* @__PURE__ */ new Set(["snared", "rooted", "stunned", "silenced", "disoriented", "incapacitated", "fleeing", "charmed", "banished"]);
   var CARD_POS_TECHS = /* @__PURE__ */ new Set(["move_out", "frontal", "line_of_sight", "spread", "stack", "soak", "bait"]);
-  var CARD_AXIS_PRIORITY = ["kick", "cc", "displace", "dispel", "freedom", "soothe"];
+  var CARD_AXIS_PRIORITY = ["kick", "cc", "displace", "dispel", "freedom", "soothe", "heal_absorb"];
   function cardAnswersFor(cast, group) {
     const out = { tank: [], healer: [], dps: [] };
     const add = (role, axis, ability, cls, scope, note) => {
@@ -2493,6 +2493,10 @@ var KeplerEngine = (() => {
         const d = bestDisplacer(s, cast.creature_type);
         if (d) add(role, "displace", d.name, s.class, "enemy", d.note);
       }
+    }
+    if (/heal[-\s]?absorb/i.test(cast.coaching_note ?? "")) {
+      const healer = group.find((s) => s.party_role === "healer");
+      add("healer", "heal_absorb", "Out-heal the absorb", healer?.class ?? "", "party", "Pump healing to break the absorb before the next heal lands \u2014 a held heal is wasted.");
     }
     for (const role of ROLE_TAGS) {
       const seen = /* @__PURE__ */ new Set();
