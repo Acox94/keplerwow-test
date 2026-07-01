@@ -485,6 +485,8 @@
     padding:2px 8px; color:#cdd6e0; }
   #cdetail .cd-badge.boss { background:#3a1416; border-color:#a53437; color:#ffd7d7; }
   #cdetail .cd-badge.muted { color:var(--muted); font-style:italic; }
+  #cdetail .cd-badge.cd-spawn { cursor:pointer; background:#14242f; border-color:#2a6f7a; color:#8fe3ef; }
+  #cdetail .cd-badge.cd-spawn:hover { background:#1b3440; border-color:#3fa6b5; }
   #cdetail .cd-x { position:absolute; top:8px; right:12px; background:transparent; border:0; color:var(--muted);
     font-size:18px; cursor:pointer; line-height:1; padding:4px; }
   #cdetail .cd-x:hover { color:var(--ink); }
@@ -861,6 +863,9 @@ function loadPortrait(el, m) {
 // npc_id. Verbatim WoW spell descriptions come from an optional sidecar (spell-descriptions.json,
 // spell_id -> text); absent that it falls back to the DB2 tooltip template carried on the spell.
 let creaturesById = new Map();   // npc_id -> creature record (built when the dist loads)
+// creature→creature spawn links: a mob that TURNS INTO / summons another (the target isn't map-placed).
+// The detail card shows a clickable chip so ctrl-clicking the source jumps to what it becomes.
+const SPAWNS = { 264798: 261556 };   // Infused Eggs → Hatchling (eggs hatch when stepped on)
 let SPELL_DESC = {};             // spell_id -> verbatim WoW description (sidecar, optional)
 fetch('./spell-descriptions.json').then(r => r.ok ? r.json() : {}).then(m => { SPELL_DESC = m || {}; kwInjectBaseDamage(); if (dungeon) renderAnalysis(); }).catch(() => {});
 let CARD_EFFECTS = {};           // spell_id -> CURATED concise effect distillation (card-effects.json); the card's EFFECT line
@@ -1052,13 +1057,17 @@ function openCreatureCard(npcId, mk) {
   const isBoss = !!((c && c.is_boss) || (mk && mk.boss));
   loadHero(c, name, type);
   _cd.querySelector('#cdName').textContent = name;
+  const spawnId = SPAWNS[npcId], spawnC = spawnId != null ? creaturesById.get(spawnId) : null;
   const badges = [
     `<span class="cd-badge${isBoss ? ' boss' : ''}">${esc(isBoss ? 'Boss' : ((c && c.classification) || 'Trash'))}</span>`,
     type ? `<span class="cd-badge">${esc(type)}</span>` : '',
     `<span class="cd-badge">${esc(fmtHP(c && c.base_health))} HP</span>`,
+    spawnC ? `<span class="cd-badge cd-spawn" data-spawn="${spawnId}" title="hatches into ${esc(spawnC.name)} — click to view">↳ ${esc(spawnC.name)}</span>` : '',
     c ? '' : `<span class="cd-badge muted">not in dataset</span>`,
   ].filter(Boolean).join('');
   _cd.querySelector('#cdBadges').innerHTML = badges;
+  const spawnChip = _cd.querySelector('#cdBadges .cd-spawn');
+  if (spawnChip) spawnChip.onclick = () => openCreatureCard(Number(spawnChip.dataset.spawn), null);
 
   const spells = dedupSpells(c && c.spells);
   const abilsEl = _cd.querySelector('#cdAbils'), descEl = _cd.querySelector('#cdDesc');
