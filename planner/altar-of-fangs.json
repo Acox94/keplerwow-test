@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68301,
-    "extracted_at": "2026-07-01T02:04:29.799Z",
+    "extracted_at": "2026-07-01T10:37:01.567Z",
     "patch_version": "12.1.0",
     "source_versions": {
       "curated": {
@@ -25,19 +25,12 @@
         }
       },
       "dungeons": [
-        "ruby-life-pools",
-        "murder-row",
-        "den-of-nalorakk",
-        "the-blinding-vale",
-        "voidscar-arena",
-        "altar-of-fangs",
-        "temple-of-sethraliss",
-        "kings-rest"
+        "altar-of-fangs"
       ],
       "membership": {
         "source": "file"
       },
-      "season": "midnight-s2"
+      "season": null
     }
   },
   "creatures": [
@@ -1708,7 +1701,7 @@
       "avoidable": false,
       "base_health": 2452393,
       "classification": null,
-      "creature_type": "Not specified",
+      "creature_type": "Humanoid",
       "display_id": null,
       "forces": null,
       "is_boss": false,
@@ -1716,7 +1709,47 @@
       "level": null,
       "name": "Blade of the Altar",
       "npc_id": 271453,
-      "spells": [],
+      "spells": [
+        {
+          "base_damage": null,
+          "cast_order": null,
+          "cast_time_ms": 0,
+          "coaching_note": "Teleports behind a random player, slashing them and applying Laced Edge (a non-dispellable Nature DoT to heal through); it leaves the tank to reach its target.",
+          "completion_effect": null,
+          "description": "Teleports behind a player and slashes them, inflicting $1308518s2 Nature damage and an additional $1308518s3 Nature damage every $1308518t3 sec for $1308518d.",
+          "dispel_detonates": false,
+          "dispel_type": "None",
+          "displacement": [],
+          "dot": true,
+          "duration_ms": 6000,
+          "freedom_partial": false,
+          "high_risk": [],
+          "is_aoe": false,
+          "is_channeled": false,
+          "is_interruptible": false,
+          "is_lethal": false,
+          "is_stoppable": false,
+          "mechanic": null,
+          "name": "Laced Edge",
+          "notes": null,
+          "observed_channel_stop": null,
+          "observed_kick_point": null,
+          "party_targets": null,
+          "positioning": [],
+          "priority": "priority",
+          "recast_cooldown_confidence": null,
+          "recast_cooldown_ms": null,
+          "requires_interrupt": false,
+          "scales_to_lethal": true,
+          "school": "Nature",
+          "secondary_of": null,
+          "spell_id": 1308518,
+          "tank_buster": false,
+          "target_roles": null,
+          "unavoidable": false,
+          "vulnerability": null
+        }
+      ],
       "summoned_by": null
     }
   ],
