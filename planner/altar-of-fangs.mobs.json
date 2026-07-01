@@ -1,8 +1,8 @@
 {
-  "_source": "manual placement (planner-spike editor) \u2014 floor 1 hand-audited; floors 2-3 from the combat-log capture",
+  "_source": "manual placement (planner-spike editor) — floor 1 hand-audited; floors 2-3 from the combat-log capture",
   "_placement": "manual",
   "_frame": "image-fraction 0..1 of the floor PNG (identity fit; px = x*PNG_W, py = y*PNG_H). PNG = the true UiMap art layer bounds 1002x668 (DB2 UiMapArtStyleLayer id=1), cropped from the 1024x768 tile canvas 2026-06-30.",
-  "_note": "Floor 1 (73): hand-placed + audited (LOCKED, treat as accurate). Floor 2 (55): from the temporal-merged capture, converted from the floor-2 fit {dx:-25,dy:-5} into image-fraction \u2014 to be audited in ?edit=1&f=1. Floor 3 (47): /kcal'd on 2590 (from the +11 clear, SV flushed) - wx/wy projected to image-fraction x/y; forces from the combined-log solve (single-run, PROVISIONAL - re-confirm with a 2nd floor-3 run). Audit positions in ?edit=1&f=2. [crop migration 2026-06-30] PNGs cropped 1024x768->1002x668; mob fractions re-based x*=1024/1002, y*=768/668 (same pixel, so placements unchanged). [boss-add removal 2026-06-30] dropped 22 Uncoiled Writhe (262398+270417) placed instances \u2014 The Writhing Coil boss adds (forces 0, reform via Assimilation); kept in the roster (palette + threat analysis), removable/addable in ?edit=1. Floor 2 now 33 placed mobs, hand-audit pending.",
+  "_note": "Floor 1 (73): hand-placed + audited (LOCKED, treat as accurate). Floor 2 (55): from the temporal-merged capture, converted from the floor-2 fit {dx:-25,dy:-5} into image-fraction — to be audited in ?edit=1&f=1. Floor 3 (47): /kcal'd on 2590 (from the +11 clear, SV flushed) - wx/wy projected to image-fraction x/y; forces CONFIRMED by the +12 2-run cross-check 2026-07-01 (Ascendant Serpent 30, Ula'tek's Chosen 25, Blade of the Altar 5, Living Venom 1; solve reconciles the trusted floor-1 weights too). Audit positions in ?edit=1&f=2. [crop migration 2026-06-30] PNGs cropped 1024x768->1002x668; mob fractions re-based x*=1024/1002, y*=768/668 (same pixel, so placements unchanged). [boss-add removal 2026-06-30] dropped 22 Uncoiled Writhe (262398+270417) placed instances — The Writhing Coil boss adds (forces 0, reform via Assimilation); kept in the roster (palette + threat analysis), removable/addable in ?edit=1. Floor 2 now 33 placed mobs, hand-audit pending. [RECOVERY 2026-07-01] floors 2 (33) + 3 (54) restored from editor localStorage after an export/reload cleared the on-screen editor; floor 1 (73) kept locked; attrs+forces re-attached by npc_id.",
   "floors": {
     "2588": 1,
     "2589": 2,
@@ -1032,7 +1032,7 @@
       "y": 0.44611
     },
     {
-      "iid": "264798_74",
+      "iid": "264798_2_1",
       "npc_id": 264798,
       "name": "Infused Eggs",
       "boss": false,
@@ -1042,11 +1042,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.46177,
-      "y": 0.21665
+      "x": 0.45478,
+      "y": 0.18372,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "264798_75",
+      "iid": "264798_2_2",
       "npc_id": 264798,
       "name": "Infused Eggs",
       "boss": false,
@@ -1056,11 +1058,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.45636,
-      "y": 0.22389
+      "x": 0.44948,
+      "y": 0.1898,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_76",
+      "iid": "261557_2_3",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1070,11 +1074,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.45891,
-      "y": 0.19837
+      "x": 0.45198,
+      "y": 0.16837,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_77",
+      "iid": "261557_2_4",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1084,11 +1090,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.44478,
-      "y": 0.2152
+      "x": 0.43815,
+      "y": 0.1825,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_78",
+      "iid": "261552_2_5",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1098,11 +1106,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.48395,
-      "y": 0.24893
+      "x": 0.47648,
+      "y": 0.21081,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_79",
+      "iid": "261552_2_6",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1112,11 +1122,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.47056,
-      "y": 0.26173
+      "x": 0.46338,
+      "y": 0.22155,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_80",
+      "iid": "261552_2_7",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1126,11 +1138,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.44368,
-      "y": 0.29891
+      "x": 0.43708,
+      "y": 0.25276,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_81",
+      "iid": "261557_2_8",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1140,11 +1154,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.4596,
-      "y": 0.30513
+      "x": 0.45265,
+      "y": 0.25798,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "262011_82",
+      "iid": "262011_2_9",
       "npc_id": 262011,
       "name": "Rattling Writhe",
       "boss": false,
@@ -1154,11 +1170,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.47494,
-      "y": 0.29075
+      "x": 0.46766,
+      "y": 0.24591,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "264798_83",
+      "iid": "264798_2_10",
       "npc_id": 264798,
       "name": "Infused Eggs",
       "boss": false,
@@ -1168,11 +1186,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.4399,
-      "y": 0.31488
+      "x": 0.43338,
+      "y": 0.26617,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "264798_84",
+      "iid": "264798_2_11",
       "npc_id": 264798,
       "name": "Infused Eggs",
       "boss": false,
@@ -1182,11 +1202,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.4145,
-      "y": 0.27285
+      "x": 0.40852,
+      "y": 0.23089,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_85",
+      "iid": "261557_2_12",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1196,11 +1218,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.42831,
-      "y": 0.25744
+      "x": 0.42204,
+      "y": 0.21795,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_86",
+      "iid": "261552_2_13",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1210,11 +1234,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.45868,
-      "y": 0.29899
+      "x": 0.45175,
+      "y": 0.25283,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "264798_87",
+      "iid": "264798_2_14",
       "npc_id": 264798,
       "name": "Infused Eggs",
       "boss": false,
@@ -1224,11 +1250,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.4726,
-      "y": 0.22969
+      "x": 0.46538,
+      "y": 0.19466,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "264798_88",
+      "iid": "264798_2_15",
       "npc_id": 264798,
       "name": "Infused Eggs",
       "boss": false,
@@ -1238,11 +1266,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.50689,
-      "y": 0.16757
+      "x": 0.49893,
+      "y": 0.14252,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_89",
+      "iid": "261557_2_16",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1252,11 +1282,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.50356,
-      "y": 0.19353
+      "x": 0.49567,
+      "y": 0.16431,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_90",
+      "iid": "261552_2_17",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1266,11 +1298,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.48764,
-      "y": 0.17904
+      "x": 0.48009,
+      "y": 0.15215,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "264798_91",
+      "iid": "264798_2_18",
       "npc_id": 264798,
       "name": "Infused Eggs",
       "boss": false,
@@ -1280,11 +1314,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.4618,
-      "y": 0.24145
+      "x": 0.45481,
+      "y": 0.20453,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "264798_92",
+      "iid": "264798_2_19",
       "npc_id": 264798,
       "name": "Infused Eggs",
       "boss": false,
@@ -1294,11 +1330,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.49792,
-      "y": 0.15836
+      "x": 0.49015,
+      "y": 0.13479,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "264798_93",
+      "iid": "264798_2_20",
       "npc_id": 264798,
       "name": "Infused Eggs",
       "boss": false,
@@ -1308,11 +1346,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.5507,
-      "y": 0.23699
+      "x": 0.5418,
+      "y": 0.20079,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_94",
+      "iid": "261552_2_21",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1322,11 +1362,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.53121,
-      "y": 0.1918
+      "x": 0.52273,
+      "y": 0.16286,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_95",
+      "iid": "261557_2_22",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1336,11 +1378,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.54687,
-      "y": 0.2149
+      "x": 0.53805,
+      "y": 0.18225,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_96",
+      "iid": "261552_2_23",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1350,11 +1394,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.55671,
-      "y": 0.21727
+      "x": 0.54768,
+      "y": 0.18424,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "262011_97",
+      "iid": "262011_2_24",
       "npc_id": 262011,
       "name": "Rattling Writhe",
       "boss": false,
@@ -1364,11 +1410,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.52809,
-      "y": 0.28809
+      "x": 0.51967,
+      "y": 0.24368,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_98",
+      "iid": "261552_2_25",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1378,11 +1426,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.52489,
-      "y": 0.295
+      "x": 0.51654,
+      "y": 0.24948,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_99",
+      "iid": "261552_2_26",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1392,11 +1442,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.53221,
-      "y": 0.28256
+      "x": 0.5237,
+      "y": 0.23904,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "262011_100",
+      "iid": "262011_2_27",
       "npc_id": 262011,
       "name": "Rattling Writhe",
       "boss": false,
@@ -1406,11 +1458,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.69129,
-      "y": 0.52807
+      "x": 0.67937,
+      "y": 0.44511,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_101",
+      "iid": "261552_2_28",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1420,11 +1474,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.69467,
-      "y": 0.56137
+      "x": 0.68267,
+      "y": 0.47306,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_102",
+      "iid": "261552_2_29",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1434,11 +1490,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.7037,
-      "y": 0.55128
+      "x": 0.69151,
+      "y": 0.46459,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261552_103",
+      "iid": "261552_2_30",
       "npc_id": 261552,
       "name": "Bloodletter",
       "boss": false,
@@ -1448,11 +1506,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.68258,
-      "y": 0.55833
+      "x": 0.67084,
+      "y": 0.4705,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_104",
+      "iid": "261557_2_31",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1462,11 +1522,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.70595,
-      "y": 0.5058
+      "x": 0.69371,
+      "y": 0.42641,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_105",
+      "iid": "261557_2_32",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1476,11 +1538,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.6832,
-      "y": 0.54761
+      "x": 0.67145,
+      "y": 0.46151,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "259446_111",
+      "iid": "259446_2_33",
       "npc_id": 259446,
       "name": "The Writhing Coil",
       "boss": true,
@@ -1490,11 +1554,13 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.69126,
-      "y": 0.54406
+      "x": 0.67934,
+      "y": 0.45853,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_129",
+      "iid": "261557_3_1",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1504,13 +1570,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.64033,
-      "y": 0.69803,
-      "wx": 1142.19,
-      "wy": 1950.99
+      "x": 0.64057,
+      "y": 0.69635,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_130",
+      "iid": "261557_3_2",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1520,13 +1586,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.63984,
-      "y": 0.76048,
-      "wx": 1105.12,
-      "wy": 1951.44
+      "x": 0.64007,
+      "y": 0.75813,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_131",
+      "iid": "271453_3_3",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -1536,13 +1602,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.64994,
-      "y": 0.73591,
-      "wx": 1119.71,
-      "wy": 1942.31
+      "x": 0.65,
+      "y": 0.73382,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_132",
+      "iid": "271453_3_4",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -1552,13 +1618,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.64518,
-      "y": 0.72347,
-      "wx": 1127.09,
-      "wy": 1946.6
+      "x": 0.65,
+      "y": 0.72156,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_133",
+      "iid": "261557_3_5",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1568,13 +1634,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.59847,
-      "y": 0.76023,
-      "wx": 1105.28,
-      "wy": 1988.8
+      "x": 0.59856,
+      "y": 0.75787,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261557_134",
+      "iid": "261557_3_6",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1584,13 +1650,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.59781,
-      "y": 0.69657,
-      "wx": 1143.06,
-      "wy": 1989.38
+      "x": 0.59791,
+      "y": 0.6949,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_135",
+      "iid": "271453_3_7",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -1600,13 +1666,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.60187,
-      "y": 0.71494,
-      "wx": 1132.16,
-      "wy": 1985.72
+      "x": 0.6018,
+      "y": 0.70958,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261573_136",
+      "iid": "261573_3_8",
       "npc_id": 261573,
       "name": "Ascendant Serpent",
       "boss": false,
@@ -1616,13 +1682,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.61904,
-      "y": 0.72837,
-      "wx": 1124.19,
-      "wy": 1970.22
+      "x": 0.6192,
+      "y": 0.72635,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_137",
+      "iid": "271453_3_9",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -1632,13 +1698,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.59495,
-      "y": 0.80148,
-      "wx": 1080.79,
-      "wy": 1991.97
+      "x": 0.48902,
+      "y": 0.7006,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_138",
+      "iid": "271453_3_10",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -1648,45 +1714,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.59172,
-      "y": 0.81165,
-      "wx": 1074.76,
-      "wy": 1994.89
+      "x": 0.48902,
+      "y": 0.71108,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_139",
-      "npc_id": 271453,
-      "name": "Blade of the Altar",
-      "boss": false,
-      "did": null,
-      "type": "Not specified",
-      "forces": 5,
-      "known": true,
-      "uiMapID": 2590,
-      "sublevel": 3,
-      "x": 0.4869,
-      "y": 0.702,
-      "wx": 1139.83,
-      "wy": 2089.56
-    },
-    {
-      "iid": "271453_140",
-      "npc_id": 271453,
-      "name": "Blade of the Altar",
-      "boss": false,
-      "did": null,
-      "type": "Not specified",
-      "forces": 5,
-      "known": true,
-      "uiMapID": 2590,
-      "sublevel": 3,
-      "x": 0.48812,
-      "y": 0.70402,
-      "wx": 1138.63,
-      "wy": 2088.46
-    },
-    {
-      "iid": "263112_141",
+      "iid": "263112_3_11",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1696,13 +1730,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.471,
-      "y": 0.78553,
-      "wx": 1090.26,
-      "wy": 2103.92
+      "x": 0.4465,
+      "y": 0.78443,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_142",
+      "iid": "263112_3_12",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1712,13 +1746,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.47437,
-      "y": 0.79724,
-      "wx": 1083.31,
-      "wy": 2100.87
+      "x": 0.47305,
+      "y": 0.8024,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_143",
+      "iid": "263112_3_13",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1728,13 +1762,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44752,
-      "y": 0.82071,
-      "wx": 1069.38,
-      "wy": 2125.12
+      "x": 0.4465,
+      "y": 0.82036,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_144",
+      "iid": "263112_3_14",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1744,13 +1778,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.47297,
-      "y": 0.81918,
-      "wx": 1070.29,
-      "wy": 2102.14
+      "x": 0.4705,
+      "y": 0.82036,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_145",
+      "iid": "263112_3_15",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1760,13 +1794,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46038,
-      "y": 0.8277,
-      "wx": 1065.23,
-      "wy": 2113.51
+      "x": 0.4585,
+      "y": 0.82485,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_146",
+      "iid": "263112_3_16",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1776,13 +1810,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46504,
-      "y": 0.77919,
-      "wx": 1094.02,
-      "wy": 2109.31
+      "x": 0.4585,
+      "y": 0.77844,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_147",
+      "iid": "263112_3_17",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1792,13 +1826,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45803,
-      "y": 0.79001,
-      "wx": 1087.6,
-      "wy": 2115.63
+      "x": 0.4705,
+      "y": 0.78443,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263109_148",
+      "iid": "263109_3_18",
       "npc_id": 263109,
       "name": "Ula'tek's Chosen",
       "boss": false,
@@ -1808,13 +1842,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45816,
-      "y": 0.80312,
-      "wx": 1079.82,
-      "wy": 2115.52
+      "x": 0.4585,
+      "y": 0.8024,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_149",
+      "iid": "271453_3_19",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -1824,13 +1858,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46259,
-      "y": 0.71602,
-      "wx": 1131.51,
-      "wy": 2111.52
+      "x": 0.454,
+      "y": 0.714,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_150",
+      "iid": "271453_3_20",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -1840,13 +1874,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46298,
-      "y": 0.7053,
-      "wx": 1137.88,
-      "wy": 2111.17
+      "x": 0.463,
+      "y": 0.7,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_151",
+      "iid": "271453_3_21",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -1856,13 +1890,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45412,
-      "y": 0.70587,
-      "wx": 1137.54,
-      "wy": 2119.17
+      "x": 0.454,
+      "y": 0.7,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_152",
+      "iid": "271453_3_22",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -1872,29 +1906,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46565,
-      "y": 0.71189,
-      "wx": 1133.96,
-      "wy": 2108.75
+      "x": 0.46307,
+      "y": 0.714,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_153",
-      "npc_id": 263112,
-      "name": "Living Venom",
-      "boss": false,
-      "did": 58535,
-      "type": "Aberration",
-      "forces": 1,
-      "known": true,
-      "uiMapID": 2590,
-      "sublevel": 3,
-      "x": 0.46866,
-      "y": 0.73319,
-      "wx": 1121.33,
-      "wy": 2106.04
-    },
-    {
-      "iid": "263109_154",
+      "iid": "263109_3_23",
       "npc_id": 263109,
       "name": "Ula'tek's Chosen",
       "boss": false,
@@ -1904,13 +1922,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.47971,
-      "y": 0.62117,
-      "wx": 1187.8,
-      "wy": 2096.05
+      "x": 0.47904,
+      "y": 0.6183,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_155",
+      "iid": "263112_3_24",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1920,13 +1938,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.47871,
-      "y": 0.6605,
-      "wx": 1164.46,
-      "wy": 2096.95
+      "x": 0.47904,
+      "y": 0.60778,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_156",
+      "iid": "263112_3_25",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1936,13 +1954,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.47402,
-      "y": 0.63891,
-      "wx": 1177.27,
-      "wy": 2101.19
+      "x": 0.47305,
+      "y": 0.62275,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_157",
+      "iid": "263112_3_26",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1952,13 +1970,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.47834,
-      "y": 0.61586,
-      "wx": 1190.95,
-      "wy": 2097.29
+      "x": 0.47904,
+      "y": 0.62874,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_158",
+      "iid": "263112_3_27",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1968,13 +1986,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.47179,
-      "y": 0.62913,
-      "wx": 1183.08,
-      "wy": 2103.2
+      "x": 0.47305,
+      "y": 0.61377,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_159",
+      "iid": "263112_3_28",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1984,13 +2002,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.48512,
-      "y": 0.62455,
-      "wx": 1185.8,
-      "wy": 2091.17
+      "x": 0.48503,
+      "y": 0.61377,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263112_160",
+      "iid": "263112_3_29",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -2000,13 +2018,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.48563,
-      "y": 0.65393,
-      "wx": 1168.36,
-      "wy": 2090.7
+      "x": 0.48503,
+      "y": 0.62275,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_161",
+      "iid": "271453_3_30",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -2016,13 +2034,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.42897,
-      "y": 0.54565,
-      "wx": 1232.62,
-      "wy": 2141.88
+      "x": 0.42415,
+      "y": 0.54491,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261560_162",
+      "iid": "261560_3_31",
       "npc_id": 261560,
       "name": "Primal Serpent",
       "boss": false,
@@ -2032,13 +2050,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45139,
-      "y": 0.4943,
-      "wx": 1263.09,
-      "wy": 2121.63
+      "x": 0.45097,
+      "y": 0.49485,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261554_163",
+      "iid": "261554_3_32",
       "npc_id": 261554,
       "name": "Twinfang Harrower",
       "boss": false,
@@ -2048,13 +2066,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45358,
-      "y": 0.50071,
-      "wx": 1259.29,
-      "wy": 2119.65
+      "x": 0.45709,
+      "y": 0.50449,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "261560_164",
+      "iid": "261560_3_33",
       "npc_id": 261560,
       "name": "Primal Serpent",
       "boss": false,
@@ -2064,13 +2082,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46375,
-      "y": 0.49367,
-      "wx": 1263.47,
-      "wy": 2110.47
+      "x": 0.46337,
+      "y": 0.49485,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_165",
+      "iid": "271453_3_34",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -2080,13 +2098,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44526,
-      "y": 0.50048,
-      "wx": 1259.43,
-      "wy": 2127.17
+      "x": 0.44611,
+      "y": 0.50449,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_166",
+      "iid": "271453_3_35",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -2096,13 +2114,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46471,
-      "y": 0.50267,
-      "wx": 1258.13,
-      "wy": 2109.6
+      "x": 0.46806,
+      "y": 0.50449,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_167",
+      "iid": "271453_3_36",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -2112,13 +2130,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.48048,
-      "y": 0.54513,
-      "wx": 1232.93,
-      "wy": 2095.36
+      "x": 0.48802,
+      "y": 0.54491,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_168",
+      "iid": "271453_3_37",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -2128,13 +2146,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.43273,
-      "y": 0.50935,
-      "wx": 1254.16,
-      "wy": 2138.49
+      "x": 0.42814,
+      "y": 0.50898,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_169",
+      "iid": "271453_3_38",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -2144,13 +2162,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44775,
-      "y": 0.52365,
-      "wx": 1245.67,
-      "wy": 2124.92
+      "x": 0.48802,
+      "y": 0.52844,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_170",
+      "iid": "271453_3_39",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -2160,13 +2178,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45102,
-      "y": 0.24283,
-      "wx": 1412.33,
-      "wy": 2121.97
+      "x": 0.45059,
+      "y": 0.24612,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "270306_171",
+      "iid": "270306_3_40",
       "npc_id": 270306,
       "name": "Ritual Chieftain",
       "boss": false,
@@ -2176,13 +2194,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45374,
-      "y": 0.23516,
-      "wx": 1416.88,
-      "wy": 2119.51
+      "x": 0.45332,
+      "y": 0.23853,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "270306_172",
+      "iid": "270306_3_41",
       "npc_id": 270306,
       "name": "Ritual Chieftain",
       "boss": false,
@@ -2192,13 +2210,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46325,
-      "y": 0.23506,
-      "wx": 1416.95,
-      "wy": 2110.93
+      "x": 0.46286,
+      "y": 0.23842,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "271453_173",
+      "iid": "271453_3_42",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
@@ -2208,13 +2226,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46608,
-      "y": 0.24331,
-      "wx": 1412.05,
-      "wy": 2108.36
+      "x": 0.46607,
+      "y": 0.24612,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "263109_174",
+      "iid": "263109_3_43",
       "npc_id": 263109,
       "name": "Ula'tek's Chosen",
       "boss": false,
@@ -2224,13 +2242,13 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45825,
-      "y": 0.24235,
-      "wx": 1412.62,
-      "wy": 2115.44
+      "x": 0.45784,
+      "y": 0.24563,
+      "wx": 0,
+      "wy": 0
     },
     {
-      "iid": "259447_175",
+      "iid": "259447_3_44",
       "npc_id": 259447,
       "name": "Zul'jan",
       "boss": true,
@@ -2240,10 +2258,170 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45816,
-      "y": 0.22996,
-      "wx": 1419.97,
-      "wy": 2115.52
+      "x": 0.45776,
+      "y": 0.23338,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "263112_3_45",
+      "npc_id": 263112,
+      "name": "Living Venom",
+      "boss": false,
+      "did": 58535,
+      "type": "Aberration",
+      "forces": 1,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.4433,
+      "y": 0.8024,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "271453_3_46",
+      "npc_id": 271453,
+      "name": "Blade of the Altar",
+      "boss": false,
+      "did": null,
+      "type": "Not specified",
+      "forces": 5,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.424,
+      "y": 0.69174,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "271453_3_47",
+      "npc_id": 271453,
+      "name": "Blade of the Altar",
+      "boss": false,
+      "did": null,
+      "type": "Not specified",
+      "forces": 5,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.424,
+      "y": 0.70008,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "263109_3_48",
+      "npc_id": 263109,
+      "name": "Ula'tek's Chosen",
+      "boss": false,
+      "did": 142327,
+      "type": "Humanoid",
+      "forces": 25,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.43713,
+      "y": 0.6183,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "263112_3_49",
+      "npc_id": 263112,
+      "name": "Living Venom",
+      "boss": false,
+      "did": 58535,
+      "type": "Aberration",
+      "forces": 1,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.43713,
+      "y": 0.60778,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "263112_3_50",
+      "npc_id": 263112,
+      "name": "Living Venom",
+      "boss": false,
+      "did": 58535,
+      "type": "Aberration",
+      "forces": 1,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.43713,
+      "y": 0.62874,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "263112_3_51",
+      "npc_id": 263112,
+      "name": "Living Venom",
+      "boss": false,
+      "did": 58535,
+      "type": "Aberration",
+      "forces": 1,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.43114,
+      "y": 0.62275,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "263112_3_52",
+      "npc_id": 263112,
+      "name": "Living Venom",
+      "boss": false,
+      "did": 58535,
+      "type": "Aberration",
+      "forces": 1,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.44311,
+      "y": 0.62275,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "263112_3_53",
+      "npc_id": 263112,
+      "name": "Living Venom",
+      "boss": false,
+      "did": 58535,
+      "type": "Aberration",
+      "forces": 1,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.43114,
+      "y": 0.61377,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "263112_3_54",
+      "npc_id": 263112,
+      "name": "Living Venom",
+      "boss": false,
+      "did": 58535,
+      "type": "Aberration",
+      "forces": 1,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.44311,
+      "y": 0.61377,
+      "wx": 0,
+      "wy": 0
     }
   ],
   "forces_total": 836
