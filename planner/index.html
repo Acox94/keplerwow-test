@@ -2685,7 +2685,15 @@ function editorBoot() {
     let j; try { j = await fetch(CFG.mobs).then(r => r.json()); } catch { if (!silent) alert('No captured mobs.json to import.'); return; }
     const rows = (FLOOR.sublevel == null ? j.mobs : j.mobs.filter(m => m.sublevel === FLOOR.sublevel)).filter(m => m.x != null);
     if (!rows.length) { if (!silent) alert('No captured mobs on this floor.'); return; }
-    if (!silent && MOBS.length && !confirm(`Add ${rows.length} captured mob(s) to the ${MOBS.length} already placed on ${FLOOR.label}?`)) return;
+    // GUARD (replace-by-default): a re-click used to blindly APPEND, silently DOUBLING an already-placed
+    // floor. Importing onto a populated floor now REPLACES it (the common "reload / restore" intent) — we
+    // clear the floor first, then load the file's set. Auto-seed (silent, on a fresh/empty floor) is
+    // unaffected, and other floors are never touched.
+    if (!silent && MOBS.length) {
+      if (!confirm(`${FLOOR.label} already has ${MOBS.length} placed mob(s).\n\nReplace them with the ${rows.length} from the file?\n(OK = replace / restore  ·  Cancel = leave as-is)`)) return;
+      for (const iid of Object.keys(markers)) { markers[iid].marker.remove(); delete markers[iid]; }
+      MOBS.length = 0;
+    }
     const manual = j._placement === 'manual';
     const f = Object.assign({ sx: 1, sy: 1, dx: 0, dy: 0 }, FLOOR.fit);
     let pu = 0.5, pv = 0.5;

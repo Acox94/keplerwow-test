@@ -44,7 +44,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -72,7 +72,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -128,7 +128,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -142,7 +142,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -520,7 +520,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -534,7 +534,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -590,7 +590,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -632,7 +632,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -716,7 +716,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -730,7 +730,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -786,7 +786,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -800,7 +800,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -940,7 +940,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -954,7 +954,7 @@
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
@@ -1166,7 +1166,7 @@
       "boss": false,
       "did": 137231,
       "type": "Beast",
-      "forces": 10,
+      "forces": 25,
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
@@ -1406,7 +1406,7 @@
       "boss": false,
       "did": 137231,
       "type": "Beast",
-      "forces": 10,
+      "forces": 25,
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
@@ -1454,7 +1454,7 @@
       "boss": false,
       "did": 137231,
       "type": "Beast",
-      "forces": 10,
+      "forces": 25,
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
@@ -1560,7 +1560,7 @@
       "wy": 0
     },
     {
-      "iid": "261557_3_1",
+      "iid": "261557_1",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1576,7 +1576,7 @@
       "wy": 0
     },
     {
-      "iid": "261557_3_2",
+      "iid": "261557_2",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1592,12 +1592,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_3",
+      "iid": "271453_3",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -1608,12 +1608,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_4",
+      "iid": "271453_4",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -1624,7 +1624,7 @@
       "wy": 0
     },
     {
-      "iid": "261557_3_5",
+      "iid": "261557_5",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1640,7 +1640,7 @@
       "wy": 0
     },
     {
-      "iid": "261557_3_6",
+      "iid": "261557_6",
       "npc_id": 261557,
       "name": "High Evolutionist",
       "boss": false,
@@ -1656,12 +1656,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_7",
+      "iid": "271453_7",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -1672,7 +1672,7 @@
       "wy": 0
     },
     {
-      "iid": "261573_3_8",
+      "iid": "261573_8",
       "npc_id": 261573,
       "name": "Ascendant Serpent",
       "boss": false,
@@ -1688,12 +1688,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_9",
+      "iid": "271453_9",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -1704,12 +1704,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_10",
+      "iid": "271453_10",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -1720,7 +1720,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_11",
+      "iid": "263112_11",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1736,7 +1736,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_12",
+      "iid": "263112_12",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1752,7 +1752,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_13",
+      "iid": "263112_13",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1768,7 +1768,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_14",
+      "iid": "263112_14",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1784,7 +1784,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_15",
+      "iid": "263112_15",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1800,7 +1800,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_16",
+      "iid": "263112_16",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1816,7 +1816,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_17",
+      "iid": "263112_17",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1832,7 +1832,7 @@
       "wy": 0
     },
     {
-      "iid": "263109_3_18",
+      "iid": "263109_18",
       "npc_id": 263109,
       "name": "Ula'tek's Chosen",
       "boss": false,
@@ -1848,12 +1848,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_19",
+      "iid": "271453_19",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -1864,12 +1864,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_20",
+      "iid": "271453_20",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -1880,12 +1880,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_21",
+      "iid": "271453_21",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -1896,12 +1896,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_22",
+      "iid": "271453_22",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -1912,7 +1912,7 @@
       "wy": 0
     },
     {
-      "iid": "263109_3_23",
+      "iid": "263109_23",
       "npc_id": 263109,
       "name": "Ula'tek's Chosen",
       "boss": false,
@@ -1928,7 +1928,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_24",
+      "iid": "263112_24",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1944,7 +1944,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_25",
+      "iid": "263112_25",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1960,7 +1960,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_26",
+      "iid": "263112_26",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1976,7 +1976,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_27",
+      "iid": "263112_27",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -1992,7 +1992,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_28",
+      "iid": "263112_28",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -2008,7 +2008,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_29",
+      "iid": "263112_29",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -2024,12 +2024,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_30",
+      "iid": "271453_30",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -2040,13 +2040,13 @@
       "wy": 0
     },
     {
-      "iid": "261560_3_31",
+      "iid": "261560_31",
       "npc_id": 261560,
       "name": "Primal Serpent",
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
@@ -2056,7 +2056,7 @@
       "wy": 0
     },
     {
-      "iid": "261554_3_32",
+      "iid": "261554_32",
       "npc_id": 261554,
       "name": "Twinfang Harrower",
       "boss": false,
@@ -2072,13 +2072,13 @@
       "wy": 0
     },
     {
-      "iid": "261560_3_33",
+      "iid": "261560_33",
       "npc_id": 261560,
       "name": "Primal Serpent",
       "boss": false,
       "did": 137230,
       "type": "Beast",
-      "forces": 2,
+      "forces": 7,
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
@@ -2088,12 +2088,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_34",
+      "iid": "271453_34",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -2104,12 +2104,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_35",
+      "iid": "271453_35",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -2120,12 +2120,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_36",
+      "iid": "271453_36",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -2136,12 +2136,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_37",
+      "iid": "271453_37",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -2152,12 +2152,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_38",
+      "iid": "271453_38",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -2168,12 +2168,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_39",
+      "iid": "271453_39",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -2184,7 +2184,7 @@
       "wy": 0
     },
     {
-      "iid": "270306_3_40",
+      "iid": "270306_40",
       "npc_id": 270306,
       "name": "Ritual Chieftain",
       "boss": false,
@@ -2200,7 +2200,7 @@
       "wy": 0
     },
     {
-      "iid": "270306_3_41",
+      "iid": "270306_41",
       "npc_id": 270306,
       "name": "Ritual Chieftain",
       "boss": false,
@@ -2216,12 +2216,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_42",
+      "iid": "271453_42",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -2232,7 +2232,7 @@
       "wy": 0
     },
     {
-      "iid": "263109_3_43",
+      "iid": "263109_43",
       "npc_id": 263109,
       "name": "Ula'tek's Chosen",
       "boss": false,
@@ -2248,7 +2248,7 @@
       "wy": 0
     },
     {
-      "iid": "259447_3_44",
+      "iid": "259447_44",
       "npc_id": 259447,
       "name": "Zul'jan",
       "boss": true,
@@ -2264,7 +2264,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_45",
+      "iid": "263112_45",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -2280,12 +2280,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_46",
+      "iid": "271453_46",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -2296,12 +2296,12 @@
       "wy": 0
     },
     {
-      "iid": "271453_3_47",
+      "iid": "271453_47",
       "npc_id": 271453,
       "name": "Blade of the Altar",
       "boss": false,
       "did": 142336,
-      "type": "Not specified",
+      "type": "Humanoid",
       "forces": 5,
       "known": true,
       "uiMapID": 2590,
@@ -2312,7 +2312,7 @@
       "wy": 0
     },
     {
-      "iid": "263109_3_48",
+      "iid": "263109_48",
       "npc_id": 263109,
       "name": "Ula'tek's Chosen",
       "boss": false,
@@ -2328,7 +2328,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_49",
+      "iid": "263112_49",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -2344,7 +2344,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_50",
+      "iid": "263112_50",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -2360,7 +2360,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_51",
+      "iid": "263112_51",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -2376,7 +2376,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_52",
+      "iid": "263112_52",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -2392,7 +2392,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_53",
+      "iid": "263112_53",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -2408,7 +2408,7 @@
       "wy": 0
     },
     {
-      "iid": "263112_3_54",
+      "iid": "263112_54",
       "npc_id": 263112,
       "name": "Living Venom",
       "boss": false,
@@ -2420,6 +2420,54 @@
       "sublevel": 3,
       "x": 0.44311,
       "y": 0.61377,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "271453_55",
+      "npc_id": 271453,
+      "name": "Blade of the Altar",
+      "boss": false,
+      "did": 142336,
+      "type": "Humanoid",
+      "forces": 5,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.43349,
+      "y": 0.68312,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "271453_56",
+      "npc_id": 271453,
+      "name": "Blade of the Altar",
+      "boss": false,
+      "did": 142336,
+      "type": "Humanoid",
+      "forces": 5,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.60579,
+      "y": 0.8009,
+      "wx": 0,
+      "wy": 0
+    },
+    {
+      "iid": "271453_57",
+      "npc_id": 271453,
+      "name": "Blade of the Altar",
+      "boss": false,
+      "did": 142336,
+      "type": "Humanoid",
+      "forces": 5,
+      "known": true,
+      "uiMapID": 2590,
+      "sublevel": 3,
+      "x": 0.60579,
+      "y": 0.81287,
       "wx": 0,
       "wy": 0
     }
