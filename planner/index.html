@@ -1068,7 +1068,7 @@ function openCreatureCard(npcId, mk) {
     `<span class="cd-badge${isBoss ? ' boss' : ''}">${esc(isBoss ? 'Boss' : ((c && c.classification) || 'Trash'))}</span>`,
     type ? `<span class="cd-badge">${esc(type)}</span>` : '',
     `<span class="cd-badge">${esc(fmtHP(c && c.base_health))} HP</span>`,
-    forces != null ? `<span class="cd-badge">${forces} ${forces === 1 ? 'force' : 'forces'}</span>` : '',
+    forces != null ? `<span class="cd-badge">${FORCES_TOTAL ? (forces / FORCES_TOTAL * 100).toFixed(1) + '% ' : ''}(${forces})</span>` : '',
     spawnC ? `<span class="cd-badge cd-spawn" data-spawn="${spawnId}" title="hatches into ${esc(spawnC.name)} — click to view">↳ ${esc(spawnC.name)}</span>` : '',
     c ? '' : `<span class="cd-badge muted">not in dataset</span>`,
   ].filter(Boolean).join('');
