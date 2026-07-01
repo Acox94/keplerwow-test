@@ -1,8 +1,8 @@
 {
-  "_source": "manual placement (planner-spike editor) — floor 1 hand-audited; floors 2-3 from the combat-log capture",
+  "_source": "manual placement (planner-spike editor) \u2014 floor 1 hand-audited; floors 2-3 from the combat-log capture",
   "_placement": "manual",
   "_frame": "image-fraction 0..1 of the floor PNG (identity fit; px = x*PNG_W, py = y*PNG_H). PNG = the true UiMap art layer bounds 1002x668 (DB2 UiMapArtStyleLayer id=1), cropped from the 1024x768 tile canvas 2026-06-30.",
-  "_note": "Floor 1 (73): hand-placed + audited (LOCKED, treat as accurate). Floor 2 (55): from the temporal-merged capture, converted from the floor-2 fit {dx:-25,dy:-5} into image-fraction — to be audited in ?edit=1&f=1. Floor 3 (47): /kcal'd on 2590 (from the +11 clear, SV flushed) - wx/wy projected to image-fraction x/y; forces from the combined-log solve (single-run, PROVISIONAL - re-confirm with a 2nd floor-3 run). Audit positions in ?edit=1&f=2. [crop migration 2026-06-30] PNGs cropped 1024x768->1002x668; mob fractions re-based x*=1024/1002, y*=768/668 (same pixel, so placements unchanged). [boss-add removal 2026-06-30] dropped 22 Uncoiled Writhe (262398+270417) placed instances — The Writhing Coil boss adds (forces 0, reform via Assimilation); kept in the roster (palette + threat analysis), removable/addable in ?edit=1. Floor 2 now 33 placed mobs, hand-audit pending.",
+  "_note": "Floor 1 (73): hand-placed + audited (LOCKED, treat as accurate). Floor 2 (55): from the temporal-merged capture, converted from the floor-2 fit {dx:-25,dy:-5} into image-fraction \u2014 to be audited in ?edit=1&f=1. Floor 3 (47): /kcal'd on 2590 (from the +11 clear, SV flushed) - wx/wy projected to image-fraction x/y; forces from the combined-log solve (single-run, PROVISIONAL - re-confirm with a 2nd floor-3 run). Audit positions in ?edit=1&f=2. [crop migration 2026-06-30] PNGs cropped 1024x768->1002x668; mob fractions re-based x*=1024/1002, y*=768/668 (same pixel, so placements unchanged). [boss-add removal 2026-06-30] dropped 22 Uncoiled Writhe (262398+270417) placed instances \u2014 The Writhing Coil boss adds (forces 0, reform via Assimilation); kept in the roster (palette + threat analysis), removable/addable in ?edit=1. Floor 2 now 33 placed mobs, hand-audit pending.",
   "floors": {
     "2588": 1,
     "2589": 2,
@@ -1042,8 +1042,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.4488,
-      "y": 0.2406
+      "x": 0.46177,
+      "y": 0.21665
     },
     {
       "iid": "264798_75",
@@ -1056,8 +1056,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.44339,
-      "y": 0.24784
+      "x": 0.45636,
+      "y": 0.22389
     },
     {
       "iid": "261557_76",
@@ -1070,8 +1070,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.44594,
-      "y": 0.22232
+      "x": 0.45891,
+      "y": 0.19837
     },
     {
       "iid": "261557_77",
@@ -1084,8 +1084,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.43181,
-      "y": 0.23915
+      "x": 0.44478,
+      "y": 0.2152
     },
     {
       "iid": "261552_78",
@@ -1098,8 +1098,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.47098,
-      "y": 0.27288
+      "x": 0.48395,
+      "y": 0.24893
     },
     {
       "iid": "261552_79",
@@ -1112,8 +1112,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.45759,
-      "y": 0.28568
+      "x": 0.47056,
+      "y": 0.26173
     },
     {
       "iid": "261552_80",
@@ -1126,8 +1126,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.43071,
-      "y": 0.32286
+      "x": 0.44368,
+      "y": 0.29891
     },
     {
       "iid": "261557_81",
@@ -1140,8 +1140,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.44663,
-      "y": 0.32908
+      "x": 0.4596,
+      "y": 0.30513
     },
     {
       "iid": "262011_82",
@@ -1154,8 +1154,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.46197,
-      "y": 0.3147
+      "x": 0.47494,
+      "y": 0.29075
     },
     {
       "iid": "264798_83",
@@ -1168,8 +1168,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.42693,
-      "y": 0.33883
+      "x": 0.4399,
+      "y": 0.31488
     },
     {
       "iid": "264798_84",
@@ -1182,8 +1182,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.40153,
-      "y": 0.2968
+      "x": 0.4145,
+      "y": 0.27285
     },
     {
       "iid": "261557_85",
@@ -1196,8 +1196,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.41534,
-      "y": 0.28139
+      "x": 0.42831,
+      "y": 0.25744
     },
     {
       "iid": "261552_86",
@@ -1210,8 +1210,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.44571,
-      "y": 0.32294
+      "x": 0.45868,
+      "y": 0.29899
     },
     {
       "iid": "264798_87",
@@ -1224,8 +1224,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.45963,
-      "y": 0.25364
+      "x": 0.4726,
+      "y": 0.22969
     },
     {
       "iid": "264798_88",
@@ -1238,8 +1238,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.49392,
-      "y": 0.19152
+      "x": 0.50689,
+      "y": 0.16757
     },
     {
       "iid": "261557_89",
@@ -1252,8 +1252,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.49059,
-      "y": 0.21748
+      "x": 0.50356,
+      "y": 0.19353
     },
     {
       "iid": "261552_90",
@@ -1266,8 +1266,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.47467,
-      "y": 0.20299
+      "x": 0.48764,
+      "y": 0.17904
     },
     {
       "iid": "264798_91",
@@ -1280,8 +1280,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.44883,
-      "y": 0.2654
+      "x": 0.4618,
+      "y": 0.24145
     },
     {
       "iid": "264798_92",
@@ -1294,8 +1294,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.48495,
-      "y": 0.18231
+      "x": 0.49792,
+      "y": 0.15836
     },
     {
       "iid": "264798_93",
@@ -1308,8 +1308,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.53773,
-      "y": 0.26094
+      "x": 0.5507,
+      "y": 0.23699
     },
     {
       "iid": "261552_94",
@@ -1322,8 +1322,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.51824,
-      "y": 0.21575
+      "x": 0.53121,
+      "y": 0.1918
     },
     {
       "iid": "261557_95",
@@ -1336,8 +1336,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.5339,
-      "y": 0.23885
+      "x": 0.54687,
+      "y": 0.2149
     },
     {
       "iid": "261552_96",
@@ -1350,8 +1350,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.54374,
-      "y": 0.24122
+      "x": 0.55671,
+      "y": 0.21727
     },
     {
       "iid": "262011_97",
@@ -1364,8 +1364,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.51512,
-      "y": 0.31204
+      "x": 0.52809,
+      "y": 0.28809
     },
     {
       "iid": "261552_98",
@@ -1378,8 +1378,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.51192,
-      "y": 0.31895
+      "x": 0.52489,
+      "y": 0.295
     },
     {
       "iid": "261552_99",
@@ -1392,8 +1392,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.51924,
-      "y": 0.30651
+      "x": 0.53221,
+      "y": 0.28256
     },
     {
       "iid": "262011_100",
@@ -1406,8 +1406,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.67832,
-      "y": 0.55202
+      "x": 0.69129,
+      "y": 0.52807
     },
     {
       "iid": "261552_101",
@@ -1420,8 +1420,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.6817,
-      "y": 0.58532
+      "x": 0.69467,
+      "y": 0.56137
     },
     {
       "iid": "261552_102",
@@ -1434,8 +1434,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.69073,
-      "y": 0.57523
+      "x": 0.7037,
+      "y": 0.55128
     },
     {
       "iid": "261552_103",
@@ -1448,8 +1448,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.66961,
-      "y": 0.58228
+      "x": 0.68258,
+      "y": 0.55833
     },
     {
       "iid": "261557_104",
@@ -1462,8 +1462,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.69298,
-      "y": 0.52975
+      "x": 0.70595,
+      "y": 0.5058
     },
     {
       "iid": "261557_105",
@@ -1476,8 +1476,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.67023,
-      "y": 0.57156
+      "x": 0.6832,
+      "y": 0.54761
     },
     {
       "iid": "259446_111",
@@ -1490,8 +1490,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.67829,
-      "y": 0.56801
+      "x": 0.69126,
+      "y": 0.54406
     },
     {
       "iid": "261557_129",
