@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68301,
-    "extracted_at": "2026-07-01T01:49:25.769Z",
+    "extracted_at": "2026-07-01T02:04:29.799Z",
     "patch_version": "12.1.0",
     "source_versions": {
       "curated": {
@@ -845,7 +845,47 @@
       "level": null,
       "name": "Hatchling",
       "npc_id": 261556,
-      "spells": [],
+      "spells": [
+        {
+          "base_damage": null,
+          "cast_order": null,
+          "cast_time_ms": 0,
+          "coaching_note": "Hatchling priority chain: avoid stepping on the eggs -> stay out of Hatchling melee range -> group the Hatchlings together -> CC and kill. Each Hatchling hunts (fixates) a random player via Nascent Hunger and hits hard in melee (~48k median, up to ~107k @ +11). They ARE CC-able (stun/disorient/slow — Shadowfury/Blinding Light land), so CC to group + burst them; they're squishy.",
+          "completion_effect": null,
+          "description": "Hunting a random player.",
+          "dispel_detonates": false,
+          "dispel_type": "None",
+          "displacement": [],
+          "dot": false,
+          "duration_ms": null,
+          "freedom_partial": false,
+          "high_risk": [],
+          "is_aoe": false,
+          "is_channeled": true,
+          "is_interruptible": false,
+          "is_lethal": false,
+          "is_stoppable": false,
+          "mechanic": null,
+          "name": "Nascent Hunger",
+          "notes": "Fixate cast — 'Hunting a random player' (self-aura); the Hatchling deals no spell damage, only melee. CC-confirmed on 261556 (log: Shadowfury x48, Blinding Light x31, Psychic Scream x7). Summoned by Infused Eggs (Hatch 1293059). hand-added 2026-06-30.",
+          "observed_channel_stop": null,
+          "observed_kick_point": null,
+          "party_targets": null,
+          "positioning": [],
+          "priority": "priority",
+          "recast_cooldown_confidence": "measured",
+          "recast_cooldown_ms": 2476,
+          "requires_interrupt": false,
+          "scales_to_lethal": false,
+          "school": "Physical",
+          "secondary_of": null,
+          "spell_id": 1306383,
+          "tank_buster": false,
+          "target_roles": null,
+          "unavoidable": false,
+          "vulnerability": null
+        }
+      ],
       "summoned_by": null
     },
     {
