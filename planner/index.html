@@ -2672,15 +2672,22 @@ function editorBoot() {
     save();
   }
 
-  function exportJson() {
-    const floorsObj = {}; for (const [sub, uim] of Object.entries(subToUiMap)) floorsObj[uim] = +sub;
-    const mobs = placed.map((p, i) => { const c = byId.get(p.npc_id) || {};
-      return { iid: `${p.npc_id}_${i + 1}`, npc_id: p.npc_id, name: c.name ?? null, boss: !!c.is_boss,
-        did: c.display_id ?? null, type: c.creature_type ?? null, forces: 0, known: byId.has(p.npc_id),
-        uiMapID: subToUiMap[p.sublevel] ?? 0, sublevel: p.sublevel, x: p.u, y: p.v }; });
-    const out = { _source: 'manual placement (planner-spike editor)', _placement: 'manual',
-      _frame: 'image-fraction 0..1 of the floor PNG (identity fit; px = x*PNG_W, py = y*PNG_H)',
-      floors: floorsObj, mobs };
+  // MERGE onto the live mobs.json — only the CURRENT floor is rewritten from the editor; every other floor,
+  // plus forces / forces_total / _note, is kept verbatim. So editing one floor never wipes another, and the
+  // baked enemy-forces survive (weight is per npc TYPE, so we recover each mob's forces by npc_id from the
+  // live file — the old export hardcoded forces:0 and rebuilt the whole file from localStorage, nuking both).
+  async function exportJson() {
+    let base = {}; try { base = await fetch(CFG.mobs).then(r => r.json()); } catch {}
+    const baseMobs = Array.isArray(base.mobs) ? base.mobs : [];
+    const forcesByNpc = new Map(baseMobs.map(m => [m.npc_id, m.forces]));
+    const others = baseMobs.filter(m => m.sublevel !== FLOOR.sublevel);       // preserve every OTHER floor as-is
+    const here = MOBS.map((m, i) => { const c = byId.get(m.npc_id) || {};     // rewrite only THIS floor
+      return { iid: `${m.npc_id}_${i + 1}`, npc_id: m.npc_id, name: c.name ?? m.name ?? null, boss: !!(c.is_boss ?? m.boss),
+        did: c.display_id ?? m.did ?? null, type: c.creature_type ?? m.type ?? null,
+        forces: forcesByNpc.get(m.npc_id) ?? 0, known: byId.has(m.npc_id),
+        uiMapID: subToUiMap[FLOOR.sublevel] ?? m.uiMapID ?? 0, sublevel: FLOOR.sublevel,
+        x: +m._u.toFixed(5), y: +m._v.toFixed(5), wx: m.wx ?? 0, wy: m.wy ?? 0 }; });
+    const out = { ...base, _placement: 'manual', mobs: others.concat(here) };
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2) + '\n'], { type: 'application/json' }));
     a.download = `${DKEY}.mobs.json`; a.click();
