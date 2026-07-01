@@ -717,6 +717,7 @@ let FORCES_TOTAL = 0;        // enemy-forces denominator (MDT dungeonTotalCount.
 // route that spans floors — each floor is its own page (?f=), so only the current floor's MOBS are live;
 // the other floors' pulls live in localStorage and we price their iids through this map.
 let FORCES_BY_IID = new Map();
+let FORCES_BY_NPC = new Map();   // npc_id -> enemy-forces weight (per TYPE), for the detail card
 const portrait = (did) => `https://render.worldofwarcraft.com/us/npcs/zoom/creature-display-${did}.jpg`;
 
 // Calibration nudge (texture px). The MDT projection is VERIFIED correct against MDT's own source
@@ -1062,10 +1063,12 @@ function openCreatureCard(npcId, mk) {
   loadHero(c, name, type);
   _cd.querySelector('#cdName').textContent = name;
   const spawnId = SPAWNS[npcId], spawnC = spawnId != null ? creaturesById.get(spawnId) : null;
+  const forces = (mk && mk.forces != null) ? mk.forces : (FORCES_BY_NPC.has(npcId) ? FORCES_BY_NPC.get(npcId) : null);
   const badges = [
     `<span class="cd-badge${isBoss ? ' boss' : ''}">${esc(isBoss ? 'Boss' : ((c && c.classification) || 'Trash'))}</span>`,
     type ? `<span class="cd-badge">${esc(type)}</span>` : '',
     `<span class="cd-badge">${esc(fmtHP(c && c.base_health))} HP</span>`,
+    forces != null ? `<span class="cd-badge">${forces} ${forces === 1 ? 'force' : 'forces'}</span>` : '',
     spawnC ? `<span class="cd-badge cd-spawn" data-spawn="${spawnId}" title="hatches into ${esc(spawnC.name)} — click to view">↳ ${esc(spawnC.name)}</span>` : '',
     c ? '' : `<span class="cd-badge muted">not in dataset</span>`,
   ].filter(Boolean).join('');
@@ -2482,6 +2485,7 @@ if (EDIT) {
       }
       MOBS = rows.map(m => ({ ...m, _u: m.x, _v: m.y, x: fitX(m.x), y: fitY(m.y) })); FORCES_TOTAL = j.forces_total || 0;
       FORCES_BY_IID = new Map((j.mobs || []).map(m => [m.iid, m.forces || 0]));   // ALL floors, for the cross-floor sum
+      FORCES_BY_NPC = new Map((j.mobs || []).map(m => [m.npc_id, m.forces || 0]));   // per npc TYPE, for the detail card
       buildMarkers(); window._spike.markers = markers; restoreRoute(); })
     .catch(e => { document.querySelector('.note').textContent = 'failed to load mob positions: ' + (e && e.message || e); newPull(); });
 }
