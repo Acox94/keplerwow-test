@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68301,
-    "extracted_at": "2026-07-01T12:50:39.550Z",
+    "extracted_at": "2026-07-01T14:24:46.699Z",
     "patch_version": "12.1.0",
     "source_versions": {
       "curated": {
@@ -25,12 +25,19 @@
         }
       },
       "dungeons": [
-        "altar-of-fangs"
+        "ruby-life-pools",
+        "murder-row",
+        "den-of-nalorakk",
+        "the-blinding-vale",
+        "voidscar-arena",
+        "altar-of-fangs",
+        "temple-of-sethraliss",
+        "kings-rest"
       ],
       "membership": {
         "source": "file"
       },
-      "season": null
+      "season": "midnight-s2"
     }
   },
   "creatures": [
@@ -1700,9 +1707,9 @@
     {
       "avoidable": false,
       "base_health": 2452393,
-      "classification": null,
+      "classification": "Elite",
       "creature_type": "Humanoid",
-      "display_id": 7224879,
+      "display_id": 142336,
       "forces": null,
       "is_boss": false,
       "is_boss_add": false,

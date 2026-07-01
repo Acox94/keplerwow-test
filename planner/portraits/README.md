@@ -34,12 +34,18 @@ dist/altar-of-fangs.json`.
 Living Venom `58535` (all old reused models).
 
 **No displayId at all:** the scrape-id Zul'jan (267797) → name blip (the real Zul'jan, combat id 259447, is
-`145435` below). **Blade of the Altar (271453) — RESOLVED 2026-07-01 via `/kmodel`:** it has no Wowhead page /
-no CreatureDisplayInfo id, so its `display_id` is set to its **M2 FileDataID `7224879`** (the serpent model,
-shared with High Evolutionist/Ula'tek's Chosen), obtained from the in-game `/kmodel 271453` (`SetCreature →
-GetModelFileID`). The FileDataID is used as a pseudo-displayId key: `portraits/7224879.png` + `fullbody/7224879.png`
-are found before any CDN lookup (which would 404 on a non-display id). Framed via `_frame.mjs` (a one-off head crop,
-centre 0.44,0.45 size 0.42 — matching the serpent set); re-frame in `portrait-framer.html` for polish if wanted.
+`145435` below).
+
+**Blade of the Altar (271453) — displayId `142336`, CORRECTED 2026-07-01.** First pass mis-keyed it to the raw **M2
+FileDataID `7224879`** because `/kmodel` (then) only read the base model — but that serpent rig (`sethrak_ulatek`,
+ModelID 16931) is shared by **74 colour displays**, so rendering the bare M2 gave the wrong skin (a green/High-Evo
+look). Its Wowhead PTR page (absent at first datamine, present now) gives displayId **142336**, and the updated
+`/kmodel 271453` (KeplerCoords **v0.8.1**, now reads `GetDisplayInfo`) **confirmed 142336 in-client** — the
+authoritative npc→display link. It's the **WHITE** variant (body `sethrak_ulatek_white` 7322088 / armor `_dark` 7322089
+/ `iridescence_white` 7322095; geosets FacialA1 + B3 + C4). **GOTCHA:** the white body tints green under dungeon light
+and the headdress is dark-crimson, which reads as "magenta" in a video — the purple sibling **137220** (irid_purple)
+and green sibling **142335** are look-alikes on the same A1B3C4 geometry; only the in-client `/kmodel` (or the body
+colour) tells them apart. Render as `142336.png` (Skins → `base (142336)`). The old `7224879.png` pseudo-key is retired.
 
 **Self-rendered (14 committed; full-body sources in `../fullbody/`):**
 
@@ -48,6 +54,7 @@ centre 0.44,0.45 size 0.42 — matching the serpent set); re-frame in `portrait-
 - [x] `137231.png` — Rattling Writhe
 - [x] `142320.png` — High Evolutionist *(green skin via `base (137210)` — texture-collapsed model; build-drift verified)*
 - [x] `142327.png` — Ula'tek's Chosen *(via `base (137216)`)*
+- [ ] `142336.png` — Blade of the Altar *(WHITE variant of the shared serpent rig; Skins → `base (142336)`; NOT the retired `7224879` pseudo-key)*
 - [x] `142340.png` — Ravenous Descendant
 - [x] `142361.png` — Uncoiled Writhe (covers npc 262398 + 270417)
 - [x] `142375.png` — Hatchling
@@ -118,6 +125,7 @@ manual tick-list, since wow.export shows named geoset groups rather than raw sub
 | `137231.png` | `7133447` ⚠ | 7537080 | default | Rattling Writhe |
 | `142320.png` | `7224879` ⚠ | 7322083, 7322087, 7322094 | 102, 201, 301 | High Evolutionist |
 | `142327.png` | `7224879` ⚠ | 7322090, 7322084, 7322091 | 102, 203, 303 | Ula'tek's Chosen |
+| `142336.png` | `7224879` ⚠ | 7322088, 7322089, 7322095 | 101, 203, 304 | Blade of the Altar (WHITE variant; purple sib 137220, green sib 142335) |
 | `142340.png` | `7133443` ⚠ | 7521612, 7521619, 7521618 | 101, 201, 301 | Ravenous Descendant |
 | `142361.png` | `1670968` ⚠ | 7454979 | default | Uncoiled Writhe (shares M2 with Bloodletter `104480`) |
 | `142375.png` | `801469` | 7454973 | default | Hatchling |
