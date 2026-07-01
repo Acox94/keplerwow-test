@@ -2538,6 +2538,24 @@ var KeplerEngine = (() => {
     if (ev && (ev.kind === "positioning" || ev.kind === "avoidable")) return "dodge";
     return null;
   }
+  function cardIntrinsic(cast) {
+    if (cast.primary_answer) return cast.primary_answer;
+    const isKick = cast.is_interruptible, isCC = cast.is_stoppable;
+    const present = /* @__PURE__ */ new Set();
+    if (cast.dispel_type === "Enrage") present.add("soothe");
+    if (CARD_REMOVABLE.has(cast.dispel_type)) present.add("dispel");
+    if (isKick) present.add("kick");
+    if (isCC) present.add("cc");
+    if (isCC && !isKick && !cast.is_boss) present.add("displace");
+    if (cast.mechanic === "rooted" || cast.mechanic === "snared") present.add("freedom");
+    if (cast.tank_buster) present.add("tank_buster");
+    if (/heal[-\s]?absorb/i.test(cast.coaching_note ?? "")) present.add("heal_absorb");
+    if (present.has("soothe")) return "soothe";
+    for (const ax of CARD_AXIS_PRIORITY) if (present.has(ax)) return ax;
+    const ev = cardEveryone(cast);
+    if (ev && (ev.kind === "positioning" || ev.kind === "avoidable")) return "dodge";
+    return null;
+  }
   function cardTags(cast, answers, primary) {
     const axes = /* @__PURE__ */ new Set();
     for (const role of ROLE_TAGS) for (const a of answers[role]) axes.add(a.axis);
@@ -2574,6 +2592,7 @@ var KeplerEngine = (() => {
         expect: cardExpect(cast),
         answers,
         primary_answer,
+        intrinsic_answer: cardIntrinsic(cast),
         everyone: cardEveryone(cast),
         tags: cardTags(cast, answers, primary_answer)
       });

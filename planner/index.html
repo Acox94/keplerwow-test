@@ -2183,6 +2183,10 @@ const V2_AXIS_LABEL = { kick: 'Kick', cc: 'CC', displace: 'Knock / Grip', dispel
 const V2_SOLUTION_LABEL = { kick: 'Interrupt', cc: 'Crowd Control', displace: 'Knock / Grip', dispel: 'Dispel', freedom: 'Freedom', soothe: 'Soothe', heal_absorb: 'Heal Absorb', tank_buster: 'Tank Buster', dodge: 'Dodge' };
 function renderCardV2(card, id, open) {
   const ans = card.answers, primary = card.primary_answer, tags = card.tags;
+  // FALLBACK for an empty/partial comp: when no spec COVERS the axis, primary_answer is null — show the
+  // mechanic's INTRINSIC answer (engine-derived from the cast's own flags) MUTED as the headline, so the
+  // card still reads "this is soothable / dispellable / kickable" rather than a bare severity word.
+  const headline = primary || card.intrinsic_answer, covered = !!primary;
   const everyone = fmtEveryone(card.everyone);
   const sevCls = KW_SEV_CLASS[card.severity] || 'kw-sev-info';
   const mut = 'color:var(--kw-ink-3,#7c8696)';
@@ -2220,12 +2224,14 @@ function renderCardV2(card, id, open) {
   const rec = spellRec(card.spell_id);
   // DISPEL/SOOTHE cards take the dispel-TYPE colour (Poison green, Magic blue …) as the card accent — driving
   // the headline, the icon box and the left edge — instead of the generic resolution colour.
-  const primaryTypeColor = primary === 'dispel' ? (DISPEL_TYPE_COLOR[rec && rec.dispel_type] || null)
-    : primary === 'soothe' ? DISPEL_TYPE_COLOR.Enrage : null;
-  const resColor = primaryTypeColor || V2_RES_COLOR[primary] || 'var(--kw-line,#2a2e3d)';
-  // LEFT EDGE: dispel/soothe use the dispel-type colour; the role/execution mechanic axes (heal_absorb /
-  // tank_buster / dodge) take their label colour too, so the edge matches the headline. Other axes keep severity.
-  const edgeColor = primaryTypeColor || (['heal_absorb', 'tank_buster', 'dodge', 'kick'].includes(primary) ? V2_RES_COLOR[primary] : null);
+  // headline-type colour (dispel/soothe key on the dispel TYPE) — from the HEADLINE axis so the intrinsic
+  // fallback gets the right colour too.
+  const headlineTypeColor = headline === 'dispel' ? (DISPEL_TYPE_COLOR[rec && rec.dispel_type] || null)
+    : headline === 'soothe' ? DISPEL_TYPE_COLOR.Enrage : null;
+  // icon box + edge tint ONLY when the comp COVERS the axis (a real, actionable answer). An uncovered
+  // (intrinsic-only) card keeps a neutral box + plain severity edge so it never masquerades as covered.
+  const resColor = covered ? (headlineTypeColor || V2_RES_COLOR[headline] || 'var(--kw-line,#2a2e3d)') : 'var(--kw-line,#2a2e3d)';
+  const edgeColor = covered ? (headlineTypeColor || (['heal_absorb', 'tank_buster', 'dodge', 'kick'].includes(primary) ? V2_RES_COLOR[primary] : null)) : null;
   const cms = rec ? rec.cast_time_ms : 0;
   const meta = [rec && rec.school, cms > 0 ? `${cms % 1000 === 0 ? cms / 1000 : (cms / 1000).toFixed(1)}s cast` : (rec ? 'instant' : ''), rec && rec.priority].filter(Boolean).join(' · ');
   const tipDesc = (SPELL_DESC[card.spell_id] || '').replace(/\r\n/g, '\n').replace(/\n{2,}/g, '\n').trim();
@@ -2269,27 +2275,31 @@ function renderCardV2(card, id, open) {
   // when collapsed, carrying the severity colour (kw-sevb), with a placeholder dispel/answer icon beside it.
   const cdMs = rec && rec.recast_cooldown_ms;
   const cdTxt = cdMs ? ` <span class="kw-cd">(${Math.round(cdMs / 1000)}s)</span>` : '';
-  const solLabel = primary ? (V2_SOLUTION_LABEL[primary] || primary) : (KW_SEV_LABEL[card.severity] || '');
-  // colour the headline by the dispel TYPE (dispel/soothe), else the RESOLUTION (matches the icon box + edge).
-  const solColor = primaryTypeColor || (primary ? (V2_RES_COLOR[primary] || '#0796ff') : 'var(--kw-sev-2)');
+  // The headline shows the ANSWER axis — primary when the comp covers it, else the intrinsic fallback — or
+  // the severity word only when the cast has no answer axis at all. An intrinsic-only headline is MUTED
+  // (color-mixed toward the muted grey) + carries a "no spec covers this" tooltip.
+  const solLabel = headline ? (V2_SOLUTION_LABEL[headline] || headline) : (KW_SEV_LABEL[card.severity] || '');
+  const brightSol = headlineTypeColor || (headline ? (V2_RES_COLOR[headline] || '#0796ff') : 'var(--kw-sev-2)');
+  const solColor = (headline && !covered) ? `color-mix(in srgb, ${brightSol} 52%, var(--kw-mut,#8b93a7))` : brightSol;
+  const solTitle = (headline && !covered) ? ' title="No spec in your current comp can do this — pick one that can (this is still how the mechanic is answered)."' : '';
   // dispel-icons/<key>.png — dispel answers key on the dispel TYPE (magic/curse/poison/disease/bleed),
   // others on the resolution (interrupt/cc/freedom/enrage/displace). Missing file -> the placeholder square.
-  const solKey = !primary ? null
-    : primary === 'dispel' ? ((rec && rec.dispel_type && rec.dispel_type !== 'None') ? rec.dispel_type.toLowerCase() : 'dispel')
-    : primary === 'kick' ? 'interrupt'
-    : primary === 'soothe' ? 'enrage'
-    : primary === 'heal_absorb' ? 'heal'
-    : primary === 'tank_buster' ? 'tank'
-    : primary === 'dodge' ? 'caution'
-    : primary; // cc / freedom / displace
+  const solKey = !headline ? null
+    : headline === 'dispel' ? ((rec && rec.dispel_type && rec.dispel_type !== 'None') ? rec.dispel_type.toLowerCase() : 'dispel')
+    : headline === 'kick' ? 'interrupt'
+    : headline === 'soothe' ? 'enrage'
+    : headline === 'heal_absorb' ? 'heal'
+    : headline === 'tank_buster' ? 'tank'
+    : headline === 'dodge' ? 'caution'
+    : headline; // cc / freedom / displace
   const solIcon = solKey
-    ? `<img class="kw-sol-icon-img" src="dispel-icons/${solKey}.png" alt="" onerror="this.outerHTML='<span class=&quot;kw-sol-icon&quot; style=&quot;border-color:${solColor}&quot;></span>'">`
+    ? `<img class="kw-sol-icon-img"${covered ? '' : ' style="opacity:.6"'} src="dispel-icons/${solKey}.png" alt="" onerror="this.outerHTML='<span class=&quot;kw-sol-icon&quot; style=&quot;border-color:${solColor}&quot;></span>'">`
     : '';
   return `<div class="kw-card kw-card--major ${sevCls}${open ? ' kw-card--open' : ''}" data-card="${esc(id)}"${edgeColor ? ` style="border-left-color:${edgeColor}"` : ''}>
       <div class="kw-card-head" role="button" tabindex="0" aria-expanded="${open ? 'true' : 'false'}" style="flex-direction:column;align-items:stretch;gap:3px">
         <div style="display:flex;align-items:center;gap:8px">
           <span class="kw-spell" style="flex:1;min-width:0"><span style="text-shadow:0 0 6px color-mix(in srgb, ${solColor} 80%, transparent)">${esc(card.spell_name)}</span>${cdTxt}</span>
-          <span style="display:inline-flex;align-items:center;gap:4px"><span class="kw-sevb" style="font-size:14px;color:${solColor}">${esc(solLabel)}</span>${solIcon}</span>
+          <span style="display:inline-flex;align-items:center;gap:4px"><span class="kw-sevb"${solTitle} style="font-size:14px;color:${solColor}">${esc(solLabel)}</span>${solIcon}</span>
           <div class="kw-hright">${KW_CHEV}</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
