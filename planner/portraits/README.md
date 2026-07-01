@@ -33,8 +33,13 @@ dist/altar-of-fangs.json`.
 **Already covered by a public CDN — no render needed:** Venom Leech `125502`, Bloodletter `104480`,
 Living Venom `58535` (all old reused models).
 
-**No displayId at all → always a name blip:** Blade of the Altar (271453, no Wowhead page), the
-scrape-id Zul'jan (267797). The real Zul'jan (combat id 259447) is `145435` below.
+**No displayId at all:** the scrape-id Zul'jan (267797) → name blip (the real Zul'jan, combat id 259447, is
+`145435` below). **Blade of the Altar (271453) — RESOLVED 2026-07-01 via `/kmodel`:** it has no Wowhead page /
+no CreatureDisplayInfo id, so its `display_id` is set to its **M2 FileDataID `7224879`** (the serpent model,
+shared with High Evolutionist/Ula'tek's Chosen), obtained from the in-game `/kmodel 271453` (`SetCreature →
+GetModelFileID`). The FileDataID is used as a pseudo-displayId key: `portraits/7224879.png` + `fullbody/7224879.png`
+are found before any CDN lookup (which would 404 on a non-display id). Framed via `_frame.mjs` (a one-off head crop,
+centre 0.44,0.45 size 0.42 — matching the serpent set); re-frame in `portrait-framer.html` for polish if wanted.
 
 **Self-rendered (14 committed; full-body sources in `../fullbody/`):**
 

@@ -1,7 +1,7 @@
 {
   "build_info": {
     "build_number": 68301,
-    "extracted_at": "2026-07-01T10:37:01.567Z",
+    "extracted_at": "2026-07-01T12:50:39.550Z",
     "patch_version": "12.1.0",
     "source_versions": {
       "curated": {
@@ -1702,7 +1702,7 @@
       "base_health": 2452393,
       "classification": null,
       "creature_type": "Humanoid",
-      "display_id": null,
+      "display_id": 7224879,
       "forces": null,
       "is_boss": false,
       "is_boss_add": false,
