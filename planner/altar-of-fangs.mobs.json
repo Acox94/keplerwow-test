@@ -1,8 +1,8 @@
 {
-  "_source": "manual placement (planner-spike editor) \u2014 floor 1 hand-audited; floors 2-3 from the combat-log capture",
+  "_source": "manual placement (planner-spike editor) — floor 1 hand-audited; floors 2-3 from the combat-log capture",
   "_placement": "manual",
-  "_frame": "image-fraction 0..1 of the floor PNG (identity fit; px = x*PNG_W, py = y*PNG_H)",
-  "_note": "Floor 1 (73): hand-placed + audited (LOCKED, treat as accurate). Floor 2 (55): from the temporal-merged capture, converted from the floor-2 fit {dx:-25,dy:-5} into image-fraction \u2014 to be audited in ?edit=1&f=1. Floor 3 (47): /kcal'd on 2590 (from the +11 clear, SV flushed) - wx/wy projected to image-fraction x/y; forces from the combined-log solve (single-run, PROVISIONAL - re-confirm with a 2nd floor-3 run). Audit positions in ?edit=1&f=2.",
+  "_frame": "image-fraction 0..1 of the floor PNG (identity fit; px = x*PNG_W, py = y*PNG_H). PNG = the true UiMap art layer bounds 1002x668 (DB2 UiMapArtStyleLayer id=1), cropped from the 1024x768 tile canvas 2026-06-30.",
+  "_note": "Floor 1 (73): hand-placed + audited (LOCKED, treat as accurate). Floor 2 (55): from the temporal-merged capture, converted from the floor-2 fit {dx:-25,dy:-5} into image-fraction — to be audited in ?edit=1&f=1. Floor 3 (47): /kcal'd on 2590 (from the +11 clear, SV flushed) - wx/wy projected to image-fraction x/y; forces from the combined-log solve (single-run, PROVISIONAL - re-confirm with a 2nd floor-3 run). Audit positions in ?edit=1&f=2. [crop migration 2026-06-30] PNGs cropped 1024x768->1002x668; mob fractions re-based x*=1024/1002, y*=768/668 (same pixel, so placements unchanged). [boss-add removal 2026-06-30] dropped 22 Uncoiled Writhe (262398+270417) placed instances — The Writhing Coil boss adds (forces 0, reform via Assimilation); kept in the roster (palette + threat analysis), removable/addable in ?edit=1. Floor 2 now 33 placed mobs, hand-audit pending.",
   "floors": {
     "2588": 1,
     "2589": 2,
@@ -20,8 +20,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.48926,
-      "y": 0.33333
+      "x": 0.5,
+      "y": 0.38323
     },
     {
       "iid": "261553_2",
@@ -34,8 +34,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.4707,
-      "y": 0.33333
+      "x": 0.48103,
+      "y": 0.38323
     },
     {
       "iid": "261560_3",
@@ -48,8 +48,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.46777,
-      "y": 0.34245
+      "x": 0.47804,
+      "y": 0.39371
     },
     {
       "iid": "261554_4",
@@ -62,8 +62,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.47949,
-      "y": 0.33203
+      "x": 0.49002,
+      "y": 0.38174
     },
     {
       "iid": "261560_5",
@@ -76,8 +76,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.49219,
-      "y": 0.34245
+      "x": 0.503,
+      "y": 0.39371
     },
     {
       "iid": "270306_6",
@@ -90,8 +90,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.38696,
-      "y": 0.33464
+      "x": 0.39546,
+      "y": 0.38474
     },
     {
       "iid": "261553_7",
@@ -104,8 +104,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.39941,
-      "y": 0.32943
+      "x": 0.40818,
+      "y": 0.37875
     },
     {
       "iid": "261553_8",
@@ -118,8 +118,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.39941,
-      "y": 0.34115
+      "x": 0.40818,
+      "y": 0.39222
     },
     {
       "iid": "261560_9",
@@ -132,8 +132,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.39258,
-      "y": 0.34896
+      "x": 0.4012,
+      "y": 0.4012
     },
     {
       "iid": "261560_10",
@@ -146,8 +146,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.39258,
-      "y": 0.32031
+      "x": 0.4012,
+      "y": 0.36826
     },
     {
       "iid": "261550_11",
@@ -160,8 +160,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.42969,
-      "y": 0.20443
+      "x": 0.43912,
+      "y": 0.23503
     },
     {
       "iid": "261550_12",
@@ -174,8 +174,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.52246,
-      "y": 0.20443
+      "x": 0.53393,
+      "y": 0.23503
     },
     {
       "iid": "261550_13",
@@ -188,8 +188,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51585,
-      "y": 0.22057
+      "x": 0.52718,
+      "y": 0.25359
     },
     {
       "iid": "261550_14",
@@ -202,8 +202,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.5127,
-      "y": 0.29948
+      "x": 0.52396,
+      "y": 0.34431
     },
     {
       "iid": "261550_15",
@@ -216,8 +216,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.4248,
-      "y": 0.21224
+      "x": 0.43413,
+      "y": 0.24401
     },
     {
       "iid": "261550_16",
@@ -230,8 +230,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.42188,
-      "y": 0.20182
+      "x": 0.43114,
+      "y": 0.23203
     },
     {
       "iid": "261550_17",
@@ -244,8 +244,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.42773,
-      "y": 0.19401
+      "x": 0.43712,
+      "y": 0.22305
     },
     {
       "iid": "261550_18",
@@ -258,8 +258,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.50879,
-      "y": 0.29036
+      "x": 0.51996,
+      "y": 0.33383
     },
     {
       "iid": "261550_19",
@@ -272,8 +272,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.5166,
-      "y": 0.29036
+      "x": 0.52794,
+      "y": 0.33383
     },
     {
       "iid": "261550_20",
@@ -286,8 +286,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.41992,
-      "y": 0.19141
+      "x": 0.42914,
+      "y": 0.22006
     },
     {
       "iid": "261550_21",
@@ -300,8 +300,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.45215,
-      "y": 0.36979
+      "x": 0.46208,
+      "y": 0.42515
     },
     {
       "iid": "261550_22",
@@ -314,8 +314,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.45703,
-      "y": 0.375
+      "x": 0.46706,
+      "y": 0.43114
     },
     {
       "iid": "261553_23",
@@ -328,8 +328,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.43652,
-      "y": 0.37891
+      "x": 0.4461,
+      "y": 0.43563
     },
     {
       "iid": "261553_24",
@@ -342,8 +342,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.45996,
-      "y": 0.38281
+      "x": 0.47006,
+      "y": 0.44012
     },
     {
       "iid": "261553_25",
@@ -356,8 +356,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.44727,
-      "y": 0.38802
+      "x": 0.45709,
+      "y": 0.44611
     },
     {
       "iid": "261550_26",
@@ -370,8 +370,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.44434,
-      "y": 0.36849
+      "x": 0.4541,
+      "y": 0.42365
     },
     {
       "iid": "261553_27",
@@ -384,8 +384,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.45703,
-      "y": 0.38802
+      "x": 0.46706,
+      "y": 0.44611
     },
     {
       "iid": "261553_28",
@@ -398,8 +398,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.43848,
-      "y": 0.36849
+      "x": 0.44811,
+      "y": 0.42365
     },
     {
       "iid": "261553_29",
@@ -412,8 +412,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.47266,
-      "y": 0.40104
+      "x": 0.48304,
+      "y": 0.46108
     },
     {
       "iid": "261553_30",
@@ -426,8 +426,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.47949,
-      "y": 0.45443
+      "x": 0.49002,
+      "y": 0.52246
     },
     {
       "iid": "261553_31",
@@ -440,8 +440,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.47559,
-      "y": 0.46354
+      "x": 0.48603,
+      "y": 0.53293
     },
     {
       "iid": "261553_32",
@@ -454,8 +454,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.4834,
-      "y": 0.46354
+      "x": 0.49401,
+      "y": 0.53293
     },
     {
       "iid": "261554_33",
@@ -468,8 +468,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.47266,
-      "y": 0.52474
+      "x": 0.48304,
+      "y": 0.60329
     },
     {
       "iid": "261553_34",
@@ -482,8 +482,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.44727,
-      "y": 0.47656
+      "x": 0.45709,
+      "y": 0.5479
     },
     {
       "iid": "270306_35",
@@ -496,8 +496,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.43848,
-      "y": 0.48177
+      "x": 0.44811,
+      "y": 0.55389
     },
     {
       "iid": "261553_36",
@@ -510,8 +510,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.44336,
-      "y": 0.47135
+      "x": 0.45309,
+      "y": 0.54191
     },
     {
       "iid": "261560_37",
@@ -524,8 +524,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.44727,
-      "y": 0.48307
+      "x": 0.45709,
+      "y": 0.55539
     },
     {
       "iid": "261560_38",
@@ -538,8 +538,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.43848,
-      "y": 0.47005
+      "x": 0.44811,
+      "y": 0.54042
     },
     {
       "iid": "261550_39",
@@ -552,8 +552,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.44141,
-      "y": 0.44661
+      "x": 0.4511,
+      "y": 0.51347
     },
     {
       "iid": "261550_40",
@@ -566,8 +566,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.44043,
-      "y": 0.4375
+      "x": 0.4501,
+      "y": 0.50299
     },
     {
       "iid": "261550_41",
@@ -580,8 +580,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.43457,
-      "y": 0.44271
+      "x": 0.44411,
+      "y": 0.50898
     },
     {
       "iid": "261560_42",
@@ -594,8 +594,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51074,
-      "y": 0.38542
+      "x": 0.52195,
+      "y": 0.44312
     },
     {
       "iid": "261550_43",
@@ -608,8 +608,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.50977,
-      "y": 0.3763
+      "x": 0.52096,
+      "y": 0.43263
     },
     {
       "iid": "261550_44",
@@ -622,8 +622,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51294,
-      "y": 0.36691
+      "x": 0.5242,
+      "y": 0.42184
     },
     {
       "iid": "261560_45",
@@ -636,8 +636,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51807,
-      "y": 0.37598
+      "x": 0.52944,
+      "y": 0.43226
     },
     {
       "iid": "261550_46",
@@ -650,8 +650,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.52246,
-      "y": 0.21484
+      "x": 0.53393,
+      "y": 0.247
     },
     {
       "iid": "261550_47",
@@ -664,8 +664,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51535,
-      "y": 0.21099
+      "x": 0.52667,
+      "y": 0.24258
     },
     {
       "iid": "261550_48",
@@ -678,8 +678,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.50781,
-      "y": 0.29688
+      "x": 0.51896,
+      "y": 0.34132
     },
     {
       "iid": "261550_49",
@@ -692,8 +692,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51514,
-      "y": 0.20117
+      "x": 0.52645,
+      "y": 0.23129
     },
     {
       "iid": "261550_50",
@@ -706,8 +706,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51758,
-      "y": 0.29688
+      "x": 0.52894,
+      "y": 0.34132
     },
     {
       "iid": "261560_51",
@@ -720,8 +720,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.43359,
-      "y": 0.28906
+      "x": 0.44311,
+      "y": 0.33233
     },
     {
       "iid": "261560_52",
@@ -734,8 +734,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.4375,
-      "y": 0.29297
+      "x": 0.44711,
+      "y": 0.33683
     },
     {
       "iid": "270306_53",
@@ -748,8 +748,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.56934,
-      "y": 0.33464
+      "x": 0.58184,
+      "y": 0.38474
     },
     {
       "iid": "261553_54",
@@ -762,8 +762,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.55762,
-      "y": 0.34049
+      "x": 0.56986,
+      "y": 0.39146
     },
     {
       "iid": "261553_55",
@@ -776,8 +776,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.55762,
-      "y": 0.32943
+      "x": 0.56986,
+      "y": 0.37875
     },
     {
       "iid": "261560_56",
@@ -790,8 +790,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.56445,
-      "y": 0.32161
+      "x": 0.57684,
+      "y": 0.36976
     },
     {
       "iid": "261560_57",
@@ -804,8 +804,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.56445,
-      "y": 0.34896
+      "x": 0.57684,
+      "y": 0.4012
     },
     {
       "iid": "261550_58",
@@ -818,8 +818,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.50573,
-      "y": 0.36735
+      "x": 0.51683,
+      "y": 0.42234
     },
     {
       "iid": "261553_59",
@@ -832,8 +832,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.48535,
-      "y": 0.40104
+      "x": 0.49601,
+      "y": 0.46108
     },
     {
       "iid": "261550_60",
@@ -846,8 +846,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.50919,
-      "y": 0.43442
+      "x": 0.52037,
+      "y": 0.49945
     },
     {
       "iid": "261550_61",
@@ -860,8 +860,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51414,
-      "y": 0.43372
+      "x": 0.52543,
+      "y": 0.49865
     },
     {
       "iid": "261550_62",
@@ -874,8 +874,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51981,
-      "y": 0.43035
+      "x": 0.53122,
+      "y": 0.49477
     },
     {
       "iid": "261550_63",
@@ -888,8 +888,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51614,
-      "y": 0.42432
+      "x": 0.52747,
+      "y": 0.48784
     },
     {
       "iid": "270306_64",
@@ -902,8 +902,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.52148,
-      "y": 0.47786
+      "x": 0.53293,
+      "y": 0.5494
     },
     {
       "iid": "261553_65",
@@ -916,8 +916,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51465,
-      "y": 0.46484
+      "x": 0.52595,
+      "y": 0.53443
     },
     {
       "iid": "261553_66",
@@ -930,8 +930,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51074,
-      "y": 0.47135
+      "x": 0.52195,
+      "y": 0.54191
     },
     {
       "iid": "261560_67",
@@ -944,8 +944,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.52148,
-      "y": 0.46354
+      "x": 0.53293,
+      "y": 0.53293
     },
     {
       "iid": "261560_68",
@@ -958,8 +958,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.51074,
-      "y": 0.48047
+      "x": 0.52195,
+      "y": 0.5524
     },
     {
       "iid": "261554_69",
@@ -972,8 +972,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.4873,
-      "y": 0.52474
+      "x": 0.498,
+      "y": 0.60329
     },
     {
       "iid": "259445_70",
@@ -986,8 +986,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.50879,
-      "y": 0.68359
+      "x": 0.51996,
+      "y": 0.78592
     },
     {
       "iid": "264798_71",
@@ -1000,8 +1000,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.48039,
-      "y": 0.74817
+      "x": 0.49094,
+      "y": 0.86017
     },
     {
       "iid": "264798_72",
@@ -1014,8 +1014,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.44837,
-      "y": 0.69452
+      "x": 0.45821,
+      "y": 0.79849
     },
     {
       "iid": "261553_73",
@@ -1028,8 +1028,8 @@
       "known": true,
       "uiMapID": 2588,
       "sublevel": 1,
-      "x": 0.43945,
-      "y": 0.38802
+      "x": 0.4491,
+      "y": 0.44611
     },
     {
       "iid": "264798_74",
@@ -1042,8 +1042,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.43916,
-      "y": 0.20927
+      "x": 0.4488,
+      "y": 0.2406
     },
     {
       "iid": "264798_75",
@@ -1056,8 +1056,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.43386,
-      "y": 0.21557
+      "x": 0.44339,
+      "y": 0.24784
     },
     {
       "iid": "261557_76",
@@ -1070,8 +1070,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.43636,
-      "y": 0.19337
+      "x": 0.44594,
+      "y": 0.22232
     },
     {
       "iid": "261557_77",
@@ -1084,8 +1084,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.42253,
-      "y": 0.20801
+      "x": 0.43181,
+      "y": 0.23915
     },
     {
       "iid": "261552_78",
@@ -1098,8 +1098,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.46086,
-      "y": 0.23735
+      "x": 0.47098,
+      "y": 0.27288
     },
     {
       "iid": "261552_79",
@@ -1112,8 +1112,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.44776,
-      "y": 0.24848
+      "x": 0.45759,
+      "y": 0.28568
     },
     {
       "iid": "261552_80",
@@ -1126,8 +1126,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.42146,
-      "y": 0.28082
+      "x": 0.43071,
+      "y": 0.32286
     },
     {
       "iid": "261557_81",
@@ -1140,8 +1140,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.43703,
-      "y": 0.28623
+      "x": 0.44663,
+      "y": 0.32908
     },
     {
       "iid": "262011_82",
@@ -1154,8 +1154,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.45204,
-      "y": 0.27372
+      "x": 0.46197,
+      "y": 0.3147
     },
     {
       "iid": "264798_83",
@@ -1168,8 +1168,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.41776,
-      "y": 0.29471
+      "x": 0.42693,
+      "y": 0.33883
     },
     {
       "iid": "264798_84",
@@ -1182,8 +1182,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.3929,
-      "y": 0.25815
+      "x": 0.40153,
+      "y": 0.2968
     },
     {
       "iid": "261557_85",
@@ -1196,8 +1196,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.40642,
-      "y": 0.24475
+      "x": 0.41534,
+      "y": 0.28139
     },
     {
       "iid": "261552_86",
@@ -1210,8 +1210,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.43613,
-      "y": 0.28089
+      "x": 0.44571,
+      "y": 0.32294
     },
     {
       "iid": "264798_87",
@@ -1224,8 +1224,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.44976,
-      "y": 0.22061
+      "x": 0.45963,
+      "y": 0.25364
     },
     {
       "iid": "264798_88",
@@ -1238,8 +1238,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.48331,
-      "y": 0.16658
+      "x": 0.49392,
+      "y": 0.19152
     },
     {
       "iid": "261557_89",
@@ -1252,8 +1252,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.48005,
-      "y": 0.18916
+      "x": 0.49059,
+      "y": 0.21748
     },
     {
       "iid": "261552_90",
@@ -1266,8 +1266,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.46447,
-      "y": 0.17656
+      "x": 0.47467,
+      "y": 0.20299
     },
     {
       "iid": "264798_91",
@@ -1280,8 +1280,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.43919,
-      "y": 0.23084
+      "x": 0.44883,
+      "y": 0.2654
     },
     {
       "iid": "264798_92",
@@ -1294,8 +1294,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.47453,
-      "y": 0.15857
+      "x": 0.48495,
+      "y": 0.18231
     },
     {
       "iid": "264798_93",
@@ -1308,8 +1308,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.52618,
-      "y": 0.22696
+      "x": 0.53773,
+      "y": 0.26094
     },
     {
       "iid": "261552_94",
@@ -1322,8 +1322,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.50711,
-      "y": 0.18766
+      "x": 0.51824,
+      "y": 0.21575
     },
     {
       "iid": "261557_95",
@@ -1336,8 +1336,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.52243,
-      "y": 0.20775
+      "x": 0.5339,
+      "y": 0.23885
     },
     {
       "iid": "261552_96",
@@ -1350,8 +1350,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.53206,
-      "y": 0.20981
+      "x": 0.54374,
+      "y": 0.24122
     },
     {
       "iid": "262011_97",
@@ -1364,8 +1364,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.50405,
-      "y": 0.27141
+      "x": 0.51512,
+      "y": 0.31204
     },
     {
       "iid": "261552_98",
@@ -1378,8 +1378,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.50092,
-      "y": 0.27742
+      "x": 0.51192,
+      "y": 0.31895
     },
     {
       "iid": "261552_99",
@@ -1392,8 +1392,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.50808,
-      "y": 0.2666
+      "x": 0.51924,
+      "y": 0.30651
     },
     {
       "iid": "262011_100",
@@ -1406,8 +1406,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.66375,
-      "y": 0.48014
+      "x": 0.67832,
+      "y": 0.55202
     },
     {
       "iid": "261552_101",
@@ -1420,8 +1420,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.66705,
-      "y": 0.50911
+      "x": 0.6817,
+      "y": 0.58532
     },
     {
       "iid": "261552_102",
@@ -1434,8 +1434,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.67589,
-      "y": 0.50033
+      "x": 0.69073,
+      "y": 0.57523
     },
     {
       "iid": "261552_103",
@@ -1448,8 +1448,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.65522,
-      "y": 0.50646
+      "x": 0.66961,
+      "y": 0.58228
     },
     {
       "iid": "261557_104",
@@ -1462,8 +1462,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.67809,
-      "y": 0.46077
+      "x": 0.69298,
+      "y": 0.52975
     },
     {
       "iid": "261557_105",
@@ -1476,78 +1476,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.65583,
-      "y": 0.49714
-    },
-    {
-      "iid": "270417_106",
-      "npc_id": 270417,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.67844,
-      "y": 0.53012
-    },
-    {
-      "iid": "270417_107",
-      "npc_id": 270417,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.66568,
-      "y": 0.50911
-    },
-    {
-      "iid": "270417_108",
-      "npc_id": 270417,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.68073,
-      "y": 0.49508
-    },
-    {
-      "iid": "270417_109",
-      "npc_id": 270417,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.68616,
-      "y": 0.53824
-    },
-    {
-      "iid": "270417_110",
-      "npc_id": 270417,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.65877,
-      "y": 0.52152
+      "x": 0.67023,
+      "y": 0.57156
     },
     {
       "iid": "259446_111",
@@ -1560,246 +1490,8 @@
       "known": true,
       "uiMapID": 2589,
       "sublevel": 2,
-      "x": 0.66372,
-      "y": 0.49405
-    },
-    {
-      "iid": "262398_112",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.68638,
-      "y": 0.47405
-    },
-    {
-      "iid": "262398_113",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.68034,
-      "y": 0.52112
-    },
-    {
-      "iid": "262398_114",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.63386,
-      "y": 0.46471
-    },
-    {
-      "iid": "262398_115",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.65334,
-      "y": 0.45621
-    },
-    {
-      "iid": "262398_116",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.64204,
-      "y": 0.51447
-    },
-    {
-      "iid": "262398_117",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.61904,
-      "y": 0.48255
-    },
-    {
-      "iid": "262398_118",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.61544,
-      "y": 0.45604
-    },
-    {
-      "iid": "262398_119",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.67106,
-      "y": 0.51482
-    },
-    {
-      "iid": "262398_120",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.65481,
-      "y": 0.42913
-    },
-    {
-      "iid": "262398_121",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.61696,
-      "y": 0.43497
-    },
-    {
-      "iid": "262398_122",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.6259,
-      "y": 0.44014
-    },
-    {
-      "iid": "262398_123",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.62715,
-      "y": 0.46913
-    },
-    {
-      "iid": "262398_124",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.64418,
-      "y": 0.49789
-    },
-    {
-      "iid": "262398_125",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.66597,
-      "y": 0.53183
-    },
-    {
-      "iid": "262398_126",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.70017,
-      "y": 0.5304
-    },
-    {
-      "iid": "262398_127",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.62831,
-      "y": 0.51944
-    },
-    {
-      "iid": "262398_128",
-      "npc_id": 262398,
-      "name": "Uncoiled Writhe",
-      "boss": false,
-      "did": 142361,
-      "type": "Beast",
-      "forces": 0,
-      "known": true,
-      "uiMapID": 2589,
-      "sublevel": 2,
-      "x": 0.67568,
-      "y": 0.42792
+      "x": 0.67829,
+      "y": 0.56801
     },
     {
       "iid": "261557_129",
@@ -1812,8 +1504,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.62657,
-      "y": 0.60714,
+      "x": 0.64033,
+      "y": 0.69803,
       "wx": 1142.19,
       "wy": 1950.99
     },
@@ -1828,8 +1520,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.62609,
-      "y": 0.66146,
+      "x": 0.63984,
+      "y": 0.76048,
       "wx": 1105.12,
       "wy": 1951.44
     },
@@ -1844,8 +1536,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.63598,
-      "y": 0.64009,
+      "x": 0.64994,
+      "y": 0.73591,
       "wx": 1119.71,
       "wy": 1942.31
     },
@@ -1860,8 +1552,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.63132,
-      "y": 0.62927,
+      "x": 0.64518,
+      "y": 0.72347,
       "wx": 1127.09,
       "wy": 1946.6
     },
@@ -1876,8 +1568,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.58561,
-      "y": 0.66124,
+      "x": 0.59847,
+      "y": 0.76023,
       "wx": 1105.28,
       "wy": 1988.8
     },
@@ -1892,8 +1584,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.58497,
-      "y": 0.60587,
+      "x": 0.59781,
+      "y": 0.69657,
       "wx": 1143.06,
       "wy": 1989.38
     },
@@ -1908,8 +1600,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.58894,
-      "y": 0.62185,
+      "x": 0.60187,
+      "y": 0.71494,
       "wx": 1132.16,
       "wy": 1985.72
     },
@@ -1924,8 +1616,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.60574,
-      "y": 0.63353,
+      "x": 0.61904,
+      "y": 0.72837,
       "wx": 1124.19,
       "wy": 1970.22
     },
@@ -1940,8 +1632,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.58217,
-      "y": 0.69712,
+      "x": 0.59495,
+      "y": 0.80148,
       "wx": 1080.79,
       "wy": 1991.97
     },
@@ -1956,8 +1648,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.57901,
-      "y": 0.70597,
+      "x": 0.59172,
+      "y": 0.81165,
       "wx": 1074.76,
       "wy": 1994.89
     },
@@ -1972,8 +1664,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.47644,
-      "y": 0.61059,
+      "x": 0.4869,
+      "y": 0.702,
       "wx": 1139.83,
       "wy": 2089.56
     },
@@ -1988,8 +1680,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.47763,
-      "y": 0.61235,
+      "x": 0.48812,
+      "y": 0.70402,
       "wx": 1138.63,
       "wy": 2088.46
     },
@@ -2004,8 +1696,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46088,
-      "y": 0.68325,
+      "x": 0.471,
+      "y": 0.78553,
       "wx": 1090.26,
       "wy": 2103.92
     },
@@ -2020,8 +1712,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46418,
-      "y": 0.69343,
+      "x": 0.47437,
+      "y": 0.79724,
       "wx": 1083.31,
       "wy": 2100.87
     },
@@ -2036,8 +1728,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.43791,
-      "y": 0.71385,
+      "x": 0.44752,
+      "y": 0.82071,
       "wx": 1069.38,
       "wy": 2125.12
     },
@@ -2052,8 +1744,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46281,
-      "y": 0.71252,
+      "x": 0.47297,
+      "y": 0.81918,
       "wx": 1070.29,
       "wy": 2102.14
     },
@@ -2068,8 +1760,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45049,
-      "y": 0.71993,
+      "x": 0.46038,
+      "y": 0.8277,
       "wx": 1065.23,
       "wy": 2113.51
     },
@@ -2084,8 +1776,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45505,
-      "y": 0.67773,
+      "x": 0.46504,
+      "y": 0.77919,
       "wx": 1094.02,
       "wy": 2109.31
     },
@@ -2100,8 +1792,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44819,
-      "y": 0.68714,
+      "x": 0.45803,
+      "y": 0.79001,
       "wx": 1087.6,
       "wy": 2115.63
     },
@@ -2116,8 +1808,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44832,
-      "y": 0.69855,
+      "x": 0.45816,
+      "y": 0.80312,
       "wx": 1079.82,
       "wy": 2115.52
     },
@@ -2132,8 +1824,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45265,
-      "y": 0.62279,
+      "x": 0.46259,
+      "y": 0.71602,
       "wx": 1131.51,
       "wy": 2111.52
     },
@@ -2148,8 +1840,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45303,
-      "y": 0.61346,
+      "x": 0.46298,
+      "y": 0.7053,
       "wx": 1137.88,
       "wy": 2111.17
     },
@@ -2164,8 +1856,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44436,
-      "y": 0.61396,
+      "x": 0.45412,
+      "y": 0.70587,
       "wx": 1137.54,
       "wy": 2119.17
     },
@@ -2180,8 +1872,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45565,
-      "y": 0.6192,
+      "x": 0.46565,
+      "y": 0.71189,
       "wx": 1133.96,
       "wy": 2108.75
     },
@@ -2196,8 +1888,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45859,
-      "y": 0.63772,
+      "x": 0.46866,
+      "y": 0.73319,
       "wx": 1121.33,
       "wy": 2106.04
     },
@@ -2212,8 +1904,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.4694,
-      "y": 0.54029,
+      "x": 0.47971,
+      "y": 0.62117,
       "wx": 1187.8,
       "wy": 2096.05
     },
@@ -2228,8 +1920,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46843,
-      "y": 0.5745,
+      "x": 0.47871,
+      "y": 0.6605,
       "wx": 1164.46,
       "wy": 2096.95
     },
@@ -2244,8 +1936,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46384,
-      "y": 0.55572,
+      "x": 0.47402,
+      "y": 0.63891,
       "wx": 1177.27,
       "wy": 2101.19
     },
@@ -2260,8 +1952,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46806,
-      "y": 0.53567,
+      "x": 0.47834,
+      "y": 0.61586,
       "wx": 1190.95,
       "wy": 2097.29
     },
@@ -2276,8 +1968,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.46165,
-      "y": 0.54721,
+      "x": 0.47179,
+      "y": 0.62913,
       "wx": 1183.08,
       "wy": 2103.2
     },
@@ -2292,8 +1984,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.4747,
-      "y": 0.54323,
+      "x": 0.48512,
+      "y": 0.62455,
       "wx": 1185.8,
       "wy": 2091.17
     },
@@ -2308,8 +2000,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.4752,
-      "y": 0.56878,
+      "x": 0.48563,
+      "y": 0.65393,
       "wx": 1168.36,
       "wy": 2090.7
     },
@@ -2324,8 +2016,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.41975,
-      "y": 0.4746,
+      "x": 0.42897,
+      "y": 0.54565,
       "wx": 1232.62,
       "wy": 2141.88
     },
@@ -2340,8 +2032,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44169,
-      "y": 0.42994,
+      "x": 0.45139,
+      "y": 0.4943,
       "wx": 1263.09,
       "wy": 2121.63
     },
@@ -2356,8 +2048,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44384,
-      "y": 0.43551,
+      "x": 0.45358,
+      "y": 0.50071,
       "wx": 1259.29,
       "wy": 2119.65
     },
@@ -2372,8 +2064,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45379,
-      "y": 0.42939,
+      "x": 0.46375,
+      "y": 0.49367,
       "wx": 1263.47,
       "wy": 2110.47
     },
@@ -2388,8 +2080,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.43569,
-      "y": 0.43531,
+      "x": 0.44526,
+      "y": 0.50048,
       "wx": 1259.43,
       "wy": 2127.17
     },
@@ -2404,8 +2096,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45473,
-      "y": 0.43722,
+      "x": 0.46471,
+      "y": 0.50267,
       "wx": 1258.13,
       "wy": 2109.6
     },
@@ -2420,8 +2112,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.47016,
-      "y": 0.47415,
+      "x": 0.48048,
+      "y": 0.54513,
       "wx": 1232.93,
       "wy": 2095.36
     },
@@ -2436,8 +2128,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.42343,
-      "y": 0.44303,
+      "x": 0.43273,
+      "y": 0.50935,
       "wx": 1254.16,
       "wy": 2138.49
     },
@@ -2452,8 +2144,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.43813,
-      "y": 0.45547,
+      "x": 0.44775,
+      "y": 0.52365,
       "wx": 1245.67,
       "wy": 2124.92
     },
@@ -2468,8 +2160,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44133,
-      "y": 0.21121,
+      "x": 0.45102,
+      "y": 0.24283,
       "wx": 1412.33,
       "wy": 2121.97
     },
@@ -2484,8 +2176,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44399,
-      "y": 0.20454,
+      "x": 0.45374,
+      "y": 0.23516,
       "wx": 1416.88,
       "wy": 2119.51
     },
@@ -2500,8 +2192,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.4533,
-      "y": 0.20445,
+      "x": 0.46325,
+      "y": 0.23506,
       "wx": 1416.95,
       "wy": 2110.93
     },
@@ -2516,8 +2208,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.45607,
-      "y": 0.21163,
+      "x": 0.46608,
+      "y": 0.24331,
       "wx": 1412.05,
       "wy": 2108.36
     },
@@ -2532,8 +2224,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.4484,
-      "y": 0.21079,
+      "x": 0.45825,
+      "y": 0.24235,
       "wx": 1412.62,
       "wy": 2115.44
     },
@@ -2548,8 +2240,8 @@
       "known": true,
       "uiMapID": 2590,
       "sublevel": 3,
-      "x": 0.44832,
-      "y": 0.20002,
+      "x": 0.45816,
+      "y": 0.22996,
       "wx": 1419.97,
       "wy": 2115.52
     }

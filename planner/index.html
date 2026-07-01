@@ -621,10 +621,14 @@ const DUNGEONS = {
     dist:'./altar-of-fangs.json', mobs:'./altar-of-fangs.mobs.json', normalized:true,
     // Multi-floor: each painted UiMap (1024×768) seats its OWN sublevel's mobs (mobs.json carries
     // `sublevel`). Manual placement → identity fit (the per-floor `fit` is unused at render).
+    // W/H = the TRUE UiMap art layer bounds (1002x668, DB2 UiMapArtStyleLayer id=1) — the frame /kcal
+    // + MDT + C_Map author coords in. The PNGs were cropped from the 1024x768 tile canvas to match, so
+    // fit is IDENTITY for every floor (px = u*W). Any future non-zero fit here would be genuine /kcal
+    // calibration residue, NOT padding. See adding-a-dungeon.md / the crop note in stitch-uimap.mjs.
     floors:[
-      { sublevel:1, label:'Floor 1', map:'./altar-of-fangs-2588.png', W:1024, H:768, fit:{ sx:1, sy:0.834, dx:-11, dy:-46 } },
-      { sublevel:2, label:'Floor 2', map:'./altar-of-fangs-2589.png', W:1024, H:768, fit:{ sx:1, sy:1, dx:-25, dy:-5 } },  // calibrated: art fills the frame (sy 1, no compression) + a small left/up nudge to seat both packs
-      { sublevel:3, label:'Floor 3', map:'./altar-of-fangs-2590.png', W:1024, H:768, fit:{ sx:1, sy:1, dx:0, dy:0 } },  // /kcal'd on 2590 from the +11 clear — x/y projected from world coords; audit in ?edit=1&f=2
+      { sublevel:1, label:'Floor 1', map:'./altar-of-fangs-2588.png', W:1002, H:668, fit:{ sx:1, sy:1, dx:0, dy:0 } },
+      { sublevel:2, label:'Floor 2', map:'./altar-of-fangs-2589.png', W:1002, H:668, fit:{ sx:1, sy:1, dx:0, dy:0 } },
+      { sublevel:3, label:'Floor 3', map:'./altar-of-fangs-2590.png', W:1002, H:668, fit:{ sx:1, sy:1, dx:0, dy:0 } },
     ] },
 };
 const _params = new URLSearchParams(location.search);
